@@ -13,6 +13,13 @@ export interface Occurence {
 export interface Incident {
   type: string;
   occurrences: Occurence[];
+  validity: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  ignore_sha: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  known_secret: boolean;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  incident_url: string;
 }
 
 export interface EntityWithIncidents {

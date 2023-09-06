@@ -26,6 +26,8 @@ NB: The extension uses the quota of secret detection of your ggshield API token.
 - When a file is opened or saved, it is scanned using the ggshield CLI application
 - Found incidents are highlighted in code and available in the `Problems` panel as warnings
 
+![Incident highlighted](./doc/incident_highlighted.png)
+
 ## Getting started
 
 ### Requirements
@@ -47,6 +49,8 @@ Once released it will installed directly from the VS Code Marketplace.
 - `ggshield.apiKey`: GitGuardian Internal Monitoring API key
 - `ggshield.apiUrl`: GitGuardian Internal Monitoring URL (default: <https://api.gitguardian.com/>)
 
+![Settings](./doc/settings.png)
+
 ## Known issues
 
 - During starting debug with files already open, the VSCode API is triggered on a non-existent read-only file with `.git` extension.
@@ -62,12 +66,3 @@ See [Change log](./CHANGELOG.md)
 ## License
 
 ggshield and this extension are MIT licensed.
-
-- Extension not tested
-
-- Not all the output of ggshield is visible in the diagnostics (e.g. validity or secret SHA) => to be added
-- No help to remediate to incidents is offered => at least a link to doc for the first version
-
-- Exclude files with pattern to save quota => check if available in ggshield / otherwise config file
-- Check minimum VSCode engine version
-- Add screenshots
