@@ -28,6 +28,8 @@ NB: The extension uses the quota of secret detection of your ggshield API token.
 
 - When a file is opened or saved, it is scanned using the ggshield CLI application
 - Found incidents are highlighted in code and available in the `Problems` panel as warnings
+- Secrets can be ignored running the command `ggshield: Ignore last found incidents`
+- The API quota can be checked running the command `ggshield: Show quota`
 
 ![Incident highlighted](./doc/incident_highlighted.png)
 
