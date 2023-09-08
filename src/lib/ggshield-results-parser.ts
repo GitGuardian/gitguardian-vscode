@@ -1,12 +1,19 @@
-import { Diagnostic, Range, Position, DiagnosticSeverity } from "vscode";
+import {
+  Diagnostic,
+  Range,
+  Position,
+  DiagnosticSeverity,
+  window,
+} from "vscode";
 import {
   GGShieldScanResults,
   EntityWithIncidents,
   Incident,
   Occurence,
+  Validity,
 } from "./api-types";
 
-const validityDisplayName: Record<string, string> = {
+const validityDisplayName: Record<Validity, string> = {
   unknown: "Unknown",
   // eslint-disable-next-line @typescript-eslint/naming-convention
   cannot_check: "Cannot Check",
@@ -30,58 +37,37 @@ export function parseGGShieldResults(
   results: GGShieldScanResults
 ): Diagnostic[] {
   let diagnostics: Diagnostic[] = [];
-  results.entities_with_incidents.forEach(
-    (entityWithIncidents: EntityWithIncidents) => {
-      entityWithIncidents.incidents.forEach((incident: Incident) => {
-        incident.occurrences.forEach((occurrence: Occurence) => {
-          let range = new Range(
-            new Position(occurrence.line_start - 1, occurrence.index_start),
-            new Position(occurrence.line_end - 1, occurrence.index_end)
-          );
-          let diagnostic = new Diagnostic(
-            range,
-            `ggshield: ${occurrence.type}
+
+  try {
+    results.entities_with_incidents.forEach(
+      (entityWithIncidents: EntityWithIncidents) => {
+        entityWithIncidents.incidents.forEach((incident: Incident) => {
+          incident.occurrences.forEach((occurrence: Occurence) => {
+            let range = new Range(
+              new Position(occurrence.line_start - 1, occurrence.index_start),
+              new Position(occurrence.line_end - 1, occurrence.index_end)
+            );
+            let diagnostic = new Diagnostic(
+              range,
+              `ggshield: ${occurrence.type}
 
 Secret detected: ${incident.type}
 Validity: ${validityDisplayName[incident.validity]}
 Known by GitGuardian dashboard: ${incident.known_secret ? "YES" : "NO"}
+Total occurences: ${incident.total_occurrences}
 Incident URL: ${incident.incident_url || "N/A"}
-Secret SHA: ${incident.ignore_sha}
-
-For more info on how to remediate this incident: https://docs.gitguardian.com/internal-repositories-monitoring/remediate/remediate-incidents
-    `,
-            DiagnosticSeverity.Warning
-          );
-          diagnostics.push(diagnostic);
+Secret SHA: ${incident.ignore_sha}`,
+              DiagnosticSeverity.Warning
+            );
+            diagnostics.push(diagnostic);
+          });
         });
-      });
-    }
-  );
+      }
+    );
+  } catch (e) {
+    console.error(e);
+    window.showErrorMessage("ggshield: Error parsing scan results");
+  }
 
   return diagnostics;
-}
-
-/**
- * Remove duplicated incidents diagnostics
- *
- * @param diagnostics diagnostics of found incidents
- */
-export function removeDuplicatedIncidentsDiagnostics(
-  diagnostics: Diagnostic[]
-) {
-  let uniqueDiagnostics: Diagnostic[] = [];
-  let seen: Set<string> = new Set();
-  diagnostics.forEach((diagnostic: Diagnostic) => {
-    let key = diagnostic.message + ".";
-    key += diagnostic.range.start.line + "-";
-    key += diagnostic.range.start.character + "#";
-    key += diagnostic.range.end.line + "-";
-    key += diagnostic.range.end.character;
-    if (!seen.has(key)) {
-      seen.add(key);
-      uniqueDiagnostics.push(diagnostic);
-    }
-  });
-
-  return uniqueDiagnostics;
 }

@@ -15,7 +15,7 @@
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "ggshield",
+      "title": "ggshield", 
       "properties": {
         "ggshield.ggshieldPath": {
           "type": "string",
@@ -33,7 +33,17 @@
           "description": "GitGuardian Internal Monitoring URL (default: https://api.gitguardian.com/)"
         }
       }
-    }
+    },
+    "commands": [
+      {
+        "command": "ggshield.quota",
+        "title": "ggshield: Show quota"
+      },
+       {
+        "command": "ggshield.ignore",
+        "title": "ggshield: Ignore last found incidents"
+      }
+    ]
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",

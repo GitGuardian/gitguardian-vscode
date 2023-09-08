@@ -10,16 +10,27 @@ export interface Occurence {
   index_end: number;
 }
 
+export type Validity =
+  | "unknown"
+  | "cannot_check"
+  | "no_checker"
+  | "failed_to_check"
+  | "not_checked"
+  | "invalid"
+  | "valid";
+
 export interface Incident {
   type: string;
   occurrences: Occurence[];
-  validity: string;
+  validity: Validity;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   ignore_sha: string;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   known_secret: boolean;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   incident_url: string;
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  total_occurrences: number;
 }
 
 export interface EntityWithIncidents {

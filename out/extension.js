@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deactivate = exports.activate = void 0;
+const ggshield_api_1 = require("./lib/ggshield-api");
 const ggshield_configuration_1 = require("./lib/ggshield-configuration");
-const ggshield_scanner_1 = require("./lib/ggshield-scanner");
 const ggshield_results_parser_1 = require("./lib/ggshield-results-parser");
 const vscode_1 = require("vscode");
 /**
@@ -15,7 +15,6 @@ let diagnosticCollection;
  * - retrieve configuration
  * - scan file using ggshield CLI application
  * - parse ggshield results
- * - remove duplicated incidents diagnostics
  * - set diagnostics collection so the incdients are visible to the user
  *
  * @param filePath path to file
@@ -27,13 +26,12 @@ function scanFile(filePath, fileUri) {
         vscode_1.window.showErrorMessage("ggshield: Missing settings");
         return;
     }
-    const results = (0, ggshield_scanner_1.ggshieldScanFile)(filePath, configuration);
+    const results = (0, ggshield_api_1.ggshieldScanFile)(filePath, configuration);
     if (!results) {
         return;
     }
     let incidentsDiagnostics = (0, ggshield_results_parser_1.parseGGShieldResults)(results);
-    let uniqueDiagnostics = (0, ggshield_results_parser_1.removeDuplicatedIncidentsDiagnostics)(incidentsDiagnostics);
-    diagnosticCollection.set(fileUri, uniqueDiagnostics);
+    diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
 /**
  * Clean up file diagnostics
@@ -50,7 +48,14 @@ function activate(context) {
         scanFile(textDocument.fileName, textDocument.uri);
     }), vscode_1.workspace.onDidOpenTextDocument((textDocument) => {
         scanFile(textDocument.fileName, textDocument.uri);
-    }), vscode_1.workspace.onDidCloseTextDocument((textDocument) => cleanUpFileDiagnostics(textDocument.uri)));
+    }), vscode_1.workspace.onDidCloseTextDocument((textDocument) => cleanUpFileDiagnostics(textDocument.uri)), vscode_1.commands.registerCommand("ggshield.quota", () => {
+        (0, ggshield_api_1.showAPIQuota)();
+    }), vscode_1.commands.registerCommand("ggshield.ignore", () => {
+        (0, ggshield_api_1.ignoreLastFound)();
+        if (vscode_1.window.activeTextEditor) {
+            cleanUpFileDiagnostics(vscode_1.window.activeTextEditor?.document.uri);
+        }
+    }));
 }
 exports.activate = activate;
 function deactivate() { }

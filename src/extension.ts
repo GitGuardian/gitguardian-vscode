@@ -1,14 +1,16 @@
-import { getGGShieldConfiguration } from "./lib/ggshield-configuration";
-import { ggshieldScanFile } from "./lib/ggshield-scanner";
 import {
-  parseGGShieldResults,
-  removeDuplicatedIncidentsDiagnostics,
-} from "./lib/ggshield-results-parser";
+  ggshieldScanFile,
+  ignoreLastFound,
+  showAPIQuota,
+} from "./lib/ggshield-api";
+import { getGGShieldConfiguration } from "./lib/ggshield-configuration";
+import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
   Diagnostic,
   DiagnosticCollection,
   ExtensionContext,
   Uri,
+  commands,
   languages,
   window,
   workspace,
@@ -25,7 +27,6 @@ let diagnosticCollection: DiagnosticCollection;
  * - retrieve configuration
  * - scan file using ggshield CLI application
  * - parse ggshield results
- * - remove duplicated incidents diagnostics
  * - set diagnostics collection so the incdients are visible to the user
  *
  * @param filePath path to file
@@ -47,10 +48,7 @@ function scanFile(filePath: string, fileUri: Uri) {
 
   let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
 
-  let uniqueDiagnostics =
-    removeDuplicatedIncidentsDiagnostics(incidentsDiagnostics);
-
-  diagnosticCollection.set(fileUri, uniqueDiagnostics);
+  diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
 
 /**
@@ -75,7 +73,16 @@ export function activate(context: ExtensionContext) {
     }),
     workspace.onDidCloseTextDocument((textDocument) =>
       cleanUpFileDiagnostics(textDocument.uri)
-    )
+    ),
+    commands.registerCommand("ggshield.quota", () => {
+      showAPIQuota();
+    }),
+    commands.registerCommand("ggshield.ignore", () => {
+      ignoreLastFound();
+      if (window.activeTextEditor) {
+        cleanUpFileDiagnostics(window.activeTextEditor?.document.uri);
+      }
+    })
   );
 }
 

@@ -1,8 +1,8 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const assert = require("assert");
-const ggshield_results_parser_1 = require("../../lib/ggshield-results-parser");
-const vscode_1 = require("vscode");
+import * as assert from "assert";
+
+import { parseGGShieldResults } from "../../lib/ggshield-results-parser";
+import { window, DiagnosticSeverity } from "vscode";
+
 const results = `{
 "id":"/Users/paulindenaurois/Development/gitguardian/ggshield-vscode-extension/sample_files/test.py",
 "type":"path_scan",
@@ -41,23 +41,26 @@ const results = `{
 "total_occurrences":1,
 "secrets_engine_version":"2.96.0"
 }`;
+
 suite("Extension Test Suite", () => {
-    vscode_1.window.showInformationMessage("Start all tests.");
-    test("test result parser", () => {
-        const diagnostics = (0, ggshield_results_parser_1.parseGGShieldResults)(JSON.parse(results));
-        assert.strictEqual(diagnostics.length, 1);
-        const diagnostic = diagnostics[0];
-        assert.ok(diagnostic.message.includes("apikey"));
-        assert.ok(diagnostic.message.includes("Generic High Entropy Secret"));
-        assert.strictEqual(diagnostic.range.start.line, 3);
-        assert.strictEqual(diagnostic.range.start.character, 11);
-        assert.strictEqual(diagnostic.range.end.line, 3);
-        assert.strictEqual(diagnostic.range.end.character, 79);
-        assert.strictEqual(diagnostic.severity, vscode_1.DiagnosticSeverity.Warning);
-    });
-    test("test result parser with invalid json", () => {
-        const diagnostics = (0, ggshield_results_parser_1.parseGGShieldResults)(JSON.parse("{}"));
-        assert.strictEqual(diagnostics.length, 0);
-    });
+  window.showInformationMessage("Start all tests.");
+
+  test("test result parser", () => {
+    const diagnostics = parseGGShieldResults(JSON.parse(results));
+    assert.strictEqual(diagnostics.length, 1);
+    const diagnostic = diagnostics[0];
+    assert.ok(diagnostic.message.includes("apikey"));
+    assert.ok(diagnostic.message.includes("Generic High Entropy Secret"));
+    assert.strictEqual(diagnostic.range.start.line, 3);
+    assert.strictEqual(diagnostic.range.start.character, 11);
+    assert.strictEqual(diagnostic.range.end.line, 3);
+    assert.strictEqual(diagnostic.range.end.character, 79);
+    assert.strictEqual(diagnostic.severity, DiagnosticSeverity.Warning);
+  });
+
+  test("test result parser with invalid json", () => {
+    const diagnostics = parseGGShieldResults(JSON.parse("{}"));
+
+    assert.strictEqual(diagnostics.length, 0);
+  });
 });
-//# sourceMappingURL=extension.test.js.map
