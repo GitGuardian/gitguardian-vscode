@@ -1,4 +1,4 @@
-export interface Occurence {
+export interface Occurrence {
   type: string;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   line_start: number;
@@ -21,7 +21,7 @@ export type Validity =
 
 export interface Incident {
   type: string;
-  occurrences: Occurence[];
+  occurrences: Occurrence[];
   validity: Validity;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   ignore_sha: string;

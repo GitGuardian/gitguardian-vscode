@@ -1,8 +1,10 @@
 {
   "name": "ggshield",
+  "repository": "https://gitlab.gitguardian.ovh/gg-code/ggshield-vscode-extension.git",
   "displayName": "ggshield",
   "description": "GitGuardian's ggshield integration",
   "version": "0.0.1",
+  "publisher": "salome",
   "engines": {
     "vscode": "^1.81.0"
   },
@@ -15,11 +17,11 @@
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "ggshield", 
+      "title": "ggshield",
       "properties": {
         "ggshield.ggshieldPath": {
           "type": "string",
-          "default": "/usr/local/bin/ggshield",
+          "default": "/usr/bin/ggshield",
           "markdownDescription": "Path to ggshield executable (use `$ where ggshield` to find out)"
         },
         "ggshield.apiKey": {
@@ -39,7 +41,7 @@
         "command": "ggshield.quota",
         "title": "ggshield: Show quota"
       },
-       {
+      {
         "command": "ggshield.ignore",
         "title": "ggshield: Ignore last found incidents"
       }
@@ -57,14 +59,21 @@
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "20.2.5",
+    "@types/unzipper": "^0.10.9",
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
     "@vscode/test-electron": "^2.3.2",
     "eslint": "^8.41.0",
+    "follow-redirects": "^1.15.6",
     "glob": "^8.1.0",
     "mocha": "^10.2.0",
     "typescript": "^5.1.3"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@types/follow-redirects": "^1.14.4",
+    "follow-redirects": "^1.15.6",
+    "tar": "*",
+    "unzipper": "^0.12.2"
+  }
 }

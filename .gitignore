@@ -29,3 +29,6 @@ yarn-error.log*
 
 # TypeScript cache
 tsconfig.base.tsbuildinfo%
+
+# ouput dir
+out/

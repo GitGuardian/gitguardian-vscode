@@ -9,7 +9,7 @@ import {
   GGShieldScanResults,
   EntityWithIncidents,
   Incident,
-  Occurence,
+  Occurrence,
   Validity,
 } from "./api-types";
 
@@ -39,13 +39,16 @@ export function parseGGShieldResults(
   let diagnostics: Diagnostic[] = [];
 
   try {
+    if (!results.entities_with_incidents) {
+      return diagnostics;
+    }
     results.entities_with_incidents.forEach(
       (entityWithIncidents: EntityWithIncidents) => {
         entityWithIncidents.incidents.forEach((incident: Incident) => {
-          incident.occurrences.forEach((occurrence: Occurence) => {
+          incident.occurrences.forEach((occurrence: Occurrence) => {
             let range = new Range(
-              new Position(occurrence.line_start - 1, occurrence.index_start),
-              new Position(occurrence.line_end - 1, occurrence.index_end)
+              new Position(occurrence.line_start, occurrence.index_start),
+              new Position(occurrence.line_end, occurrence.index_end)
             );
             let diagnostic = new Diagnostic(
               range,
@@ -54,7 +57,7 @@ export function parseGGShieldResults(
 Secret detected: ${incident.type}
 Validity: ${validityDisplayName[incident.validity]}
 Known by GitGuardian dashboard: ${incident.known_secret ? "YES" : "NO"}
-Total occurences: ${incident.total_occurrences}
+Total occurrences: ${incident.total_occurrences}
 Incident URL: ${incident.incident_url || "N/A"}
 Secret SHA: ${incident.ignore_sha}`,
               DiagnosticSeverity.Warning

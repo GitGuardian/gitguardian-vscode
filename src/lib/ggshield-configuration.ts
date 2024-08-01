@@ -11,10 +11,14 @@ export interface GGShieldConfiguration {
  *
  * @returns ggshield configuration or undefined if at least one setting is empty
  */
-export function getGGShieldConfiguration(): GGShieldConfiguration | undefined {
+export function getGGShieldConfiguration(
+  ggshieldPath?: string
+): GGShieldConfiguration | undefined {
   let config = workspace.getConfiguration("ggshield");
 
-  let ggshieldPath: string = config.get("ggshieldPath")!;
+  if (!ggshieldPath) {
+    ggshieldPath = config.get("ggshieldPath");
+  }
   let apiUrl: string = config.get("apiUrl")!;
   let apiKey: string = config.get("apiKey")!;
 

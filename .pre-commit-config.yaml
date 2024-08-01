@@ -1,0 +1,62 @@
+default_stages: [commit]
+repos:
+  - repo: https://github.com/psf/black
+    rev: 22.3.0
+    hooks:
+      - id: black
+        language_version: python3.11
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.1.0
+    hooks:
+      # not python related
+      - id: check-added-large-files
+      - id: check-merge-conflict
+
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+
+  - repo: https://github.com/PyCQA/flake8
+    rev: 6.1.0
+    hooks:
+      - id: flake8
+        additional_dependencies:
+          - flake8-isort==6.1.1
+          - flake8-quotes==3.4.0
+          - ggflake8==1.12.2
+
+  - repo: https://github.com/PyCQA/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+
+  - repo: https://github.com/commitizen-tools/commitizen
+    rev: v3.12.0
+    hooks:
+      - id: commitizen
+        # don't forget to run pre-commit install --hook-type commit-msg for this hook to run
+        stages: [commit-msg]
+        additional_dependencies: [ggcommitizen]
+
+  - repo: https://github.com/pre-commit/mirrors-prettier # to format JSON, YAML and markdown files among others
+    rev: v2.6.2 # Keep synchronize with .gitlab-ci.yml
+    hooks:
+      - id: prettier
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.6
+    hooks:
+      - id: codespell
+
+  # use a "local" repo and not the pyright hook to ensure pyright runs in the same virtualenv
+  # as the rest of the code
+  - repo: local
+    hooks:
+      - id: pyright
+        name: pyright
+        entry: "pdm run pyright"
+        language: system
+        types: [python]
+        # do not pass filenames, otherwise Pyright might scan files we don't want it to scan
+        pass_filenames: false
+        stages: [push]
