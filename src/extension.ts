@@ -40,7 +40,6 @@ function scanFile(
   this: any,
   filePath: string,
   fileUri: Uri,
-  statusBarItem: StatusBarItem,
   ggshieldPath?: string
 ): void {
   const configuration = getGGShieldConfiguration(ggshieldPath);
@@ -55,21 +54,16 @@ function scanFile(
       });
     return;
   }
-  console.log(`Scanning ${filePath}`);
-  statusBarItem.text = `Scanning ${filePath}...`;
   const results = ggshieldScanFile(filePath, configuration);
-  console.log(`Scanned ${filePath}`);
   if (!results) {
     return;
   }
 
   let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   if (incidentsDiagnostics.length !== 0) {
-    statusBarItem.text = `GGshield: found ${incidentsDiagnostics.length} problems.`;
-    window.showWarningMessage(`ggshield found problems >:(((((`);
+    window.showWarningMessage(`GGshield found problems.`);
   } else {
-    statusBarItem.text = `GGshield: no problems found.`;
-    window.showInformationMessage(`ggshield: no problems found :)))))`);
+    window.showInformationMessage(`GGshield: no problems found.`);
   }
   diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
@@ -87,19 +81,22 @@ export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GGShield Resolver");
   const ggshieldResolver = new GGShieldResolver(outputChannel, context);
-  const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Right, 0);
-  statusBarItem.color = "#00FF00";
-  statusBarItem.text = `Checking GGShield installation...`;
-  statusBarItem.show(); // Show the status bar item
 
   ggshieldResolver
     .checkAndInstallGGShield()
     .then(() => {
+      const isGitInstalled = ggshieldResolver.isGitInstalled();
+
+      if (!isGitInstalled) {
+        window.showErrorMessage(
+          `GGshield requires git to work correctly. Please install git.`
+        );
+      }
+    })
+    .then(() => {
       ggshieldResolver.loginGGShield();
     })
     .then(() => {
-      statusBarItem.text = `GGShield installation completed.`;
-
       // Start scanning ddocuments on activation events
       // (i.e. when a new document is opened or when the document is saved)
       diagnosticCollection = languages.createDiagnosticCollection("ggshield");
@@ -112,7 +109,6 @@ export function activate(context: ExtensionContext) {
           scanFile(
             textDocument.fileName,
             textDocument.uri,
-            statusBarItem,
             ggshieldResolver.ggshieldPath
           );
         }),
@@ -122,7 +118,6 @@ export function activate(context: ExtensionContext) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
-              statusBarItem,
               ggshieldResolver.ggshieldPath
             );
           }

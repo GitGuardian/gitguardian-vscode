@@ -3,12 +3,13 @@ import {
   SpawnSyncReturns,
   spawnSync,
 } from "child_process";
-import { workspace, window, commands } from "vscode";
+import { workspace, window } from "vscode";
 import {
   GGShieldConfiguration,
   getGGShieldConfiguration,
 } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
+import * as os from "os";
 
 /**
  * Run ggshield CLI application with specified arguments
@@ -24,7 +25,7 @@ export function runGGShieldCommand(
   const { ggshieldPath, apiKey, apiUrl } = configuration;
 
   let options: SpawnSyncOptionsWithStringEncoding = {
-    cwd: "/tmp", // TODO: change this to be windows-compatible
+    cwd: os.tmpdir(),
     env: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       GITGUARDIAN_API_KEY: apiKey,
