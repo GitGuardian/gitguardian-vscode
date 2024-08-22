@@ -3,15 +3,12 @@ import {
   ignoreLastFound,
   showAPIQuota,
 } from "./lib/ggshield-api";
-import { getGGShieldConfiguration } from "./lib/ggshield-configuration";
+import { GGShieldConfiguration } from "./lib/ggshield-configuration";
 import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
-  Color,
   Diagnostic,
   DiagnosticCollection,
   ExtensionContext,
-  StatusBarAlignment,
-  StatusBarItem,
   Uri,
   commands,
   languages,
@@ -40,20 +37,8 @@ function scanFile(
   this: any,
   filePath: string,
   fileUri: Uri,
-  ggshieldPath?: string
+  configuration: GGShieldConfiguration
 ): void {
-  const configuration = getGGShieldConfiguration(ggshieldPath);
-
-  if (!configuration) {
-    window
-      .showErrorMessage("ggshield: Missing settings", "Open Settings")
-      .then((selection) => {
-        if (selection === "Open Settings") {
-          commands.executeCommand("workbench.action.openSettings", "ggshield");
-        }
-      });
-    return;
-  }
   const results = ggshieldScanFile(filePath, configuration);
   if (!results) {
     return;
@@ -80,10 +65,15 @@ function cleanUpFileDiagnostics(fileUri: Uri): void {
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GGShield Resolver");
-  const ggshieldResolver = new GGShieldResolver(outputChannel, context);
+  let configuration = new GGShieldConfiguration();
+  const ggshieldResolver = new GGShieldResolver(
+    outputChannel,
+    context,
+    configuration
+  );
 
   ggshieldResolver
-    .checkAndInstallGGShield()
+    .getGGShieldPath()
     .then(() => {
       const isGitInstalled = ggshieldResolver.isGitInstalled();
 
@@ -107,7 +97,7 @@ export function activate(context: ExtensionContext) {
           scanFile(
             textDocument.fileName,
             textDocument.uri,
-            ggshieldResolver.ggshieldPath
+            ggshieldResolver.configuration
           );
         }),
         workspace.onDidOpenTextDocument((textDocument) => {
@@ -115,7 +105,7 @@ export function activate(context: ExtensionContext) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
-              ggshieldResolver.ggshieldPath
+              ggshieldResolver.configuration
             );
           }
         }),
@@ -123,10 +113,10 @@ export function activate(context: ExtensionContext) {
           cleanUpFileDiagnostics(textDocument.uri)
         ),
         commands.registerCommand("ggshield.quota", () => {
-          showAPIQuota();
+          showAPIQuota(ggshieldResolver.configuration);
         }),
         commands.registerCommand("ggshield.ignore", () => {
-          ignoreLastFound();
+          ignoreLastFound(ggshieldResolver.configuration);
           if (window.activeTextEditor) {
             cleanUpFileDiagnostics(window.activeTextEditor?.document.uri);
           }

@@ -1,9 +1,20 @@
 import { workspace } from "vscode";
 
-export interface GGShieldConfiguration {
+export class GGShieldConfiguration {
+  // Implement the properties and methods defined in the GGShieldConfiguration interface
   ggshieldPath: string;
   apiKey: string;
   apiUrl: string;
+
+  constructor(
+    ggshieldPath: string = "",
+    apiKey: string = "",
+    apiUrl: string = ""
+  ) {
+    this.ggshieldPath = ggshieldPath;
+    this.apiKey = apiKey;
+    this.apiUrl = apiUrl;
+  }
 }
 
 /**
@@ -11,25 +22,31 @@ export interface GGShieldConfiguration {
  *
  * @returns ggshield configuration or undefined if at least one setting is empty
  */
-export function getGGShieldConfiguration(
-  ggshieldPath?: string
-): GGShieldConfiguration | undefined {
+export function getSettingsConfiguration(): GGShieldConfiguration | undefined {
   let config = workspace.getConfiguration("ggshield");
 
-  if (!ggshieldPath) {
-    ggshieldPath = config.get("ggshieldPath");
-  }
-  let apiUrl: string = config.get("apiUrl")!;
-  let apiKey: string = config.get("apiKey")!;
+  let ggshieldPath: string | undefined = config.get("ggshieldPath");
+  let apiUrl: string | undefined = config.get("apiUrl");
+  let apiKey: string | undefined = config.get("apiKey")!;
 
-  if (!ggshieldPath || !apiKey || !apiUrl) {
-    // all settings are mandatory for the extension to work
-    return undefined;
-  }
+  return new GGShieldConfiguration(ggshieldPath, apiKey, apiUrl);
+}
 
-  return {
-    ggshieldPath,
-    apiKey,
-    apiUrl,
-  };
+export function config(
+  globalConfig: GGShieldConfiguration
+): GGShieldConfiguration {
+  let settingsConf = getSettingsConfiguration();
+
+  // If any conf settings has been set explicitly in settings, use it
+
+  if (settingsConf?.ggshieldPath !== undefined) {
+    globalConfig!.ggshieldPath = globalConfig.ggshieldPath;
+  }
+  if (settingsConf?.apiUrl !== undefined) {
+    globalConfig!.apiUrl = globalConfig.apiUrl;
+  }
+  if (settingsConf?.apiKey !== undefined) {
+    globalConfig!.apiKey = globalConfig.apiKey;
+  }
+  return globalConfig;
 }

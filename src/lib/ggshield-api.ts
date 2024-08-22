@@ -4,10 +4,7 @@ import {
   spawnSync,
 } from "child_process";
 import { workspace, window } from "vscode";
-import {
-  GGShieldConfiguration,
-  getGGShieldConfiguration,
-} from "./ggshield-configuration";
+import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
 import * as os from "os";
 
@@ -51,9 +48,7 @@ export function runGGShieldCommand(
  *
  * Show error message on failure
  */
-export function showAPIQuota(): undefined {
-  const configuration = getGGShieldConfiguration();
-
+export function showAPIQuota(configuration: GGShieldConfiguration): undefined {
   if (!configuration) {
     window.showErrorMessage("ggshield: Missing settings");
     return;
@@ -74,9 +69,9 @@ export function showAPIQuota(): undefined {
  *
  * Show error message on failure
  */
-export function ignoreLastFound(): undefined {
-  const configuration = getGGShieldConfiguration();
-
+export function ignoreLastFound(
+  configuration: GGShieldConfiguration
+): undefined {
   if (!configuration) {
     window.showErrorMessage("ggshield: Missing settings");
     return;
