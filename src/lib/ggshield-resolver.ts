@@ -1,4 +1,4 @@
-import { exec } from "child_process";
+import { exec, spawnSync } from "child_process";
 import * as vscode from "vscode";
 import * as path from "path";
 import * as os from "os";
@@ -8,6 +8,8 @@ import {
   GGShieldConfiguration,
 } from "./ggshield-configuration";
 import * as fs from "fs";
+import { runGGShieldCommand } from "./ggshield-api";
+import { error } from "console";
 
 export class GGShieldResolver {
   constructor(
@@ -28,19 +30,19 @@ export class GGShieldResolver {
 
   async loginGGShield(): Promise<void> {
     return new Promise((resolve, reject) => {
-      exec(
-        `${this.configuration.ggshieldPath} auth login --method=web`,
-        (error, stdout, stderr) => {
-          if (error) {
-            this.channel.appendLine(`GGShield login failed: ${stderr}`);
-            reject();
-          } else {
-            this.channel.appendLine(`GGShield login successful: ${stdout}`);
-            console.log(`ggshield is logged in: ${stdout}`);
-            resolve();
-          }
-        }
-      );
+      let proc = runGGShieldCommand(this.configuration, [
+        "auth",
+        "login",
+        "--method=web",
+      ]);
+      if (proc.error || proc.stderr.length > 0) {
+        this.channel.appendLine(`GGShield login failed: ${proc.stderr}`);
+        reject();
+      } else {
+        this.channel.appendLine(`GGShield login successful: ${proc.stdout}`);
+        console.log(`ggshield is logged in: ${proc.stdout}`);
+        resolve();
+      }
     });
   }
 
@@ -86,24 +88,27 @@ export class GGShieldResolver {
     }
   }
 
-  async isGGShieldInstalled(
-    ggshieldPath: string | undefined
-  ): Promise<boolean> {
-    if (!ggshieldPath) {
-      ggshieldPath = "ggshield";
-    }
+  async isGGShieldInstalled(ggshieldPath: string): Promise<boolean> {
+    /**
+     * Tries to determine if `ggshield` is installed by checking if a specified path.
+     *
+     * @returns {Promise<boolean>} A promise that resolves if `ggshield` is installed.
+     */
+
+    let configuration = new GGShieldConfiguration(
+      (ggshieldPath = ggshieldPath)
+    );
     return new Promise((resolve) => {
-      exec(`${ggshieldPath} --version`, (error, stdout, stderr) => {
-        if (error) {
-          this.channel.appendLine(`ggshield is not installed: ${stderr}`);
-          console.log(`ggshield is not installed: ${stderr}`);
-          resolve(false);
-        } else {
-          this.channel.appendLine(`ggshield is installed: ${stdout}`);
-          console.log(`ggshield is installed: ${stdout}`);
-          resolve(true);
-        }
-      });
+      let proc = runGGShieldCommand(configuration, ["--version"]);
+      if (proc.error || proc.stderr.length > 0) {
+        this.channel.appendLine(`ggshield is not installed: ${proc.stderr}`);
+        console.log(`ggshield is not installed: ${proc.stderr}`);
+        resolve(false);
+      } else {
+        this.channel.appendLine(`ggshield is installed: ${proc.stdout}`);
+        console.log(`ggshield is installed: ${proc.stdout}`);
+        resolve(true);
+      }
     });
   }
 
@@ -114,18 +119,21 @@ export class GGShieldResolver {
      * @returns {Promise<boolean>} A promise that resolves `ggshield` path is determined.
      */
 
-    return new Promise((resolve, reject) => {
-      exec(`ggshield --version`, async (error, stdout, stderr) => {
-        if (error) {
-          this.channel.appendLine(`ggshield is not installed globally.`);
-          console.log(`ggshield is not installed globally: ${stderr}`);
-          resolve(false);
-        } else {
-          this.channel.appendLine(`ggshield is installed globally: ${stdout}`);
-          console.log(`ggshield is installed globally: ${stdout}`);
-          resolve(true);
-        }
-      });
+    return new Promise((resolve) => {
+      let proc = runGGShieldCommand(this.configuration, ["--version"]);
+      if (proc.error || proc.stderr.length > 0) {
+        this.channel.appendLine(
+          `ggshield is not installed globally: ${proc.stderr}`
+        );
+        console.log(`ggshield is not installed globally: ${proc.stderr}`);
+        resolve(false);
+      } else {
+        this.channel.appendLine(
+          `ggshield is installed globally: ${proc.stdout}`
+        );
+        console.log(`ggshield is installed globally: ${proc.stdout}`);
+        resolve(true);
+      }
     });
   }
 
@@ -181,17 +189,14 @@ export class GGShieldResolver {
 
   async isGitInstalled(): Promise<boolean> {
     return new Promise((resolve) => {
-      exec("git --version", (error, stdout, stderr) => {
-        if (error) {
-          this.channel.appendLine(
-            `GGShield requires git to scan files: ${stderr}`
-          );
-          console.log(`git is not installed: ${stderr}`);
-          resolve(false);
-        } else {
-          resolve(true);
-        }
-      });
+      let proc = spawnSync("git", ["--version"]);
+      if (proc.error || proc.stderr.length > 0) {
+        this.channel.appendLine(`GGShield requires git to scan files.`);
+        console.log(`git is not installed.`);
+        resolve(false);
+      } else {
+        resolve(true);
+      }
     });
   }
 }
