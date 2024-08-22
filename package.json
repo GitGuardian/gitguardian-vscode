@@ -21,7 +21,7 @@
       "properties": {
         "ggshield.ggshieldPath": {
           "type": "string",
-          "default": "/usr/bin/ggshield",
+          "default": "",
           "markdownDescription": "Path to ggshield executable (use `$ where ggshield` to find out)"
         },
         "ggshield.apiKey": {

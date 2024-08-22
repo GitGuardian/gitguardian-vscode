@@ -4,6 +4,7 @@ import * as path from "path";
 import * as os from "os";
 import { Binary, getBinaryAbsolutePath } from "./ggshield-resolver-utils";
 import { getGGShieldConfiguration } from "./ggshield-configuration";
+import * as fs from "fs";
 
 export class GGShieldResolver {
   constructor(
@@ -16,10 +17,10 @@ export class GGShieldResolver {
     return new Promise((resolve, reject) => {
       exec(`${this.ggshieldPath} auth login`, (error, stdout, stderr) => {
         if (error) {
-          this.channel.appendLine(`GGshield login failed: ${stderr}`);
+          this.channel.appendLine(`GGShield login failed: ${stderr}`);
           reject();
         } else {
-          this.channel.appendLine(`GGshield login successful: ${stdout}`);
+          this.channel.appendLine(`GGShield login successful: ${stdout}`);
           console.log(`ggshield is logged in: ${stdout}`);
           resolve();
         }
@@ -39,7 +40,7 @@ export class GGShieldResolver {
 
     // Use standalone
     if (!isInstalled) {
-      await this.installGGShield();
+      await this.useInternalGGShield();
     }
   }
 
@@ -64,7 +65,7 @@ export class GGShieldResolver {
     });
   }
 
-  private async installGGShield(): Promise<void> {
+  private async useInternalGGShield(): Promise<void> {
     this.channel.appendLine("Fetching ggshield binary...");
     try {
       // Get platform and architecture
@@ -74,10 +75,17 @@ export class GGShieldResolver {
 
       this.ggshieldPath = path.join(
         this.context.asAbsolutePath(""),
-        "ggshield-internal-installation",
+        "ggshield-internal",
         binary.binary,
         binary.executable
       );
+      const pathExists = fs.existsSync(this.ggshieldPath);
+      if (!pathExists) {
+        this.channel.appendLine(
+          `ggshield binary not found: this architecture is not supported ${this.ggshieldPath}`
+        );
+        throw new Error(`architecture is not supported`);
+      }
 
       this.channel.appendLine(`ggshield executable: ${this.ggshieldPath}`);
     } catch (error) {
@@ -91,7 +99,7 @@ export class GGShieldResolver {
       exec("git --version", (error, stdout, stderr) => {
         if (error) {
           this.channel.appendLine(
-            `GGshield requires git to scan files: ${stderr}`
+            `GGShield requires git to scan files: ${stderr}`
           );
           console.log(`git is not installed: ${stderr}`);
           resolve(false);

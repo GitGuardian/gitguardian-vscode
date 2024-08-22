@@ -61,9 +61,9 @@ function scanFile(
 
   let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   if (incidentsDiagnostics.length !== 0) {
-    window.showWarningMessage(`GGshield found problems.`);
+    window.showWarningMessage(`GGShield found problems.`);
   } else {
-    window.showInformationMessage(`GGshield: no problems found.`);
+    window.showInformationMessage(`GGShield: no problems found.`);
   }
   diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
@@ -89,7 +89,7 @@ export function activate(context: ExtensionContext) {
 
       if (!isGitInstalled) {
         window.showErrorMessage(
-          `GGshield requires git to work correctly. Please install git.`
+          `GGShield requires git to work correctly. Please install git.`
         );
       }
     })
@@ -97,15 +97,13 @@ export function activate(context: ExtensionContext) {
       ggshieldResolver.loginGGShield();
     })
     .then(() => {
-      // Start scanning ddocuments on activation events
+      // Start scanning documents on activation events
       // (i.e. when a new document is opened or when the document is saved)
       diagnosticCollection = languages.createDiagnosticCollection("ggshield");
 
       context.subscriptions.push(diagnosticCollection);
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
-          console.log(textDocument.uri.scheme);
-          console.log(textDocument.fileName);
           scanFile(
             textDocument.fileName,
             textDocument.uri,
@@ -114,7 +112,6 @@ export function activate(context: ExtensionContext) {
         }),
         workspace.onDidOpenTextDocument((textDocument) => {
           if (textDocument.uri.scheme !== "git") {
-            console.log(textDocument.uri.scheme);
             scanFile(
               textDocument.fileName,
               textDocument.uri,

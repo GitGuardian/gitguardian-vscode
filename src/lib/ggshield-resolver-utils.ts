@@ -7,29 +7,37 @@ export function getBinaryAbsolutePath(
   platform: NodeJS.Platform,
   arch: string
 ): Binary {
-  if (platform === "win32") {
-    return {
-      binary: "ggshield-1.30.1-x86_64-pc-windows-msvc",
-      executable: "ggshield.exe",
-    };
-  } else if (platform === "darwin") {
-    if (arch === "arm64") {
-      return {
-        binary: "ggshield-1.30.1-arm64-apple-darwin",
-        executable: "ggshield",
-      };
-    } else {
-      return {
-        binary: `ggshield-1.30.1-x86_64-apple-darwin`,
-        executable: "ggshield",
-      };
-    }
-  } else if (platform === "linux") {
-    return {
-      binary: "ggshield-1.30.1-x86_64-unknown-linux-gnu",
-      executable: "ggshield",
-    };
-  } else {
-    throw new Error(`Unsupported platform: ${platform}`);
+  let executable: string = "";
+  let binary: string = "";
+  console.log(`Platform: ${platform}; Arch: ${arch}`);
+  switch (platform) {
+    case "win32":
+      executable = "ggshield.exe";
+      break;
+    case "linux":
+    case "darwin":
+      executable = "ggshield";
+      break;
+    default:
+      console.log(`Unsupported platform - ${platform}`);
+      throw new Error(`Unsupported platform: ${platform}`);
   }
+
+  switch (arch) {
+    case "x64":
+    case "x86":
+      binary = `ggshield-x86_64-${platform}`;
+      break;
+    case "arm64":
+      binary = `ggshield-arm64-${platform}`;
+      break;
+    default:
+      console.log(`Unsupported architecture - ${arch}`);
+      throw new Error(`Unsupported architecture: ${arch}`);
+  }
+  console.log(`Binary: ${binary}`);
+  return {
+    binary: binary,
+    executable: executable,
+  };
 }
