@@ -1,12 +1,11 @@
-export interface Binary {
-  binary: string;
-  executable: string;
-}
+import * as path from "path";
+import { ExtensionContext } from "vscode";
 
 export function getBinaryAbsolutePath(
   platform: NodeJS.Platform,
-  arch: string
-): Binary {
+  arch: string,
+  context: ExtensionContext
+): string {
   let executable: string = "";
   let binary: string = "";
   console.log(`Platform: ${platform}; Arch: ${arch}`);
@@ -36,8 +35,10 @@ export function getBinaryAbsolutePath(
       throw new Error(`Unsupported architecture: ${arch}`);
   }
   console.log(`Binary: ${binary}`);
-  return {
-    binary: binary,
-    executable: executable,
-  };
+  return path.join(
+    context.asAbsolutePath(""),
+    "ggshield-internal",
+    binary,
+    executable
+  );
 }

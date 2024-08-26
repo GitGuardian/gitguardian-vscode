@@ -1,6 +1,8 @@
 import {
+  SpawnOptions,
   SpawnSyncOptionsWithStringEncoding,
   SpawnSyncReturns,
+  spawn,
   spawnSync,
 } from "child_process";
 import { workspace, window } from "vscode";
@@ -19,13 +21,11 @@ export function runGGShieldCommand(
   configuration: GGShieldConfiguration,
   args: string[]
 ): SpawnSyncReturns<string> {
-  const { ggshieldPath, apiKey, apiUrl } = configuration;
+  const { ggshieldPath, apiUrl } = configuration;
 
   let options: SpawnSyncOptionsWithStringEncoding = {
     cwd: os.tmpdir(),
     env: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GITGUARDIAN_API_KEY: apiKey,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       GITGUARDIAN_API_URL: apiUrl,
     },
@@ -37,6 +37,7 @@ export function runGGShieldCommand(
   if (workspace.workspaceFolders?.length || 0 > 0) {
     options["cwd"] = workspace.workspaceFolders![0].uri.fsPath;
   }
+  console.log(ggshieldPath, args, options);
 
   let proc = spawnSync(ggshieldPath, args, options);
 
@@ -132,4 +133,17 @@ export function ggshieldScanFile(
   }
 
   return JSON.parse(proc.stdout);
+}
+
+export async function loginGGShield(
+  configuration: GGShieldConfiguration
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    let proc = runGGShieldCommand(configuration, ["auth", "login"]);
+    if (proc.stderr.length > 0) {
+      reject();
+    } else {
+      resolve();
+    }
+  });
 }

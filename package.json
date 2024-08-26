@@ -21,17 +21,12 @@
       "properties": {
         "ggshield.ggshieldPath": {
           "type": "string",
-          "default": "",
-          "markdownDescription": "Path to ggshield executable (use `$ where ggshield` to find out)"
-        },
-        "ggshield.apiKey": {
-          "type": "string",
           "default": null,
-          "description": "GitGuardian Internal Monitoring API key"
+          "markdownDescription": "Path to ggshield executable (use `$ where ggshield` to find out)"
         },
         "ggshield.apiUrl": {
           "type": "string",
-          "default": "https://api.gitguardian.com/",
+          "default": null,
           "description": "GitGuardian Internal Monitoring URL (default: https://api.gitguardian.com/)"
         }
       }

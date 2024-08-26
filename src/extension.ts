@@ -1,9 +1,13 @@
 import {
   ggshieldScanFile,
   ignoreLastFound,
+  loginGGShield,
   showAPIQuota,
 } from "./lib/ggshield-api";
-import { GGShieldConfiguration } from "./lib/ggshield-configuration";
+import {
+  createDefaultConfiguration,
+  GGShieldConfiguration,
+} from "./lib/ggshield-configuration";
 import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
   Diagnostic,
@@ -16,6 +20,7 @@ import {
   workspace,
 } from "vscode";
 import { GGShieldResolver } from "./lib/ggshield-resolver";
+import { isGitInstalled } from "./utils";
 
 /**
  * Extension diagnostic collection
@@ -65,7 +70,7 @@ function cleanUpFileDiagnostics(fileUri: Uri): void {
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GGShield Resolver");
-  let configuration = new GGShieldConfiguration();
+  let configuration = createDefaultConfiguration(context);
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
     context,
@@ -73,18 +78,20 @@ export function activate(context: ExtensionContext) {
   );
 
   ggshieldResolver
-    .getGGShieldPath()
-    .then(() => {
-      const isGitInstalled = ggshieldResolver.isGitInstalled();
-
-      if (!isGitInstalled) {
+    .checkGGShieldConfiguration()
+    .then(async () => {
+      // Check if git is installed
+      console.log("git is installed and configured");
+      const gitInstallation = await isGitInstalled();
+      if (!gitInstallation) {
         window.showErrorMessage(
           `GGShield requires git to work correctly. Please install git.`
         );
       }
     })
-    .then(() => {
-      ggshieldResolver.loginGGShield();
+    .then(async () => {
+      await loginGGShield(ggshieldResolver.configuration);
+      console.log("ggshield is logged in");
     })
     .then(() => {
       // Start scanning documents on activation events
