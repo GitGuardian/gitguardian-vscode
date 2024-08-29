@@ -47,8 +47,8 @@ export function parseGGShieldResults(
         entityWithIncidents.incidents.forEach((incident: Incident) => {
           incident.occurrences.forEach((occurrence: Occurrence) => {
             let range = new Range(
-              new Position(occurrence.line_start, occurrence.index_start),
-              new Position(occurrence.line_end, occurrence.index_end)
+              new Position(occurrence.line_start - 1, occurrence.index_start),
+              new Position(occurrence.line_end - 1, occurrence.index_end)
             );
             let diagnostic = new Diagnostic(
               range,
