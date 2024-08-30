@@ -1,4 +1,5 @@
 import {
+  ggshieldAuthStatus,
   ggshieldScanFile,
   ignoreLastFound,
   loginGGShield,
@@ -18,14 +19,19 @@ import {
   languages,
   window,
   workspace,
+  StatusBarItem,
+  StatusBarAlignment,
 } from "vscode";
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { isGitInstalled } from "./utils";
+import { GGShieldViewProvider } from "./ggshield-view";
+import { StatusBarStatus, updateStatusBarItem } from "./status-bar-utils";
 
 /**
  * Extension diagnostic collection
  */
 let diagnosticCollection: DiagnosticCollection;
+let statusBar: StatusBarItem;
 
 /**
  * Scan a file using ggshield
@@ -38,22 +44,22 @@ let diagnosticCollection: DiagnosticCollection;
  * @param filePath path to file
  * @param fileUri file uri
  */
-function scanFile(
+async function scanFile(
   this: any,
   filePath: string,
   fileUri: Uri,
   configuration: GGShieldConfiguration
-): void {
+): Promise<void> {
   const results = ggshieldScanFile(filePath, configuration);
   if (!results) {
+    updateStatusBarItem(StatusBarStatus.ready, statusBar);
     return;
   }
-
   let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   if (incidentsDiagnostics.length !== 0) {
-    window.showWarningMessage(`GGShield found problems.`);
+    updateStatusBarItem(StatusBarStatus.secretFound, statusBar);
   } else {
-    window.showInformationMessage(`GGShield: no problems found.`);
+    updateStatusBarItem(StatusBarStatus.noSecretFound, statusBar);
   }
   diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
@@ -76,6 +82,13 @@ export function activate(context: ExtensionContext) {
     context,
     configuration
   );
+  const ggshieldViewProvider = new GGShieldViewProvider(ggshieldResolver);
+  window.registerTreeDataProvider("gitguardianView", ggshieldViewProvider);
+  context.subscriptions.push(ggshieldViewProvider);
+
+  statusBar = window.createStatusBarItem(StatusBarAlignment.Left, 0);
+  updateStatusBarItem(StatusBarStatus.initialization, statusBar);
+  context.subscriptions.push(statusBar);
 
   ggshieldResolver
     .checkGGShieldConfiguration()
@@ -89,10 +102,6 @@ export function activate(context: ExtensionContext) {
         );
       }
     })
-    .then(async () => {
-      await loginGGShield(ggshieldResolver.configuration);
-      console.log("ggshield is logged in");
-    })
     .then(() => {
       // Start scanning documents on activation events
       // (i.e. when a new document is opened or when the document is saved)
@@ -101,14 +110,17 @@ export function activate(context: ExtensionContext) {
       context.subscriptions.push(diagnosticCollection);
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
+          updateStatusBarItem(StatusBarStatus.scanning, statusBar);
           scanFile(
             textDocument.fileName,
             textDocument.uri,
             ggshieldResolver.configuration
           );
         }),
-        workspace.onDidOpenTextDocument((textDocument) => {
-          if (textDocument.uri.scheme !== "git") {
+        workspace.onDidOpenTextDocument(async (textDocument) => {
+          updateStatusBarItem(StatusBarStatus.scanning, statusBar);
+          let isAuthenticated = await ggshieldAuthStatus(configuration);
+          if (textDocument.uri.scheme !== "git" && isAuthenticated) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
@@ -119,21 +131,38 @@ export function activate(context: ExtensionContext) {
         workspace.onDidCloseTextDocument((textDocument) =>
           cleanUpFileDiagnostics(textDocument.uri)
         ),
-        commands.registerCommand("ggshield.quota", () => {
+        commands.registerCommand("gitguardian.quota", () => {
           showAPIQuota(ggshieldResolver.configuration);
         }),
-        commands.registerCommand("ggshield.ignore", () => {
+        commands.registerCommand("gitguardian.ignore", () => {
           ignoreLastFound(ggshieldResolver.configuration);
           if (window.activeTextEditor) {
             cleanUpFileDiagnostics(window.activeTextEditor?.document.uri);
+          }
+        }),
+        commands.registerCommand("gitguardian.authenticate", async () => {
+          const isAuthenticated = await loginGGShield(
+            ggshieldResolver.configuration,
+            outputChannel
+          );
+          if (isAuthenticated) {
+            updateStatusBarItem(StatusBarStatus.ready, statusBar);
+            ggshieldViewProvider.refresh();
+          } else {
+            updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
           }
         })
       );
     })
     .catch((error) => {
       outputChannel.appendLine(`Error: ${error.message}`);
+      updateStatusBarItem(StatusBarStatus.error, statusBar);
     });
   outputChannel.show();
 }
 
-export function deactivate() {}
+export function deactivate() {
+  if (diagnosticCollection) {
+    diagnosticCollection.dispose();
+  }
+}

@@ -1,8 +1,8 @@
 {
-  "name": "ggshield",
+  "name": "gitguardian",
   "repository": "https://gitlab.gitguardian.ovh/gg-code/ggshield-vscode-extension.git",
-  "displayName": "ggshield",
-  "description": "GitGuardian's ggshield integration",
+  "displayName": "gitguardian",
+  "description": "GitGuardian's integration",
   "version": "0.0.1",
   "publisher": "GitGuardian",
   "engines": {
@@ -17,14 +17,14 @@
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "ggshield",
+      "title": "gitguardian",
       "properties": {
-        "ggshield.ggshieldPath": {
+        "gitguardian.ggshieldPath": {
           "type": "string",
           "default": null,
           "markdownDescription": "Path to ggshield executable (use `$ where ggshield` to find out)"
         },
-        "ggshield.apiUrl": {
+        "gitguardian.apiUrl": {
           "type": "string",
           "default": null,
           "description": "GitGuardian Internal Monitoring URL (default: https://api.gitguardian.com/)"
@@ -33,12 +33,40 @@
     },
     "commands": [
       {
-        "command": "ggshield.quota",
-        "title": "ggshield: Show quota"
+        "command": "gitguardian.quota",
+        "title": "gitguardian: Show quota"
       },
       {
-        "command": "ggshield.ignore",
-        "title": "ggshield: Ignore last found incidents"
+        "command": "gitguardian.ignore",
+        "title": "gitguardian: Ignore last found incidents"
+      },
+      {
+        "command": "gitguardian.authenticate",
+        "title": "gitguardian: Authenticate"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "gitguardian",
+          "title": "GitGuardian",
+          "icon": "logo.png"
+        }
+      ]
+    },
+    "views": {
+      "gitguardian": [
+        {
+          "id": "gitguardianView",
+          "name": "gitguardian",
+          "when": "gitguardian.isAuthenticated == false"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "gitguardianView",
+        "contents": "To get started with GitGuardian, please authenticate.\n[Authenticate](command:gitguardian.authenticate)"
       }
     ]
   },

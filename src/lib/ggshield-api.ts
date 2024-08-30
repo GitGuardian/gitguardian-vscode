@@ -1,5 +1,5 @@
 import {
-  SpawnOptions,
+  SpawnOptionsWithoutStdio,
   SpawnSyncOptionsWithStringEncoding,
   SpawnSyncReturns,
   spawn,
@@ -136,14 +136,62 @@ export function ggshieldScanFile(
 }
 
 export async function loginGGShield(
+  configuration: GGShieldConfiguration,
+  outputChannel: any
+): Promise<boolean> {
+  const { ggshieldPath, apiUrl } = configuration;
+
+  let options: SpawnOptionsWithoutStdio = {
+    cwd: os.tmpdir(),
+    env: {
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      GITGUARDIAN_API_URL: apiUrl,
+    },
+    windowsHide: true,
+  };
+
+  let args = ["auth", "login", "--method=web"];
+  console.log(ggshieldPath, args, options);
+
+  return new Promise((resolve) => {
+    const proc = spawn(ggshieldPath, args, options);
+
+    proc.stdout.on("data", (data) => {
+      outputChannel.appendLine(`ggshield stdout: ${data.toString()}`);
+    });
+
+    proc.stderr.on("data", (data) => {
+      outputChannel.appendLine(`ggshield stderr: ${data.toString()}`);
+    });
+
+    proc.on("close", (code) => {
+      if (code !== 0) {
+        outputChannel.appendLine(`ggshield process exited with code ${code}`);
+        resolve(false);
+      } else {
+        outputChannel.appendLine("ggshield login completed successfully");
+        resolve(true);
+      }
+    });
+
+    proc.on("error", (err) => {
+      outputChannel.appendLine(`ggshield process error: ${err.message}`);
+      resolve(false);
+    });
+  });
+}
+
+export async function ggshieldAuthStatus(
   configuration: GGShieldConfiguration
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    let proc = runGGShieldCommand(configuration, ["auth", "login"]);
-    if (proc.stderr.length > 0) {
-      reject();
+): Promise<boolean> {
+  return new Promise((resolve) => {
+    const proc = runGGShieldCommand(configuration, ["api-status"]);
+    if (proc.stderr || proc.error) {
+      console.log(proc.stderr);
+      resolve(false);
     } else {
-      resolve();
+      console.log(proc.stdout);
+      resolve(true);
     }
   });
 }
