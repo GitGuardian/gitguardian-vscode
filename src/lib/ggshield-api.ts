@@ -181,17 +181,15 @@ export async function loginGGShield(
   });
 }
 
-export async function ggshieldAuthStatus(
+export function ggshieldAuthStatus(
   configuration: GGShieldConfiguration
-): Promise<boolean> {
-  return new Promise((resolve) => {
-    const proc = runGGShieldCommand(configuration, ["api-status"]);
-    if (proc.stderr || proc.error) {
-      console.log(proc.stderr);
-      resolve(false);
-    } else {
-      console.log(proc.stdout);
-      resolve(true);
-    }
-  });
+): boolean {
+  const proc = runGGShieldCommand(configuration, ["api-status"]);
+  if (proc.stderr || proc.error) {
+    console.log(proc.stderr);
+    return false;
+  } else {
+    console.log(proc.stdout);
+    return true;
+  }
 }

@@ -77,6 +77,7 @@ export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GGShield Resolver");
   let configuration = createDefaultConfiguration(context);
+  let authStatus: boolean = false;
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
     context,
@@ -92,6 +93,13 @@ export function activate(context: ExtensionContext) {
 
   ggshieldResolver
     .checkGGShieldConfiguration()
+    .then(() => {
+      // Check if ggshield is authenticated
+      authStatus = ggshieldAuthStatus(configuration);
+      if (!authStatus) {
+        updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+      }
+    })
     .then(async () => {
       // Check if git is installed
       console.log("git is installed and configured");
@@ -110,17 +118,16 @@ export function activate(context: ExtensionContext) {
       context.subscriptions.push(diagnosticCollection);
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
-          updateStatusBarItem(StatusBarStatus.scanning, statusBar);
-          scanFile(
-            textDocument.fileName,
-            textDocument.uri,
-            ggshieldResolver.configuration
-          );
+          if (authStatus) {
+            scanFile(
+              textDocument.fileName,
+              textDocument.uri,
+              ggshieldResolver.configuration
+            );
+          }
         }),
         workspace.onDidOpenTextDocument(async (textDocument) => {
-          updateStatusBarItem(StatusBarStatus.scanning, statusBar);
-          let isAuthenticated = await ggshieldAuthStatus(configuration);
-          if (textDocument.uri.scheme !== "git" && isAuthenticated) {
+          if (textDocument.uri.scheme !== "git" && authStatus) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
@@ -146,6 +153,7 @@ export function activate(context: ExtensionContext) {
             outputChannel
           );
           if (isAuthenticated) {
+            authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
             ggshieldViewProvider.refresh();
           } else {
@@ -164,5 +172,6 @@ export function activate(context: ExtensionContext) {
 export function deactivate() {
   if (diagnosticCollection) {
     diagnosticCollection.dispose();
+    statusBar.dispose();
   }
 }

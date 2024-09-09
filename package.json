@@ -3,6 +3,7 @@
   "repository": "https://gitlab.gitguardian.ovh/gg-code/ggshield-vscode-extension.git",
   "displayName": "gitguardian",
   "description": "GitGuardian's integration",
+  "icon": "images/icon.png",
   "version": "0.0.1",
   "publisher": "GitGuardian",
   "engines": {
@@ -50,7 +51,7 @@
         {
           "id": "gitguardian",
           "title": "GitGuardian",
-          "icon": "logo.png"
+          "icon": "./images/gitguardian.svg"
         }
       ]
     },
