@@ -58,6 +58,7 @@
     "views": {
       "gitguardian": [
         {
+          "type": "webview",
           "id": "gitguardianView",
           "name": "gitguardian",
           "when": "gitguardian.isAuthenticated == false"
