@@ -24,24 +24,24 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
       };
     case StatusBarStatus.unauthenticated:
       return {
-        text: "Gitguardian - please authenticate",
+        text: "Gitguardian - Please authenticate",
         color: "statusBarItem.warningBackground",
       };
     case StatusBarStatus.ready:
       return { text: "Gitguardian is ready", color: "statusBar.foreground" };
     case StatusBarStatus.scanning:
       return {
-        text: "Gitguardian - scanning...",
+        text: "Gitguardian - Scanning...",
         color: "statusBar.foreground",
       };
     case StatusBarStatus.secretFound:
       return {
-        text: "Gitguardian - found secret",
+        text: "Gitguardian - Secret found",
         color: "statusBarItem.errorBackground",
       };
     case StatusBarStatus.noSecretFound:
       return {
-        text: "Gitguardian - no secret found",
+        text: "Gitguardian - No secret found",
         color: "statusBar.foreground",
       };
     case StatusBarStatus.error:
