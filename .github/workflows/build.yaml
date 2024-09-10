@@ -1,0 +1,39 @@
+name: vsixbuilder
+
+on:
+  push:
+    branches: [ mathieubellon/build-release-action ]
+
+permissions:
+  contents: read
+
+jobs:
+  build_vsix_file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+    
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      
+      - name: Setup VSCE
+        run: sudo yarn global add vsce@latest
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Build extension
+        run: |
+          vsce package --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ --allow-missing-repository
+          mv *.vsix gitguardian-vscode.vsix
+      
+      - name: Upload extension package
+        uses: actions/upload-artifact@v4
+        with:
+          name: gitguardian-vscode.vsix
+          path: gitguardian-vscode.vsix
+      
+    
