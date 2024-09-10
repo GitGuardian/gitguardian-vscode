@@ -32,3 +32,6 @@ tsconfig.base.tsbuildinfo%
 
 # ouput dir
 out/
+
+# build files
+**/*.vsix

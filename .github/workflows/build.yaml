@@ -27,7 +27,7 @@ jobs:
 
       - name: Build extension
         run: |
-          vsce package
+          vsce package --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ --allow-missing-repository
           mv *.vsix gitguardian-vscode.vsix
       
       - name: Upload extension package
