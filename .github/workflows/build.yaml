@@ -20,10 +20,10 @@ jobs:
           node-version: 22
       
       - name: Setup VSCE
-        run: sudo npm install -g vsce@latest
+        run: sudo yarn install -g vsce@latest
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
       - name: Build extension
         run: |
