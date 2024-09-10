@@ -18,17 +18,17 @@
   "main": "./out/extension.js",
   "contributes": {
     "configuration": {
-      "title": "gitguardian",
+      "title": "GitGuardian",
       "properties": {
-        "gitguardian.ggshieldPath": {
+        "gitguardian.GGShieldPath": {
           "type": "string",
           "default": null,
-          "markdownDescription": "Path to ggshield executable (use `$ where ggshield` to find out)"
+          "markdownDescription": "You can override the embedded GitGuardian CLI binary (ggshield) with a custom path"
         },
         "gitguardian.apiUrl": {
           "type": "string",
-          "default": null,
-          "description": "GitGuardian Internal Monitoring URL (default: https://api.gitguardian.com/)"
+          "default": "https://api.gitguardian.com",
+          "markdownDescription": "You can override the value here for On Premise installations"
         }
       }
     },

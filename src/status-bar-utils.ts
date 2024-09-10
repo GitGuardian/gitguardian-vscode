@@ -25,7 +25,7 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
       };
     case StatusBarStatus.unauthenticated:
       return {
-        text: "Gitguardian - please authenticate",
+        text: "Gitguardian - Please authenticate",
         color: "statusBarItem.warningBackground",
         // TODO: onclick open sidebar
       };
