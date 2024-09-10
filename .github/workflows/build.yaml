@@ -2,7 +2,7 @@ name: vsixbuilder
 
 on:
   push:
-    branches: [ mathieubellon/build-release-action ]
+    branches: [ main ]
 
 permissions:
   contents: read
