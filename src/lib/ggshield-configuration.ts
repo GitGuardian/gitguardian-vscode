@@ -2,6 +2,8 @@ import { getBinaryAbsolutePath } from "./ggshield-resolver-utils";
 import { ExtensionContext, workspace } from "vscode";
 import * as os from "os";
 
+const apiUrlDefault = "https://api.gitguardian.com/";
+
 export class GGShieldConfiguration {
   ggshieldPath: string;
   apiUrl: string;
@@ -19,15 +21,18 @@ export class GGShieldConfiguration {
  * @returns {GGShieldConfiguration} from the extension settings
  */
 export function getSettingsConfiguration(): GGShieldConfiguration | undefined {
-  const config = workspace.getConfiguration("ggshield");
+  const config = workspace.getConfiguration("gitguardian");
 
-  const ggshieldPath: string | undefined = config.get("ggshieldPath");
+  const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
 
-  if (!ggshieldPath && !apiUrl) {
+  if (!ggshieldPath) {
     return undefined;
   }
-  return new GGShieldConfiguration(ggshieldPath, apiUrl);
+  return new GGShieldConfiguration(
+    ggshieldPath,
+    apiUrl ? apiUrl : apiUrlDefault
+  );
 }
 
 export function createDefaultConfiguration(
