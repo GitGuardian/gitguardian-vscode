@@ -21,33 +21,39 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
       return {
         text: "Gitguardian - Initializing...",
         color: "statusBar.foreground",
+        // TODO: onclick open output channel if the bar is frozen and I want to see what's going on
       };
     case StatusBarStatus.unauthenticated:
       return {
         text: "Gitguardian - Please authenticate",
         color: "statusBarItem.warningBackground",
+        // TODO: onclick open sidebar
       };
     case StatusBarStatus.ready:
       return { text: "Gitguardian is ready", color: "statusBar.foreground" };
     case StatusBarStatus.scanning:
       return {
-        text: "Gitguardian - Scanning...",
+        text: "GitGuardian - scanning...",
         color: "statusBar.foreground",
+        // TODO: onclick open output channel if the bar is frozen and I want to see what's going on
       };
     case StatusBarStatus.secretFound:
       return {
-        text: "Gitguardian - Secret found",
+        text: "GitGuardian - found secret",
         color: "statusBarItem.errorBackground",
+        // TODO: onclick open problems panel
       };
     case StatusBarStatus.noSecretFound:
       return {
-        text: "Gitguardian - No secret found",
+        text: "GitGuardian - no secret found",
         color: "statusBar.foreground",
+        // TODO: onclick open sidebar
       };
     case StatusBarStatus.error:
       return {
-        text: "Gitguardian - error",
+        text: "GitGuardian - error",
         color: "statusBarItem.errorBackground",
+        // TODO: onclick open output channel panel
       };
     default:
       return { text: "", color: "statusBar.foreground" };

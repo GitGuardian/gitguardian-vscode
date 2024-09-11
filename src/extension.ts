@@ -24,7 +24,7 @@ import {
 } from "vscode";
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { isGitInstalled } from "./utils";
-import { GGShieldViewProvider } from "./ggshield-view";
+import { GitGuardianWebviewProvider } from "./ggshield-webview/gitguardian-webview-view";
 import { StatusBarStatus, updateStatusBarItem } from "./status-bar-utils";
 
 /**
@@ -83,8 +83,11 @@ export function activate(context: ExtensionContext) {
     context,
     configuration
   );
-  const ggshieldViewProvider = new GGShieldViewProvider(ggshieldResolver);
-  window.registerTreeDataProvider("gitguardianView", ggshieldViewProvider);
+  const ggshieldViewProvider = new GitGuardianWebviewProvider(
+    configuration,
+    context.extensionUri
+  );
+  window.registerWebviewViewProvider("gitguardianView", ggshieldViewProvider);
   context.subscriptions.push(ggshieldViewProvider);
 
   statusBar = window.createStatusBarItem(StatusBarAlignment.Left, 0);
