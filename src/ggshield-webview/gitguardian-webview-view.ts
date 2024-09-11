@@ -30,7 +30,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "media")],
+      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "media"), vscode.Uri.joinPath(this._extensionUri, "images")],
     };
 
     this.updateWebViewContent(webviewView);
@@ -57,6 +57,9 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
     );
+    const logoUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, "images", "gitguardian-icon-primary700-background.svg")
+    );
 
     if (this.isAuthenticated) {
       return `
@@ -69,12 +72,13 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
           <title>GitGuardian - Authenticated</title>
         </head>
         <body>
-          <h2>Welcome to the beta version of GitGuardian for VSCode.</h2>
-          <p>Whenever you save a document, it will be automatically scanned, and any secrets found will be highlighted as errors.</p>
-          <p>You can find detailed documentation <a href="${documentationUri}" target="_blank">here</a>.</p>
+          <h2>How it works</h2>
+          <p>Each time you save a document, it will undergo automatic scanning, and any detected secrets will be highlighted as errors.</p>
+          <p><a href="${documentationUri}" target="_blank">Open documentation</a></p>
 
           <h2>Feedback</h2>
-          <p>We value your feedback greatly. Please share any issues or suggestions using the following <a href="${feedbackFormUri}" target="_blank">Feedback Form</a>.</p>
+          <p>This extension is in beta.</p>
+          <p>Please share any issues or suggestions <a href="${feedbackFormUri}" target="_blank"> using the following feedback form</a>.</p>
         </body>
         </html>`;
     } else {
@@ -88,9 +92,12 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
           <title>GitGuardian - Welcome</title>
         </head>
         <body>
-          <h1>Welcome to GitGuardian</h1>
-          <p>To get started with GitGuardian, please authenticate.</p>
-          <button id="authenticate">Authenticate</button>
+          <div class="anonymous">
+            <img src="${logoUri}" alt="GitGuardian Logo" height="100px"; />
+            <h1 style="margin-bottom:0px;">Welcome to GitGuardian</h1>
+            <p>Protect your code from secrets leakage</p>
+            <button class="button large" id="authenticate">Link your IDE to your account</button>
+          </div>
           <script>
             const vscode = acquireVsCodeApi();
             document.getElementById('authenticate').addEventListener('click', () => {
@@ -108,7 +115,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
   dispose(): void {
     if (this._view) {
-      this._view.webview.onDidReceiveMessage(() => {});
+      this._view.webview.onDidReceiveMessage(() => { });
       this._view.webview.html = "";
       this._view = undefined;
     }
