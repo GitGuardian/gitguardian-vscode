@@ -3,6 +3,7 @@ import { StatusBarItem, ThemeColor } from "vscode";
 export interface StatusBarConfig {
   text: string;
   color: string;
+  command?: string;
 }
 
 export enum StatusBarStatus {
@@ -21,13 +22,13 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
       return {
         text: "GitGuardian - Initializing...",
         color: "statusBar.foreground",
-        // TODO: onclick open output channel if the bar is frozen and I want to see what's going on
+        command: "gitguardian.showOutput",
       };
     case StatusBarStatus.unauthenticated:
       return {
         text: "GitGuardian - Please authenticate",
         color: "statusBarItem.warningBackground",
-        // TODO: onclick open sidebar
+        command: "gitguardian.openSidebar",
       };
     case StatusBarStatus.ready:
       return { text: "GitGuardian is ready", color: "statusBar.foreground" };
@@ -35,25 +36,26 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
       return {
         text: "GitGuardian - Scanning...",
         color: "statusBar.foreground",
-        // TODO: onclick open output channel if the bar is frozen and I want to see what's going on
+        command: "gitguardian.showOutput",
       };
     case StatusBarStatus.secretFound:
       return {
         text: "GitGuardian - Secret found",
         color: "statusBarItem.errorBackground",
+        command: "gitguardian.openProblems",
         // TODO: onclick open problems panel
       };
     case StatusBarStatus.noSecretFound:
       return {
         text: "GitGuardian - No secret found",
         color: "statusBar.foreground",
-        // TODO: onclick open sidebar
+        command: "gitguardian.openSidebar",
       };
     case StatusBarStatus.error:
       return {
         text: "GitGuardian - error",
         color: "statusBarItem.errorBackground",
-        // TODO: onclick open output channel panel
+        command: "gitguardian.showOutput",
       };
     default:
       return { text: "", color: "statusBar.foreground" };
@@ -67,6 +69,13 @@ export function updateStatusBarItem(
   const config = getStatusBarConfig(status);
   statusBarItem.text = config.text;
   statusBarItem.backgroundColor = new ThemeColor(config.color);
+
+  // If the command is defined, assign it to the status bar item
+  if (config.command) {
+    statusBarItem.command = config.command;
+  } else {
+    statusBarItem.command = undefined;
+  }
 
   statusBarItem.show();
 }

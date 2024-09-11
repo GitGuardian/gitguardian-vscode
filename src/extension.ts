@@ -73,6 +73,38 @@ function cleanUpFileDiagnostics(fileUri: Uri): void {
   diagnosticCollection.delete(fileUri);
 }
 
+function registerOpenViewsCommands(
+  context: ExtensionContext,
+  outputChannel: any
+) {
+  const showOutputCommand = commands.registerCommand(
+    "gitguardian.showOutput",
+    () => {
+      outputChannel.show();
+    }
+  );
+
+  const openSidebarCommand = commands.registerCommand(
+    "gitguardian.openSidebar",
+    () => {
+      commands.executeCommand("workbench.view.extension.gitguardian");
+    }
+  );
+
+  const openProblemsCommand = commands.registerCommand(
+    "gitguardian.openProblems",
+    () => {
+      commands.executeCommand("workbench.actions.view.problems");
+    }
+  );
+
+  context.subscriptions.push(
+    showOutputCommand,
+    openSidebarCommand,
+    openProblemsCommand
+  );
+}
+
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GGShield Resolver");
@@ -92,6 +124,9 @@ export function activate(context: ExtensionContext) {
 
   statusBar = window.createStatusBarItem(StatusBarAlignment.Left, 0);
   updateStatusBarItem(StatusBarStatus.initialization, statusBar);
+
+  //generic commands to open correct view on status bar click
+  registerOpenViewsCommands(context, outputChannel);
   context.subscriptions.push(statusBar);
 
   ggshieldResolver

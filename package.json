@@ -44,6 +44,18 @@
       {
         "command": "gitguardian.authenticate",
         "title": "gitguardian: Authenticate"
+      },
+      {
+        "command": "gitguardian.showOutput",
+        "title": "Show Output"
+      },
+      {
+        "command": "gitguardian.openSidebar",
+        "title": "Open Sidebar"
+      },
+      {
+        "command": "gitguardian.openProblems",
+        "title": "Open Problems"
       }
     ],
     "viewsContainers": {
