@@ -181,6 +181,7 @@ export function activate(context: ExtensionContext) {
               textDocument.uri,
               ggshieldResolver.configuration
             );
+            ggshieldQuotaViewProvider.refresh();
           }
         }),
         workspace.onDidCloseTextDocument((textDocument) =>
@@ -188,6 +189,7 @@ export function activate(context: ExtensionContext) {
         ),
         commands.registerCommand("gitguardian.quota", () => {
           showAPIQuota(ggshieldResolver.configuration);
+          ggshieldQuotaViewProvider.refresh();
         }),
         commands.registerCommand("gitguardian.ignore", () => {
           ignoreLastFound(ggshieldResolver.configuration);

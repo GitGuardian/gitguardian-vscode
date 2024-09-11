@@ -43,12 +43,11 @@ export class GitGuardianQuotaWebviewProvider
 
   private async checkAuthenticationStatus() {
     this.isAuthenticated = ggshieldAuthStatus(this.ggshieldConfiguration);
-    this.updateWebViewContent(this._view);
   }
 
-  private updateQuota() {
+  private async updateQuota() {
     if (this.isAuthenticated) {
-      this.quota = getAPIquota(this.ggshieldConfiguration);
+      this.quota = await getAPIquota(this.ggshieldConfiguration);
     }
   }
 
@@ -93,6 +92,9 @@ export class GitGuardianQuotaWebviewProvider
 
   public refresh() {
     this.checkAuthenticationStatus();
+    this.updateQuota();
+
+    this.updateWebViewContent(this._view);
   }
 
   dispose(): void {

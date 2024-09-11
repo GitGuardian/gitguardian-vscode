@@ -67,7 +67,9 @@ export function showAPIQuota(configuration: GGShieldConfiguration): undefined {
   }
 }
 
-export function getAPIquota(configuration: GGShieldConfiguration): number {
+export async function getAPIquota(
+  configuration: GGShieldConfiguration
+): Promise<number> {
   try {
     const proc = runGGShieldCommand(configuration, ["quota", "--json"]);
     return JSON.parse(proc.stdout).remaining;
