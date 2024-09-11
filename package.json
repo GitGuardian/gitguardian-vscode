@@ -72,8 +72,12 @@
         {
           "type": "webview",
           "id": "gitguardianView",
-          "name": "gitguardian",
-          "when": "gitguardian.isAuthenticated == false"
+          "name": "gitguardian"
+        },
+        {
+          "type": "webview",
+          "id": "gitguardianQuotaView",
+          "name": "quota"
         }
       ]
     },

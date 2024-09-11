@@ -31,6 +31,7 @@ import {
   generateSecretName,
   GitGuardianSecretHoverProvider,
 } from "./gitguardian-hover-provider";
+import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 
 /**
  * Extension diagnostic collection
@@ -124,8 +125,17 @@ export function activate(context: ExtensionContext) {
     configuration,
     context.extensionUri
   );
+
+  const ggshieldQuotaViewProvider = new GitGuardianQuotaWebviewProvider(
+    configuration,
+    context.extensionUri
+  );
   window.registerWebviewViewProvider("gitguardianView", ggshieldViewProvider);
-  context.subscriptions.push(ggshieldViewProvider);
+  window.registerWebviewViewProvider(
+    "gitguardianQuotaView",
+    ggshieldQuotaViewProvider
+  );
+  context.subscriptions.push(ggshieldViewProvider, ggshieldQuotaViewProvider);
 
   statusBar = window.createStatusBarItem(StatusBarAlignment.Left, 0);
   updateStatusBarItem(StatusBarStatus.initialization, statusBar);
@@ -212,6 +222,7 @@ export function activate(context: ExtensionContext) {
             authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
             ggshieldViewProvider.refresh();
+            ggshieldQuotaViewProvider.refresh();
           } else {
             updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
           }
