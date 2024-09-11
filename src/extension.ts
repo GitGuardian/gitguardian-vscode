@@ -111,6 +111,13 @@ function registerOpenViewsCommands(
   );
 }
 
+function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
+  commands.registerCommand(
+    "gitguardian.refreshQuota",
+    async () => await view.refresh()
+  );
+}
+
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GGShield Resolver");
@@ -142,6 +149,7 @@ export function activate(context: ExtensionContext) {
 
   //generic commands to open correct view on status bar click
   registerOpenViewsCommands(context, outputChannel);
+  registerQuotaViewCommands(ggshieldQuotaViewProvider);
   context.subscriptions.push(statusBar);
 
   context.subscriptions.push(
@@ -181,7 +189,6 @@ export function activate(context: ExtensionContext) {
               textDocument.uri,
               ggshieldResolver.configuration
             );
-            ggshieldQuotaViewProvider.refresh();
           }
         }),
         workspace.onDidCloseTextDocument((textDocument) =>
@@ -189,7 +196,6 @@ export function activate(context: ExtensionContext) {
         ),
         commands.registerCommand("gitguardian.quota", () => {
           showAPIQuota(ggshieldResolver.configuration);
-          ggshieldQuotaViewProvider.refresh();
         }),
         commands.registerCommand("gitguardian.ignore", () => {
           ignoreLastFound(ggshieldResolver.configuration);
@@ -235,7 +241,6 @@ export function activate(context: ExtensionContext) {
       outputChannel.appendLine(`Error: ${error.message}`);
       updateStatusBarItem(StatusBarStatus.error, statusBar);
     });
-  outputChannel.show();
 }
 
 export function deactivate() {

@@ -90,9 +90,9 @@ export class GitGuardianQuotaWebviewProvider
     }
   }
 
-  public refresh() {
-    this.checkAuthenticationStatus();
-    this.updateQuota();
+  public async refresh() {
+    await this.checkAuthenticationStatus();
+    await this.updateQuota();
 
     this.updateWebViewContent(this._view);
   }
