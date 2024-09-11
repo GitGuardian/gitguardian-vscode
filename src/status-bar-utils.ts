@@ -19,18 +19,18 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
   switch (status) {
     case StatusBarStatus.initialization:
       return {
-        text: "Gitguardian - Initializing...",
+        text: "GitGuardian - Initializing...",
         color: "statusBar.foreground",
         // TODO: onclick open output channel if the bar is frozen and I want to see what's going on
       };
     case StatusBarStatus.unauthenticated:
       return {
-        text: "Gitguardian - Please authenticate",
+        text: "GitGuardian - Please authenticate",
         color: "statusBarItem.warningBackground",
         // TODO: onclick open sidebar
       };
     case StatusBarStatus.ready:
-      return { text: "Gitguardian is ready", color: "statusBar.foreground" };
+      return { text: "GitGuardian is ready", color: "statusBar.foreground" };
     case StatusBarStatus.scanning:
       return {
         text: "GitGuardian - Scanning...",
