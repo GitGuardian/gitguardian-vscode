@@ -129,15 +129,6 @@ export function activate(context: ExtensionContext) {
             );
           }
         }),
-        workspace.onDidOpenTextDocument(async (textDocument) => {
-          if (textDocument.uri.scheme !== "git" && authStatus) {
-            scanFile(
-              textDocument.fileName,
-              textDocument.uri,
-              ggshieldResolver.configuration
-            );
-          }
-        }),
         workspace.onDidCloseTextDocument((textDocument) =>
           cleanUpFileDiagnostics(textDocument.uri)
         ),
