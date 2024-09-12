@@ -25,20 +25,12 @@ export class GitGuardianQuotaWebviewProvider
     _token: vscode.CancellationToken
   ) {
     this._view = webviewView;
+    this.refresh();
 
-    webviewView.webview.options = {
-      enableScripts: true,
-      localResourceRoots: [
-        vscode.Uri.joinPath(this._extensionUri, "media"),
-        vscode.Uri.joinPath(this._extensionUri, "images"),
-      ],
-    };
-
-    this.updateWebViewContent(webviewView);
-
-    webviewView.webview.onDidReceiveMessage(async (data) => {
-      if (data.type === "authenticate") {
-        vscode.commands.executeCommand("gitguardian.authenticate");
+    webviewView.onDidChangeVisibility(() => {
+      if (webviewView.visible) {
+        // Refresh the quota when the view becomes visible (e.g., after being collapsed and reopened)
+        this.refresh();
       }
     });
   }
@@ -55,24 +47,11 @@ export class GitGuardianQuotaWebviewProvider
 
   private updateWebViewContent(webviewView?: vscode.WebviewView) {
     if (webviewView) {
-      webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+      webviewView.webview.html = this.getHtmlForWebview();
     }
   }
 
-  private getHtmlForWebview(webview: vscode.Webview): string {
-    const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
-    );
-    const logoUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(
-        this._extensionUri,
-        "images",
-        "gitguardian-icon-primary700-background.svg"
-      )
-    );
-
-    this.updateQuota();
-
+  private getHtmlForWebview(): string {
     if (this.isLoading) {
       return `
         <!DOCTYPE html>
