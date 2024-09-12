@@ -85,7 +85,8 @@
         {
           "type": "webview",
           "id": "gitguardianQuotaView",
-          "name": "quota"
+          "name": "quota",
+          "collapsed": true
         }
       ]
     },

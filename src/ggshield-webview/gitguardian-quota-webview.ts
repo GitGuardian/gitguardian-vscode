@@ -9,12 +9,14 @@ export class GitGuardianQuotaWebviewProvider
   private _view?: vscode.WebviewView;
   private isAuthenticated: boolean = false;
   private quota: number = 0;
+  private isLoading: boolean = false;
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
     private readonly _extensionUri: vscode.Uri
   ) {
     this.checkAuthenticationStatus();
+    this.updateQuota();
   }
 
   public async resolveWebviewView(
@@ -71,6 +73,16 @@ export class GitGuardianQuotaWebviewProvider
 
     this.updateQuota();
 
+    if (this.isLoading) {
+      return `
+        <!DOCTYPE html>
+        <html lang="en">
+        <body>
+          <p>Loading...</p>
+        </body>
+        </html>`;
+    }
+
     if (this.isAuthenticated) {
       return `
         <!DOCTYPE html>
@@ -91,9 +103,13 @@ export class GitGuardianQuotaWebviewProvider
   }
 
   public async refresh() {
+    this.isLoading = true;
+    this.updateWebViewContent(this._view);
+
     await this.checkAuthenticationStatus();
     await this.updateQuota();
 
+    this.isLoading = false;
     this.updateWebViewContent(this._view);
   }
 
