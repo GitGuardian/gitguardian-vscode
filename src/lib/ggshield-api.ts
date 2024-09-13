@@ -28,6 +28,8 @@ export function runGGShieldCommand(
     env: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       GITGUARDIAN_API_URL: apiUrl,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      USER_AGENT: "gitguardian-vscode",
     },
     encoding: "utf-8",
     windowsHide: true,
