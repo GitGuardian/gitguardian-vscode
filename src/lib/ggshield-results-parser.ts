@@ -62,6 +62,8 @@ Incident URL: ${incident.incident_url || "N/A"}
 Secret SHA: ${incident.ignore_sha}`,
               DiagnosticSeverity.Warning
             );
+
+            diagnostic.source = "gitguardian";
             diagnostics.push(diagnostic);
           });
         });
