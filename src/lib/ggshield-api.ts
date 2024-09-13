@@ -95,6 +95,32 @@ export function ignoreLastFound(
 }
 
 /**
+ * Ignore one secret.
+ *
+ * Show error message on failure
+ */
+export function ignoreSecret(
+  configuration: GGShieldConfiguration,
+  secretSha: string,
+  secretName: string
+): boolean {
+  const proc = runGGShieldCommand(configuration, [
+    "secret",
+    "ignore",
+    secretSha,
+    "--name",
+    secretName,
+  ]);
+  if (proc.stderr || proc.error) {
+    console.log(proc.stderr);
+    return false;
+  } else {
+    console.log(proc.stdout);
+    return true;
+  }
+}
+
+/**
  * Scan a file using ggshield CLI application
  *
  * Show error messages on failure

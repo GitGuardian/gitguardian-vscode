@@ -2,6 +2,7 @@ import {
   ggshieldAuthStatus,
   ggshieldScanFile,
   ignoreLastFound,
+  ignoreSecret,
   loginGGShield,
   showAPIQuota,
 } from "./lib/ggshield-api";
@@ -23,9 +24,13 @@ import {
   StatusBarAlignment,
 } from "vscode";
 import { GGShieldResolver } from "./lib/ggshield-resolver";
-import { isGitInstalled } from "./utils";
+import { getCurrentFile, isGitInstalled } from "./utils";
 import { GitGuardianWebviewProvider } from "./ggshield-webview/gitguardian-webview-view";
 import { StatusBarStatus, updateStatusBarItem } from "./status-bar-utils";
+import {
+  generateSecretName,
+  GitGuardianSecretHoverProvider,
+} from "./gitguardian-hover-provider";
 
 /**
  * Extension diagnostic collection
@@ -129,6 +134,10 @@ export function activate(context: ExtensionContext) {
   registerOpenViewsCommands(context, outputChannel);
   context.subscriptions.push(statusBar);
 
+  context.subscriptions.push(
+    languages.registerHoverProvider("*", new GitGuardianSecretHoverProvider())
+  );
+
   ggshieldResolver
     .checkGGShieldConfiguration()
     .then(() => {
@@ -176,6 +185,24 @@ export function activate(context: ExtensionContext) {
             cleanUpFileDiagnostics(window.activeTextEditor?.document.uri);
           }
         }),
+        commands.registerCommand(
+          "gitguardian.ignoreSecret",
+          (diagnosticData) => {
+            let currentFile = getCurrentFile();
+            let secretName = generateSecretName(currentFile, diagnosticData);
+
+            ignoreSecret(
+              ggshieldResolver.configuration,
+              diagnosticData.secretSha,
+              secretName
+            );
+            scanFile(
+              currentFile,
+              Uri.file(currentFile),
+              ggshieldResolver.configuration
+            );
+          }
+        ),
         commands.registerCommand("gitguardian.authenticate", async () => {
           const isAuthenticated = await loginGGShield(
             ggshieldResolver.configuration,

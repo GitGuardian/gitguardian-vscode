@@ -1,4 +1,6 @@
+import * as vscode from "vscode";
 import { spawnSync } from "child_process";
+import path = require("path");
 
 export async function isGitInstalled(): Promise<boolean> {
   return new Promise((resolve) => {
@@ -10,4 +12,13 @@ export async function isGitInstalled(): Promise<boolean> {
       resolve(true);
     }
   });
+}
+
+export function getCurrentFile(): string {
+  const activeEditor = vscode.window.activeTextEditor;
+  if (activeEditor) {
+    return activeEditor.document.fileName;
+  } else {
+    return "";
+  }
 }
