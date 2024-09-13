@@ -148,6 +148,8 @@ export async function loginGGShield(
     env: {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       GITGUARDIAN_API_URL: apiUrl,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      GG_USER_AGENT: "gitguardian-vscode",
     },
     windowsHide: true,
   };
