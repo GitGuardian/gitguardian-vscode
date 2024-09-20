@@ -56,6 +56,14 @@
       {
         "command": "gitguardian.openProblems",
         "title": "Open Problems"
+      },
+      {
+        "command": "gitguardian.refreshQuota",
+        "title": "Refresh Quota",
+        "icon": {
+          "light": "images/refresh-light.svg",
+          "dark": "images/refresh-dark.svg"
+        }
       }
     ],
     "viewsContainers": {
@@ -72,8 +80,13 @@
         {
           "type": "webview",
           "id": "gitguardianView",
-          "name": "gitguardian",
-          "when": "gitguardian.isAuthenticated == false"
+          "name": "gitguardian"
+        },
+        {
+          "type": "webview",
+          "id": "gitguardianQuotaView",
+          "name": "quota",
+          "collapsed": true
         }
       ]
     },
@@ -82,7 +95,16 @@
         "view": "gitguardianView",
         "contents": "To get started with GitGuardian, please authenticate.\n[Authenticate](command:gitguardian.authenticate)"
       }
-    ]
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "gitguardian.refreshQuota",
+          "group": "navigation",
+          "when": "view == gitguardianQuotaView"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "yarn run compile",

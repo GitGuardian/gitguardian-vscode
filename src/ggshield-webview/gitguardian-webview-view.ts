@@ -30,7 +30,10 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
     webviewView.webview.options = {
       enableScripts: true,
-      localResourceRoots: [vscode.Uri.joinPath(this._extensionUri, "media"), vscode.Uri.joinPath(this._extensionUri, "images")],
+      localResourceRoots: [
+        vscode.Uri.joinPath(this._extensionUri, "media"),
+        vscode.Uri.joinPath(this._extensionUri, "images"),
+      ],
     };
 
     this.updateWebViewContent(webviewView);
@@ -43,8 +46,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
   }
 
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = await ggshieldAuthStatus(this.ggshieldConfiguration);
-    this.updateWebViewContent(this._view);
+    this.isAuthenticated = ggshieldAuthStatus(this.ggshieldConfiguration);
   }
 
   private updateWebViewContent(webviewView?: vscode.WebviewView) {
@@ -58,7 +60,11 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
       vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
     );
     const logoUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "images", "gitguardian-icon-primary700-background.svg")
+      vscode.Uri.joinPath(
+        this._extensionUri,
+        "images",
+        "gitguardian-icon-primary700-background.svg"
+      )
     );
 
     if (this.isAuthenticated) {
@@ -111,11 +117,13 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
   public refresh() {
     this.checkAuthenticationStatus();
+
+    this.updateWebViewContent(this._view);
   }
 
   dispose(): void {
     if (this._view) {
-      this._view.webview.onDidReceiveMessage(() => { });
+      this._view.webview.onDidReceiveMessage(() => {});
       this._view.webview.html = "";
       this._view = undefined;
     }
