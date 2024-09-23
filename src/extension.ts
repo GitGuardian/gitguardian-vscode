@@ -26,11 +26,11 @@ import {
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { getCurrentFile, isGitInstalled } from "./utils";
 import { GitGuardianWebviewProvider } from "./ggshield-webview/gitguardian-webview-view";
-import { StatusBarStatus, updateStatusBarItem } from "./status-bar-utils";
+import { StatusBarStatus, updateStatusBarItem } from "./giguardian-interface/gitguardian-status-bar";
 import {
   generateSecretName,
   GitGuardianSecretHoverProvider,
-} from "./gitguardian-hover-provider";
+} from "./giguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 
 /**
