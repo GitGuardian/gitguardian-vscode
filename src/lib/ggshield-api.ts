@@ -232,7 +232,26 @@ export function ggshieldAuthStatus(
     console.log(proc.stderr);
     return false;
   } else {
+    if (proc.stdout.includes("unhealthy")) {
+      return false;
+    }
     console.log(proc.stdout);
     return true;
+  }
+}
+
+export function ggshieldApiKey(
+  configuration: GGShieldConfiguration,
+): string | undefined {
+  const proc = runGGShieldCommand(configuration, ["config", "list"]);
+  if (proc.stderr || proc.error) {
+    console.log(proc.stderr);
+    return undefined;
+  } else {
+    console.log(proc.stdout);
+    const regexToken = /token: ([a-zA-Z0-9]+)/;  
+    const matchToken = proc.stdout.match(regexToken);
+  
+    return matchToken ? matchToken[1].trim() : undefined;
   }
 }

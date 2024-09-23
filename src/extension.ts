@@ -1,4 +1,5 @@
 import {
+  ggshieldApiKey,
   ggshieldAuthStatus,
   ggshieldScanFile,
   ignoreLastFound,
@@ -9,6 +10,7 @@ import {
 import {
   getConfiguration,
   GGShieldConfiguration,
+  setApiKey,
 } from "./lib/ggshield-configuration";
 import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
@@ -233,6 +235,7 @@ export function activate(context: ExtensionContext) {
             authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
             commands.executeCommand('setContext', 'isAuthenticated', true);
+            setApiKey(configuration, ggshieldApiKey(configuration));
             ggshieldViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
           } else {
