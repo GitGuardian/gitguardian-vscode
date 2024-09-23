@@ -20,26 +20,16 @@ export class GGShieldConfiguration {
  * TODO: Check with Mathieu if this behaviour is expected
  * @returns {GGShieldConfiguration} from the extension settings
  */
-export function getSettingsConfiguration(): GGShieldConfiguration | undefined {
+export function getConfiguration(
+  context: ExtensionContext
+): GGShieldConfiguration {
   const config = workspace.getConfiguration("gitguardian");
 
   const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
 
-  if (!ggshieldPath) {
-    return undefined;
-  }
   return new GGShieldConfiguration(
-    ggshieldPath,
+    ggshieldPath ? ggshieldPath : getBinaryAbsolutePath(os.platform(), os.arch(), context),
     apiUrl ? apiUrl : apiUrlDefault
-  );
-}
-
-export function createDefaultConfiguration(
-  context: ExtensionContext
-): GGShieldConfiguration {
-  return new GGShieldConfiguration(
-    getBinaryAbsolutePath(os.platform(), os.arch(), context),
-    "https://api.gitguardian.com/"
   );
 }

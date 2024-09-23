@@ -7,7 +7,7 @@ import {
   showAPIQuota,
 } from "./lib/ggshield-api";
 import {
-  createDefaultConfiguration,
+  getConfiguration,
   GGShieldConfiguration,
 } from "./lib/ggshield-configuration";
 import { parseGGShieldResults } from "./lib/ggshield-results-parser";
@@ -121,7 +121,7 @@ function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GitGuardian");
-  let configuration = createDefaultConfiguration(context);
+  let configuration = getConfiguration(context);
   let authStatus: boolean = false;
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
