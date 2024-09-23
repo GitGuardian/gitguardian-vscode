@@ -120,7 +120,7 @@ function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
 
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
-  const outputChannel = window.createOutputChannel("GGShield Resolver");
+  const outputChannel = window.createOutputChannel("GitGuardian");
   let configuration = createDefaultConfiguration(context);
   let authStatus: boolean = false;
   const ggshieldResolver = new GGShieldResolver(
@@ -222,6 +222,7 @@ export function activate(context: ExtensionContext) {
           }
         ),
         commands.registerCommand("gitguardian.authenticate", async () => {
+          outputChannel.show();
           const isAuthenticated = await loginGGShield(
             ggshieldResolver.configuration,
             outputChannel
