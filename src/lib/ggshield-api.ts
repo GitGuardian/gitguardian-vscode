@@ -21,7 +21,7 @@ export function runGGShieldCommand(
   configuration: GGShieldConfiguration,
   args: string[]
 ): SpawnSyncReturns<string> {
-  const { ggshieldPath, apiUrl } = configuration;
+  const { ggshieldPath, apiUrl, apiKey } = configuration;
 
   let options: SpawnSyncOptionsWithStringEncoding = {
     cwd: os.tmpdir(),
@@ -30,6 +30,8 @@ export function runGGShieldCommand(
       GITGUARDIAN_API_URL: apiUrl,
       // eslint-disable-next-line @typescript-eslint/naming-convention
       GG_USER_AGENT: "gitguardian-vscode",
+      //eslint-disable-next-line @typescript-eslint/naming-convention
+      GITGUARDIAN_API_KEY: apiKey,
     },
     encoding: "utf-8",
     windowsHide: true,
@@ -178,7 +180,7 @@ export async function loginGGShield(
   configuration: GGShieldConfiguration,
   outputChannel: any
 ): Promise<boolean> {
-  const { ggshieldPath, apiUrl } = configuration;
+  const { ggshieldPath, apiUrl, apiKey } = configuration;
 
   let options: SpawnOptionsWithoutStdio = {
     cwd: os.tmpdir(),

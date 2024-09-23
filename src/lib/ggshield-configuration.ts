@@ -7,10 +7,12 @@ const apiUrlDefault = "https://api.gitguardian.com/";
 export class GGShieldConfiguration {
   ggshieldPath: string;
   apiUrl: string;
+  apiKey: string;
 
-  constructor(ggshieldPath: string = "", apiUrl: string = "") {
+  constructor(ggshieldPath: string = "", apiUrl: string = "", apiKey: string = "") {
     this.ggshieldPath = ggshieldPath;
     this.apiUrl = apiUrl;
+    this.apiKey = apiKey;
   }
 }
 
@@ -27,9 +29,11 @@ export function getConfiguration(
 
   const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
+  const apiKey: string | undefined = config.get("apiKey");
 
   return new GGShieldConfiguration(
     ggshieldPath ? ggshieldPath : getBinaryAbsolutePath(os.platform(), os.arch(), context),
-    apiUrl ? apiUrl : apiUrlDefault
+    apiUrl ? apiUrl : apiUrlDefault,
+    apiKey ? apiKey : ""
   );
 }
