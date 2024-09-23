@@ -7,6 +7,7 @@ import {
   spawnSync,
 } from "child_process";
 import { workspace, window } from "vscode";
+import axios from 'axios';
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
 import * as os from "os";
@@ -87,6 +88,23 @@ export async function getAPIquota(
   } catch (e) {
     return 0;
   }
+}
+
+
+export async function getRemediationMessage(
+  configuration: GGShieldConfiguration
+): Promise<string> {
+  const path = require('node:path');
+    try {
+      const response = await axios.get(path.join(configuration.apiUrl,'v1/metadata'), {
+          headers: {
+              'authorization': `Token ${configuration.apiKey}`
+          }
+      });
+      return response.data.remediation_messages.pre_commit;
+    } catch (error) {
+        return "An error occured.";
+    }
 }
 
 /**

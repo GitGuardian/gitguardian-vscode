@@ -34,6 +34,7 @@ import {
   GitGuardianSecretHoverProvider,
 } from "./giguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
+import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
 
 /**
  * Extension diagnostic collection
@@ -135,16 +136,24 @@ export function activate(context: ExtensionContext) {
     context.extensionUri
   );
 
+  const ggshieldRemediationMessageViewProvider = new GitGuardianRemediationMessageWebviewProvider(
+    configuration,
+    context.extensionUri
+  );
   const ggshieldQuotaViewProvider = new GitGuardianQuotaWebviewProvider(
     configuration,
     context.extensionUri
   );
   window.registerWebviewViewProvider("gitguardianView", ggshieldViewProvider);
   window.registerWebviewViewProvider(
+    "gitguardianRemediationMessageView",
+    ggshieldRemediationMessageViewProvider
+  );
+  window.registerWebviewViewProvider(
     "gitguardianQuotaView",
     ggshieldQuotaViewProvider
   );
-  context.subscriptions.push(ggshieldViewProvider, ggshieldQuotaViewProvider);
+  context.subscriptions.push(ggshieldViewProvider, ggshieldRemediationMessageViewProvider, ggshieldQuotaViewProvider);
 
   statusBar = window.createStatusBarItem(StatusBarAlignment.Left, 0);
   updateStatusBarItem(StatusBarStatus.initialization, statusBar);
@@ -241,6 +250,7 @@ export function activate(context: ExtensionContext) {
             const ggshieldApi = ggshieldApiKey(configuration);
             setApiKey(configuration, ggshieldApi);
             ggshieldViewProvider.refresh();
+            ggshieldRemediationMessageViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
           } else {
             updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
