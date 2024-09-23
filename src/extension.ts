@@ -120,6 +120,7 @@ function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
 
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
+  commands.executeCommand('setContext', 'isAuthenticated', false);
   const outputChannel = window.createOutputChannel("GGShield Resolver");
   let configuration = createDefaultConfiguration(context);
   let authStatus: boolean = false;
@@ -163,7 +164,9 @@ export function activate(context: ExtensionContext) {
       authStatus = ggshieldAuthStatus(configuration);
       if (!authStatus) {
         updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
-      }
+       } else {
+        commands.executeCommand('setContext', 'isAuthenticated', true);
+       }
     })
     .then(async () => {
       // Check if git is installed
@@ -229,6 +232,7 @@ export function activate(context: ExtensionContext) {
           if (isAuthenticated) {
             authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
+            commands.executeCommand('setContext', 'isAuthenticated', true);
             ggshieldViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
           } else {

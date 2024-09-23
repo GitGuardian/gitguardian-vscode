@@ -86,7 +86,8 @@
           "type": "webview",
           "id": "gitguardianQuotaView",
           "name": "quota",
-          "collapsed": true
+          "collapsed": true,
+          "when": "isAuthenticated == true"
         }
       ]
     },
