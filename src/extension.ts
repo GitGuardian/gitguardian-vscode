@@ -163,7 +163,9 @@ export function activate(context: ExtensionContext) {
       authStatus = ggshieldAuthStatus(configuration);
       if (!authStatus) {
         updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
-      }
+       } else {
+        commands.executeCommand('setContext', 'isAuthenticated', true);
+       }
     })
     .then(async () => {
       // Check if git is installed
@@ -230,6 +232,7 @@ export function activate(context: ExtensionContext) {
           if (isAuthenticated) {
             authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
+            commands.executeCommand('setContext', 'isAuthenticated', true);
             ggshieldViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
           } else {
