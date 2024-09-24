@@ -2,6 +2,7 @@ import * as vscode from "vscode";
 import {
   getConfiguration,
   GGShieldConfiguration,
+  setGGShieldPath,
 } from "./ggshield-configuration";
 import { runGGShieldCommand } from "./ggshield-api";
 import { window } from "vscode";
@@ -37,6 +38,7 @@ export class GGShieldResolver {
       this.channel.appendLine(
         `Using ggshield at: ${this.configuration.ggshieldPath}, to change this go to settings.`
       );
+      setGGShieldPath(this.configuration);
       return;
     } catch (error) {
       this.channel.appendLine(
