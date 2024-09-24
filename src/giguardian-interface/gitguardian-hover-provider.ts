@@ -67,5 +67,5 @@ export function generateSecretName(
   currentFile: string,
   uriDiagnostic: any
 ): string {
-  return `${uriDiagnostic.detector} - ${currentFile}:l.${uriDiagnostic.startLine}`;
+  return `${uriDiagnostic.detector} - ${vscode.workspace.asRelativePath(currentFile)}:l.${uriDiagnostic.startLine}`;
 }
