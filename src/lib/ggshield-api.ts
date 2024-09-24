@@ -251,6 +251,12 @@ export async function loginGGShield(
   });
 }
 
+export function logoutGGShield(
+  configuration: GGShieldConfiguration
+): void {
+  const proc = runGGShieldCommand(configuration, ["auth", "logout"]);
+}
+
 export function ggshieldAuthStatus(
   configuration: GGShieldConfiguration
 ): boolean {

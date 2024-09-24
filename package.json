@@ -51,6 +51,10 @@
         "title": "gitguardian: Authenticate"
       },
       {
+        "command": "gitguardian.logout",
+        "title": "gitguardian: logout"
+      },
+      {
         "command": "gitguardian.showOutput",
         "title": "Show Output"
       },
