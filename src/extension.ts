@@ -173,13 +173,14 @@ export function activate(context: ExtensionContext) {
     .then(() => {
       // Check if ggshield is authenticated
       authStatus = ggshieldAuthStatus(configuration);
-      if (!authStatus) {
-        updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
-       } else {
+      const ggshieldApi = ggshieldApiKey(configuration);
+      if (authStatus && ggshieldApi) {
         commands.executeCommand('setContext', 'isAuthenticated', true);
         updateStatusBarItem(StatusBarStatus.ready, statusBar);
-        const ggshieldApi = ggshieldApiKey(configuration);
         setApiKey(configuration, ggshieldApi);
+       } else {
+        updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+        authStatus = false;
       }
     })
     .then(async () => {
