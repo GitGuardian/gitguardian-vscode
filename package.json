@@ -29,6 +29,11 @@
           "type": "string",
           "default": "https://api.gitguardian.com",
           "markdownDescription": "You can override the value here for On Premise installations"
+        },
+        "gitguardian.apiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Your API Key"
         }
       }
     },

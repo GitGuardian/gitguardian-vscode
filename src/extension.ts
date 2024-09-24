@@ -1,4 +1,5 @@
 import {
+  ggshieldApiKey,
   ggshieldAuthStatus,
   ggshieldScanFile,
   ignoreLastFound,
@@ -7,8 +8,9 @@ import {
   showAPIQuota,
 } from "./lib/ggshield-api";
 import {
-  createDefaultConfiguration,
+  getConfiguration,
   GGShieldConfiguration,
+  setApiKey,
 } from "./lib/ggshield-configuration";
 import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
@@ -121,7 +123,7 @@ function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
   const outputChannel = window.createOutputChannel("GitGuardian");
-  let configuration = createDefaultConfiguration(context);
+  let configuration = getConfiguration(context);
   let authStatus: boolean = false;
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
@@ -165,7 +167,10 @@ export function activate(context: ExtensionContext) {
         updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
        } else {
         commands.executeCommand('setContext', 'isAuthenticated', true);
-       }
+        updateStatusBarItem(StatusBarStatus.ready, statusBar);
+        const ggshieldApi = ggshieldApiKey(configuration);
+        setApiKey(configuration, ggshieldApi);
+      }
     })
     .then(async () => {
       // Check if git is installed
@@ -233,6 +238,8 @@ export function activate(context: ExtensionContext) {
             authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
             commands.executeCommand('setContext', 'isAuthenticated', true);
+            const ggshieldApi = ggshieldApiKey(configuration);
+            setApiKey(configuration, ggshieldApi);
             ggshieldViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
           } else {

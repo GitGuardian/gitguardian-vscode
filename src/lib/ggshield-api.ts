@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   SpawnOptionsWithoutStdio,
   SpawnSyncOptionsWithStringEncoding,
@@ -21,16 +22,26 @@ export function runGGShieldCommand(
   configuration: GGShieldConfiguration,
   args: string[]
 ): SpawnSyncReturns<string> {
-  const { ggshieldPath, apiUrl } = configuration;
+  const { ggshieldPath, apiUrl, apiKey } = configuration;
+  let env: {
+    GITGUARDIAN_API_URL: string;
+    GG_USER_AGENT: string;
+    GITGUARDIAN_API_KEY?: string; // Note the ? to indicate this property is optional
+  } = {
+    GITGUARDIAN_API_URL: apiUrl,
+    GG_USER_AGENT: "gitguardian-vscode",
+  };
+  
+  if (apiKey) {
+    env = {
+      ...env,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      GITGUARDIAN_API_KEY: apiKey,
+    };
+  }
 
   let options: SpawnSyncOptionsWithStringEncoding = {
     cwd: os.tmpdir(),
-    env: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GITGUARDIAN_API_URL: apiUrl,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GG_USER_AGENT: "gitguardian-vscode",
-    },
     encoding: "utf-8",
     windowsHide: true,
   };
@@ -178,7 +189,7 @@ export async function loginGGShield(
   configuration: GGShieldConfiguration,
   outputChannel: any
 ): Promise<boolean> {
-  const { ggshieldPath, apiUrl } = configuration;
+  const { ggshieldPath, apiUrl, apiKey } = configuration;
 
   let options: SpawnOptionsWithoutStdio = {
     cwd: os.tmpdir(),
@@ -230,7 +241,35 @@ export function ggshieldAuthStatus(
     console.log(proc.stderr);
     return false;
   } else {
+    if (proc.stdout.includes("unhealthy")) {
+      return false;
+    }
     console.log(proc.stdout);
     return true;
+  }
+}
+
+export function ggshieldApiKey(
+  configuration: GGShieldConfiguration,
+): string | undefined {
+  const proc = runGGShieldCommand(configuration, ["config", "list"]);
+  if (proc.stderr || proc.error) {
+    console.log(proc.stderr);
+    return undefined;
+  } else {
+    console.log(proc.stdout);
+    const apiUrl = configuration.apiUrl;
+    const re = /api/;
+
+    const regexInstanceSection = `\\[${apiUrl.replace(re, "dashboard")}\\]([\\s\\S]*?)(?=\\[|$)`;
+    const instanceSectionMatch = proc.stdout.match(regexInstanceSection);
+
+    if (instanceSectionMatch) {
+      const instanceSection = instanceSectionMatch[0];
+      const regexToken = /token:\s([a-zA-Z0-9]+)/;
+      const matchToken = instanceSection.match(regexToken);
+      
+      return matchToken ? matchToken[1].trim() : undefined;
+    }
   }
 }
