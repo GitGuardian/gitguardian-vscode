@@ -5,6 +5,7 @@ import {
   ignoreLastFound,
   ignoreSecret,
   loginGGShield,
+  logoutGGShield,
   showAPIQuota,
 } from "./lib/ggshield-api";
 import {
@@ -255,6 +256,16 @@ export function activate(context: ExtensionContext) {
           } else {
             updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
           }
+        }),
+        commands.registerCommand("gitguardian.logout", async () => {
+          outputChannel.show();
+          logoutGGShield(ggshieldResolver.configuration);
+          updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+          commands.executeCommand('setContext', 'isAuthenticated', false);
+          setApiKey(configuration, undefined);
+          ggshieldViewProvider.refresh();
+          ggshieldRemediationMessageViewProvider.refresh();
+          ggshieldQuotaViewProvider.refresh();
         })
       );
     })
