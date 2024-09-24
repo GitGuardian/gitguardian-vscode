@@ -167,7 +167,10 @@ export function activate(context: ExtensionContext) {
         updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
        } else {
         commands.executeCommand('setContext', 'isAuthenticated', true);
-       }
+        updateStatusBarItem(StatusBarStatus.ready, statusBar);
+        const ggshieldApi = ggshieldApiKey(configuration);
+        setApiKey(configuration, ggshieldApi);
+      }
     })
     .then(async () => {
       // Check if git is installed
@@ -235,7 +238,8 @@ export function activate(context: ExtensionContext) {
             authStatus = true;
             updateStatusBarItem(StatusBarStatus.ready, statusBar);
             commands.executeCommand('setContext', 'isAuthenticated', true);
-            setApiKey(configuration, ggshieldApiKey(configuration));
+            const ggshieldApi = ggshieldApiKey(configuration);
+            setApiKey(configuration, ggshieldApi);
             ggshieldViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
           } else {

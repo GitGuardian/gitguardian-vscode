@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import {
   SpawnOptionsWithoutStdio,
   SpawnSyncOptionsWithStringEncoding,
@@ -22,17 +23,25 @@ export function runGGShieldCommand(
   args: string[]
 ): SpawnSyncReturns<string> {
   const { ggshieldPath, apiUrl, apiKey } = configuration;
+  let env: {
+    GITGUARDIAN_API_URL: string;
+    GG_USER_AGENT: string;
+    GITGUARDIAN_API_KEY?: string; // Note the ? to indicate this property is optional
+  } = {
+    GITGUARDIAN_API_URL: apiUrl,
+    GG_USER_AGENT: "gitguardian-vscode",
+  };
+  
+  if (apiKey) {
+    env = {
+      ...env,
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      GITGUARDIAN_API_KEY: apiKey,
+    };
+  }
 
   let options: SpawnSyncOptionsWithStringEncoding = {
     cwd: os.tmpdir(),
-    env: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GITGUARDIAN_API_URL: apiUrl,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GG_USER_AGENT: "gitguardian-vscode",
-      //eslint-disable-next-line @typescript-eslint/naming-convention
-      GITGUARDIAN_API_KEY: apiKey,
-    },
     encoding: "utf-8",
     windowsHide: true,
   };
@@ -249,9 +258,18 @@ export function ggshieldApiKey(
     return undefined;
   } else {
     console.log(proc.stdout);
-    const regexToken = /token: ([a-zA-Z0-9]+)/;  
-    const matchToken = proc.stdout.match(regexToken);
-  
-    return matchToken ? matchToken[1].trim() : undefined;
+    const apiUrl = configuration.apiUrl;
+    const re = /api/;
+
+    const regexInstanceSection = `\\[${apiUrl.replace(re, "dashboard")}\\]([\\s\\S]*?)(?=\\[|$)`;
+    const instanceSectionMatch = proc.stdout.match(regexInstanceSection);
+
+    if (instanceSectionMatch) {
+      const instanceSection = instanceSectionMatch[0];
+      const regexToken = /token:\s([a-zA-Z0-9]+)/;
+      const matchToken = instanceSection.match(regexToken);
+      
+      return matchToken ? matchToken[1].trim() : undefined;
+    }
   }
 }

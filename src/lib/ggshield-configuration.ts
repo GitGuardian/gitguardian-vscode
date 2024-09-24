@@ -1,5 +1,5 @@
 import { getBinaryAbsolutePath } from "./ggshield-resolver-utils";
-import { ExtensionContext, workspace } from "vscode";
+import { ConfigurationTarget, ExtensionContext, workspace } from "vscode";
 import * as os from "os";
 
 const apiUrlDefault = "https://api.gitguardian.com/";
@@ -43,6 +43,7 @@ export function setApiKey(configuration: GGShieldConfiguration, apiKey: string |
   if (!apiKey) {
     throw new Error("Missing API Key");
   }
+
   configuration.apiKey = apiKey;
-  config.update("apiKey", apiKey);
+  config.update("apiKey", apiKey, ConfigurationTarget.Global);
 }
