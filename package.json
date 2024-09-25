@@ -94,7 +94,9 @@
         {
           "type": "webview",
           "id": "gitguardianRemediationMessageView",
-          "name": "remediation message"
+          "name": "remediation message",
+          "collapsed": true,
+          "when": "isAuthenticated == true"
         },
         {
           "type": "webview",
