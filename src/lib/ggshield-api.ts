@@ -27,10 +27,12 @@ export function runGGShieldCommand(
   let env: {
     GITGUARDIAN_API_URL: string;
     GG_USER_AGENT: string;
+    GITGUARDIAN_DONT_LOAD_ENV: string;
     GITGUARDIAN_API_KEY?: string; // Note the ? to indicate this property is optional
-  } = {
+    } = {
     GITGUARDIAN_API_URL: apiUrl,
     GG_USER_AGENT: "gitguardian-vscode",
+    GITGUARDIAN_DONT_LOAD_ENV: "true",
   };
   
   if (apiKey) {
@@ -43,6 +45,7 @@ export function runGGShieldCommand(
 
   let options: SpawnSyncOptionsWithStringEncoding = {
     cwd: os.tmpdir(),
+    env: env,
     encoding: "utf-8",
     windowsHide: true,
   };
@@ -273,6 +276,11 @@ export function ggshieldAuthStatus(
   }
 }
 
+/**
+ * Get ggshield API key from ggshield config list
+ * 
+ * Search for the correct instance section and return the token
+ * */
 export function ggshieldApiKey(
   configuration: GGShieldConfiguration,
 ): string | undefined {
@@ -292,8 +300,13 @@ export function ggshieldApiKey(
       const instanceSection = instanceSectionMatch[0];
       const regexToken = /token:\s([a-zA-Z0-9]+)/;
       const matchToken = instanceSection.match(regexToken);
+
+      // if the token is not found, or is not a valid token, return undefined
+      if (!matchToken || matchToken[1].trim().length !== 71 ) {
+        return undefined;
+      }
       
-      return matchToken ? matchToken[1].trim() : undefined;
+      return matchToken[1].trim();
     }
   }
 }
