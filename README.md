@@ -1,6 +1,6 @@
 # GitGuardian's ggshield VSCode extension
 
-## Table of contents
+## Table of content
 
 - [GitGuardian's ggshield VSCode extension](#gitguardians-ggshield-vscode-extension)
   - [Table of contents](#table-of-contents)
@@ -20,45 +20,24 @@
 
 ## Description
 
-This extension helps you detect more than 350+ types of secrets, as well as other potential security vulnerabilities or policy breaks affecting your codebase, directly from VSCode using [ggshield](https://www.gitguardian.com/ggshield)) CLI application.
+This extension helps you detect more than 400+ types of secrets directly from VSCode using [ggshield](https://www.gitguardian.com/ggshield)) CLI application.
 
 NB: The extension uses the quota of secret detection of your ggshield API token.
 
 ### Features
 
-- When a file is opened or saved, it is scanned using the ggshield CLI application
+- When a file is saved, it is scanned using the ggshield CLI application
 - Found incidents are highlighted in code and available in the `Problems` panel as warnings
-- Secrets can be ignored running the command `ggshield: Ignore last found incidents`
+- Secrets can be ignored running the command `ggshield: Ignore last found incidents` or via the UI
 - The API quota can be checked running the command `ggshield: Show quota`
 
-![Incident highlighted](./doc/incident_highlighted.png)
+![Incident highlighted](./doc/incident_highlighted_dark.png)
 
 ## Getting started
 
-### Requirements
-
-The extension requires `ggshield` to be installed. See [documentation](https://docs.gitguardian.com/ggshield-docs/getting-started) for more details on how to install and use it.
-
-The current minimum version is *1.15.0*.
-
-### Installation
-
-To test the plugin, open this project with VSCode and press F5, a window called "Development Host" will open with the extension loaded.  
-You then need to set up the extension settings.
-
-Once released it will installed directly from the VS Code Marketplace.
-
-### Configuration
-
-- `ggshield.ggshieldPath`: Path to ggshield executable (use `$ where ggshield` to find out)
-- `ggshield.apiKey`: GitGuardian Internal Monitoring API key
-- `ggshield.apiUrl`: GitGuardian Internal Monitoring URL (default: <https://api.gitguardian.com/>)
-
-![Settings](./doc/settings.png)
-
 ### Scan for secrets
 
-The scanning is triggered automatically when opening or saving a file. Incidents are highlighted in file and available in the `Problems` panel as warnings.
+The scanning is triggered automatically when saving a file. Incidents are highlighted in file and available in the `Problems` panel as warnings.
 
 ### How to remediate incidents?
 
