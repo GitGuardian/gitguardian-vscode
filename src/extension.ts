@@ -202,7 +202,9 @@ export function activate(context: ExtensionContext) {
       context.subscriptions.push(diagnosticCollection);
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
-          if (authStatus) {
+          // Check if the document is inside the workspace
+          const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
+          if (authStatus && workspaceFolder) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
