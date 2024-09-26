@@ -225,6 +225,9 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand(
           "gitguardian.ignoreSecret",
           (diagnosticData) => {
+            window.showInformationMessage(
+              'Secret ignored.'
+            );
             let currentFile = getCurrentFile();
             let secretName = generateSecretName(currentFile, diagnosticData);
 
