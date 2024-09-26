@@ -11,6 +11,7 @@ import axios from 'axios';
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
 import * as os from "os";
+import { apiToDashboard, dasboardToApi } from "../utils";
 
 /**
  * Run ggshield CLI application with specified arguments
@@ -97,9 +98,10 @@ export async function getAPIquota(
 export async function getRemediationMessage(
   configuration: GGShieldConfiguration
 ): Promise<string> {
+  const apiUrl = dasboardToApi(configuration.apiUrl);
   const path = require('node:path');
     try {
-      const response = await axios.get(path.join(configuration.apiUrl,'v1/metadata'), {
+      const response = await axios.get(path.join(apiUrl,'v1/metadata'), {
           headers: {
               'authorization': `Token ${configuration.apiKey}`
           }
@@ -305,7 +307,7 @@ export function ggshieldApiKey(
     const apiUrl = configuration.apiUrl;
     const re = /api/;
 
-    const regexInstanceSection = `\\[${apiUrl.replace(re, "dashboard")}\\]([\\s\\S]*?)(?=\\[|$)`;
+    const regexInstanceSection = `\\[${apiToDashboard(apiUrl)}\\]([\\s\\S]*?)(?=\\[|$)`;
     const instanceSectionMatch = proc.stdout.match(regexInstanceSection);
 
     if (instanceSectionMatch) {
