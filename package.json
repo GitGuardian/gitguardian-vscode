@@ -1,10 +1,10 @@
 {
   "name": "gitguardian",
-  "repository": "https://gitlab.gitguardian.ovh/gg-code/ggshield-vscode-extension.git",
+  "repository": "https://github.com/GitGuardian/gitguardian-vscode",
   "displayName": "GitGuardian",
-  "description": "GitGuardian's integration",
+  "description": "Visual Studio Code extension designed to help developers safeguard their sensitive information from accidental leaks in their code",
   "icon": "images/icon.png",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "publisher": "GitGuardian",
   "engines": {
     "vscode": "^1.81.0"
