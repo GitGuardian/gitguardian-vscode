@@ -6,7 +6,7 @@ import {
   spawn,
   spawnSync,
 } from "child_process";
-import { workspace, window } from "vscode";
+import { workspace, window, WebviewView } from "vscode";
 import axios from 'axios';
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
@@ -28,7 +28,7 @@ export function runGGShieldCommand(
     GITGUARDIAN_API_URL: string;
     GG_USER_AGENT: string;
     GITGUARDIAN_DONT_LOAD_ENV: string;
-    GITGUARDIAN_API_KEY?: string; // Note the ? to indicate this property is optional
+    GITGUARDIAN_API_KEY?: string;
     } = {
     GITGUARDIAN_API_URL: apiUrl,
     GG_USER_AGENT: "gitguardian-vscode",
@@ -208,7 +208,8 @@ export function ggshieldScanFile(
 
 export async function loginGGShield(
   configuration: GGShieldConfiguration,
-  outputChannel: any
+  outputChannel: any,
+  webviewView: WebviewView,
 ): Promise<boolean> {
   const { ggshieldPath, apiUrl, apiKey } = configuration;
 
@@ -230,8 +231,19 @@ export async function loginGGShield(
     const proc = spawn(ggshieldPath, args, options);
 
     proc.stdout.on("data", (data) => {
-      outputChannel.appendLine(`ggshield stdout: ${data.toString()}`);
+      const output = data.toString();
+      outputChannel.appendLine(`ggshield stdout: ${output}`);
+
+      const urlLine = output.match(/https:\/\/[^\s]+/);
+      if (urlLine) {
+        const authUrl = urlLine[0];
+        webviewView.webview.postMessage({
+          type: 'authLink',
+          link: authUrl,
+        });
+      }
     });
+;
 
     proc.stderr.on("data", (data) => {
       outputChannel.appendLine(`ggshield stderr: ${data.toString()}`);
@@ -257,7 +269,7 @@ export async function loginGGShield(
 export function logoutGGShield(
   configuration: GGShieldConfiguration
 ): void {
-  const proc = runGGShieldCommand(configuration, ["auth", "logout"]);
+  runGGShieldCommand(configuration, ["auth", "logout"]);
 }
 
 export function ggshieldAuthStatus(
