@@ -25,6 +25,7 @@ import {
   workspace,
   StatusBarItem,
   StatusBarAlignment,
+  WebviewView,
 } from "vscode";
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { getCurrentFile, isGitInstalled } from "./utils";
@@ -240,10 +241,10 @@ export function activate(context: ExtensionContext) {
           }
         ),
         commands.registerCommand("gitguardian.authenticate", async () => {
-          outputChannel.show();
           const isAuthenticated = await loginGGShield(
             ggshieldResolver.configuration,
-            outputChannel
+            outputChannel,
+            ggshieldViewProvider.getView() as WebviewView
           );
           if (isAuthenticated) {
             authStatus = true;
@@ -259,7 +260,6 @@ export function activate(context: ExtensionContext) {
           }
         }),
         commands.registerCommand("gitguardian.logout", async () => {
-          outputChannel.show();
           logoutGGShield(ggshieldResolver.configuration);
           updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
           commands.executeCommand('setContext', 'isAuthenticated', false);

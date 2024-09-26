@@ -45,6 +45,11 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     });
   }
 
+  public getView(): vscode.WebviewView | undefined {
+    return this._view;
+  }
+
+
   private async checkAuthenticationStatus() {
     this.isAuthenticated = ggshieldAuthStatus(this.ggshieldConfiguration);
   }
@@ -103,15 +108,35 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
             <h1 style="margin-bottom:0px;">Welcome to GitGuardian</h1>
             <p>Protect your code from secrets leakage</p>
             <button class="button large" id="authenticate">Link your IDE to your account</button>
+            
+            <p id="authMessage" style="display:none;">
+              If your browser doesn't open automatically, <a id="authLink" href="#" target="_blank">click here</a>.
+            </p>
           </div>
+
           <script>
             const vscode = acquireVsCodeApi();
+            
+            // Button click event to trigger authentication
             document.getElementById('authenticate').addEventListener('click', () => {
               vscode.postMessage({ type: 'authenticate' });
             });
+            
+            // Listener for authentication link
+            window.addEventListener('message', event => {
+              const message = event.data;
+              
+              if (message.type === 'authLink') {
+                const authMessage = document.getElementById('authMessage');
+                const authLink = document.getElementById('authLink');
+                authLink.href = message.link;  // Set the authentication link
+                authMessage.style.display = 'block';  // Show the message
+              }
+            });
           </script>
         </body>
-        </html>`;
+        </html>
+    `;
     }
   }
 
