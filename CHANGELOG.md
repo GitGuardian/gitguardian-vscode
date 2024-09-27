@@ -1,5 +1,9 @@
-# Change Log
+# GitGuardian Secret Security Changelog
 
-## [0.0.1]
+## [0.1.0]
 
-- Initial release
+### Added
+- One-Click Authentication
+- Automatic Secret Scanning on Save
+- Custom Remediation Guidelines
+- Visibility into Usage Quota
