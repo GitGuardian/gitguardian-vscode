@@ -11,7 +11,7 @@ We detect more than 400+ types of secrets directly from VSCode using [GitGuardia
 - Secrets can be ignored running the command `gitguardian: Ignore last found incidents` or via the UI
 - Your API quota can be checked running the command `gitguardian: Show quota`
 
-![Incident highlighted](./doc/incident_highlighted_dark.png)
+![Incident highlighted](https://raw.githubusercontent.com/GitGuardian/gitguardian-vscode/main/doc/incident_highlighted_dark.png)
 
 ## Getting started
 
