@@ -305,7 +305,6 @@ export function ggshieldApiKey(
   } else {
     console.log(proc.stdout);
     const apiUrl = configuration.apiUrl;
-    const re = /api/;
 
     const regexInstanceSection = `\\[${apiToDashboard(apiUrl)}\\]([\\s\\S]*?)(?=\\[|$)`;
     const instanceSectionMatch = proc.stdout.match(regexInstanceSection);

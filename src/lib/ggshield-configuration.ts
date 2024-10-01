@@ -39,7 +39,5 @@ export function getConfiguration(
 }
 
 export function setApiKey(configuration: GGShieldConfiguration, apiKey: string | undefined): void {
-  const config = workspace.getConfiguration("gitguardian");
   configuration.apiKey = apiKey ? apiKey : "";
-  config.update("apiKey", apiKey, ConfigurationTarget.Global);
 }

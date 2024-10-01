@@ -246,6 +246,7 @@ export function activate(context: ExtensionContext) {
           }
         ),
         commands.registerCommand("gitguardian.authenticate", async () => {
+          commands.executeCommand("gitguardian.openSidebar");
           const isAuthenticated = await loginGGShield(
             ggshieldResolver.configuration,
             outputChannel,
