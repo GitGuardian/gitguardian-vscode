@@ -56,7 +56,7 @@ Security reports : Please report it using our [Vulnerability Disclosure Portal](
 
 ## Release Notes
 
-See [Change log](./CHANGELOG.md)
+See [Change log](https://github.com/GitGuardian/gitguardian-vscode/blob/main/CHANGELOG.md)
 
 ## License
 
