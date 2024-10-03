@@ -39,11 +39,12 @@ export class GGShieldResolver {
       );
       return;
     } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
       this.channel.appendLine(
-        `Failed to use ggshield version ${this.configuration.ggshieldPath}.`
+        `${errorMessage}`
       );
       window.showErrorMessage(
-        `Failed to use ggshield.`
+        `${errorMessage}`
       );
       throw error;
     }
@@ -57,29 +58,26 @@ export class GGShieldResolver {
   async testConfiguration(
     configuration: GGShieldConfiguration
   ): Promise<void> {
-    let proc = runGGShieldCommand(configuration, ["--version"]);
+    let proc = runGGShieldCommand(configuration, ["quota"]);
     if (proc.error || proc.stderr.length > 0) {
+      if (proc.error) { 
+        if (proc.error.message.includes("ENOENT")) {
+          throw new Error(
+            `GGShield path provided in settings is invalid: ${configuration.ggshieldPath}.`
+          );
+        } else {
+          throw new Error(proc.error.message);
+        }
+      } else if (proc.stderr.includes("Invalid API key")) {
+        throw new Error(
+          `API key provided in settings is invalid.`
+        );
+      }
       throw new Error(
-        `Configuration provided in settings is invalid: ${proc.error}`
+        `Configuration provided in settings is invalid: ${proc.stderr}`
       );
     } else {
       this.configuration = configuration;
-      return;
-    }
-  }
-
-  /**
-   * Tries the default bundled version of ggshield.
-   *
-   * @returns {Promise<void>} A promise that resolves if the configuration is valid.
-   */
-  private async checkBundledGGShield(): Promise<void> {
-    let proc = runGGShieldCommand(this.configuration, ["--version"]);
-    if (proc.error || proc.stderr.length > 0) {
-      throw new Error(
-        `ggshield binary not found, architecture not supported: ${proc.error}`
-      );
-    } else {
       return;
     }
   }
