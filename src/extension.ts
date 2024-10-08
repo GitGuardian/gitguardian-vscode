@@ -30,11 +30,11 @@ import {
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { getCurrentFile, isGitInstalled } from "./utils";
 import { GitGuardianWebviewProvider } from "./ggshield-webview/gitguardian-webview-view";
-import { StatusBarStatus, updateStatusBarItem } from "./giguardian-interface/gitguardian-status-bar";
+import { StatusBarStatus, updateStatusBarItem } from "./gitguardian-interface/gitguardian-status-bar";
 import {
   generateSecretName,
   GitGuardianSecretHoverProvider,
-} from "./giguardian-interface/gitguardian-hover-provider";
+} from "./gitguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
 
@@ -179,7 +179,7 @@ export function activate(context: ExtensionContext) {
         commands.executeCommand('setContext', 'isAuthenticated', true);
         updateStatusBarItem(StatusBarStatus.ready, statusBar);
         setApiKey(configuration, ggshieldApi);
-       } else {
+      } else {
         updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
         authStatus = false;
       }

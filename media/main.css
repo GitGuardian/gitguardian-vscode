@@ -1,5 +1,6 @@
 body {
     height: 100vh;
+    font-size: 16px;
 }
 
 body.vscode-light {
@@ -10,9 +11,10 @@ body.vscode-dark {
     color: white;
 }
 
-p {
-    font-size: 16px;
+h1 {
+    font-size: 1.3em;
 }
+
 
 .anonymous {
     display: flex;
