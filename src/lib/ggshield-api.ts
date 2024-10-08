@@ -276,6 +276,9 @@ export function ggshieldAuthStatus(
 ): boolean {
   const proc = runGGShieldCommand(configuration, ["api-status"]);
   if (proc.stderr || proc.error) {
+    if (proc.stderr.includes("Config key")){
+      window.showErrorMessage(`Gitguardian: ${proc.stderr}`);
+    }
     console.log(proc.stderr);
     return false;
   } else {

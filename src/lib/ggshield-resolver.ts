@@ -73,9 +73,6 @@ export class GGShieldResolver {
           `API key provided in settings is invalid.`
         );
       }
-      throw new Error(
-        `Configuration provided in settings is invalid: ${proc.stderr}`
-      );
     } else {
       this.configuration = configuration;
       return;
