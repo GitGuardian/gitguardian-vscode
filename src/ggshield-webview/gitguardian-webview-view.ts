@@ -2,8 +2,11 @@ import * as vscode from "vscode";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 import { ggshieldAuthStatus } from "../lib/ggshield-api";
 
-const documentationUri = vscode.Uri.parse(
-  "https://docs.gitguardian.com/ggshield-docs/getting-started"
+const projectDiscussionUri = vscode.Uri.parse(
+  "https://github.com/GitGuardian/gitguardian-vscode/discussions"
+);
+const projectIssuesUri = vscode.Uri.parse(
+  "https://github.com/GitGuardian/gitguardian-vscode/issues"
 );
 const feedbackFormUri = vscode.Uri.parse(
   "https://docs.google.com/forms/d/e/1FAIpQLSc_BemGrdQfxp6lg7KgeDoB32XZg8yMfapk2gbemu0mVfskDQ/viewform"
@@ -83,13 +86,17 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
           <title>GitGuardian - Authenticated</title>
         </head>
         <body>
-          <h2>How it works</h2>
-          <p>Each time you save a document, it will undergo automatic scanning, and any detected secrets will be highlighted as errors.</p>
-          <p><a href="${documentationUri}" target="_blank">Open documentation</a></p>
+          <h1>✅ The extension is active!</strong></h1>
+          <p>This initial version scans your active document upon saving, whether manually or automatically.</p>
+          <p>Stay tuned for more features coming soon!</p>
 
-          <h2>Feedback</h2>
-          <p>This extension is in beta.</p>
-          <p>Please share any issues or suggestions <a href="${feedbackFormUri}" target="_blank"> using the following feedback form</a>.</p>
+          <h1>Build with us !</h1>
+          <p>As we are in the v0.x release phase, our focus is on developing v1 incrementally and collaboratively with our users (you).</p>
+          <p><strong>Build with us ! Your feedback is essential to us during this process.</strong></p>
+          
+          <p><a href="${projectDiscussionUri}" target="_blank">👉 Join the discussion: share feedback, ideas, and vote</a></p>
+          <p><a href="${projectIssuesUri}" target="_blank">👉 Report any issues you encounter</a></p>
+          <p><a href="${feedbackFormUri}" target="_blank">👉 Provide anonymous feedback</a></p>
         </body>
         </html>`;
     } else {
@@ -148,7 +155,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
   dispose(): void {
     if (this._view) {
-      this._view.webview.onDidReceiveMessage(() => {});
+      this._view.webview.onDidReceiveMessage(() => { });
       this._view.webview.html = "";
       this._view = undefined;
     }
