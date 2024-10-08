@@ -55,8 +55,6 @@ export function runGGShieldCommand(
   if (workspace.workspaceFolders?.length || 0 > 0) {
     options["cwd"] = workspace.workspaceFolders![0].uri.fsPath;
   }
-  console.log(ggshieldPath, args, options);
-
   let proc = spawnSync(ggshieldPath, args, options);
 
   return proc;
@@ -227,7 +225,6 @@ export async function loginGGShield(
   };
 
   let args = ["auth", "login", "--method=web"];
-  console.log(ggshieldPath, args, options);
 
   return new Promise((resolve) => {
     const proc = spawn(ggshieldPath, args, options);
