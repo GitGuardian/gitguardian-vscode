@@ -28,12 +28,10 @@ export function runGGShieldCommand(
   let env: {
     GITGUARDIAN_API_URL: string;
     GG_USER_AGENT: string;
-    GITGUARDIAN_DONT_LOAD_ENV: string;
     GITGUARDIAN_API_KEY?: string;
     } = {
     GITGUARDIAN_API_URL: apiUrl,
     GG_USER_AGENT: "gitguardian-vscode",
-    GITGUARDIAN_DONT_LOAD_ENV: "true",
   };
   
   if (apiKey) {
