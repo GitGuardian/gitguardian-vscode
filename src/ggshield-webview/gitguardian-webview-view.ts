@@ -1,6 +1,5 @@
 import * as vscode from "vscode";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
-import { ggshieldAuthStatus } from "../lib/ggshield-api";
 
 const projectDiscussionUri = vscode.Uri.parse(
   "https://github.com/GitGuardian/gitguardian-vscode/discussions"
@@ -19,7 +18,8 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
-    private readonly _extensionUri: vscode.Uri
+    private readonly _extensionUri: vscode.Uri,
+    private context: vscode.ExtensionContext
   ) {
     this.checkAuthenticationStatus();
   }
@@ -54,7 +54,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
 
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = ggshieldAuthStatus(this.ggshieldConfiguration);
+    this.isAuthenticated = this.context.globalState.get("isAuthenticated", false);
   }
 
   private updateWebViewContent(webviewView?: vscode.WebviewView) {

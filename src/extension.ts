@@ -125,9 +125,11 @@ function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
 
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
+  commands.executeCommand('setContext', 'isAuthenticated', false);
+
   const outputChannel = window.createOutputChannel("GitGuardian");
   let configuration = getConfiguration(context);
-  let authStatus: boolean = false;
+
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
     context,
@@ -135,16 +137,19 @@ export function activate(context: ExtensionContext) {
   );
   const ggshieldViewProvider = new GitGuardianWebviewProvider(
     configuration,
-    context.extensionUri
+    context.extensionUri,
+    context
   );
 
   const ggshieldRemediationMessageViewProvider = new GitGuardianRemediationMessageWebviewProvider(
     configuration,
-    context.extensionUri
+    context.extensionUri,
+    context
   );
   const ggshieldQuotaViewProvider = new GitGuardianQuotaWebviewProvider(
     configuration,
-    context.extensionUri
+    context.extensionUri,
+    context
   );
   window.registerWebviewViewProvider("gitguardianView", ggshieldViewProvider);
   window.registerWebviewViewProvider(
@@ -173,15 +178,16 @@ export function activate(context: ExtensionContext) {
     .checkGGShieldConfiguration()
     .then(() => {
       // Check if ggshield is authenticated
-      authStatus = ggshieldAuthStatus(configuration);
-      const ggshieldApi = ggshieldApiKey(configuration);
-      if (authStatus && ggshieldApi) {
-        commands.executeCommand('setContext', 'isAuthenticated', true);
+      ggshieldAuthStatus(configuration, context);
+      if (context.globalState.get("isAuthenticated", false)) {
         updateStatusBarItem(StatusBarStatus.ready, statusBar);
-        setApiKey(configuration, ggshieldApi);
+        setApiKey(configuration, ggshieldApiKey(configuration));
+        ggshieldViewProvider.refresh();
+        ggshieldRemediationMessageViewProvider.refresh();
+        ggshieldQuotaViewProvider.refresh();
+
       } else {
         updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
-        authStatus = false;
       }
     })
     .then(async () => {
@@ -204,7 +210,9 @@ export function activate(context: ExtensionContext) {
         workspace.onDidSaveTextDocument((textDocument) => {
           // Check if the document is inside the workspace
           const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
-          if (authStatus && workspaceFolder) {
+          console.log(context.globalState.get("isAuthenticated", false), workspaceFolder);
+          console.log('»»»»»»»»»»»»»»', context.globalState.get("isAuthenticated", false) && workspaceFolder);
+          if (context.globalState.get("isAuthenticated", false) && workspaceFolder) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
@@ -247,28 +255,29 @@ export function activate(context: ExtensionContext) {
         ),
         commands.registerCommand("gitguardian.authenticate", async () => {
           commands.executeCommand("gitguardian.openSidebar");
-          const isAuthenticated = await loginGGShield(
+          await loginGGShield(
             ggshieldResolver.configuration,
             outputChannel,
-            ggshieldViewProvider.getView() as WebviewView
-          );
-          if (isAuthenticated) {
-            authStatus = true;
-            updateStatusBarItem(StatusBarStatus.ready, statusBar);
-            commands.executeCommand('setContext', 'isAuthenticated', true);
-            const ggshieldApi = ggshieldApiKey(configuration);
-            setApiKey(configuration, ggshieldApi);
+            ggshieldViewProvider.getView() as WebviewView,
+            context
+          ).then(() => {
+            console.log("»»»»»»»»»»»»»»»»»»»xxx", context.globalState.get("isAuthenticated", false));
+            if (context.globalState.get("isAuthenticated", false)) {
+              updateStatusBarItem(StatusBarStatus.ready, statusBar);
+              setApiKey(configuration, ggshieldApiKey(configuration));
+            } else {
+              updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+            }
             ggshieldViewProvider.refresh();
             ggshieldRemediationMessageViewProvider.refresh();
             ggshieldQuotaViewProvider.refresh();
-          } else {
-            updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
-          }
+          }).catch((err) => {
+            outputChannel.appendLine(`Authentication failed: ${err.message}`);
+          });
         }),
         commands.registerCommand("gitguardian.logout", async () => {
-          logoutGGShield(ggshieldResolver.configuration);
+          logoutGGShield(ggshieldResolver.configuration, context);
           updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
-          commands.executeCommand('setContext', 'isAuthenticated', false);
           setApiKey(configuration, undefined);
           ggshieldViewProvider.refresh();
           ggshieldRemediationMessageViewProvider.refresh();

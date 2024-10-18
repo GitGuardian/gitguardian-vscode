@@ -1,4 +1,4 @@
-import { getAPIquota, ggshieldAuthStatus } from "../lib/ggshield-api";
+import { getAPIquota } from "../lib/ggshield-api";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 import * as vscode from "vscode";
 
@@ -13,7 +13,8 @@ export class GitGuardianQuotaWebviewProvider
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
-    private readonly _extensionUri: vscode.Uri
+    private readonly _extensionUri: vscode.Uri,
+    private context: vscode.ExtensionContext
   ) {
     this.checkAuthenticationStatus();
     this.updateQuota();
@@ -36,7 +37,7 @@ export class GitGuardianQuotaWebviewProvider
   }
 
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = ggshieldAuthStatus(this.ggshieldConfiguration);
+    this.isAuthenticated = this.context.globalState.get("isAuthenticated", false);
   }
 
   private async updateQuota() {
