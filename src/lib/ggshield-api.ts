@@ -162,7 +162,8 @@ export async function loginGGShield(
   configuration: GGShieldConfiguration,
   outputChannel: any,
   webviewView: WebviewView,
-): Promise<boolean> {
+  context: ExtensionContext
+): Promise<void> {
   const { ggshieldPath, apiUrl, apiKey } = configuration;
 
   let options: SpawnOptionsWithoutStdio = {
@@ -176,9 +177,9 @@ export async function loginGGShield(
     windowsHide: true,
   };
 
-  let args = ["auth", "login", "--method=web"];
+  let args = ["auth", "login", "--method=web", "--debug"];
 
-  return new Promise((resolve) => {
+  return new Promise<void>((resolve, reject) => {
     const proc = spawn(ggshieldPath, args, options);
 
     proc.stdout.on("data", (data) => {
@@ -194,52 +195,62 @@ export async function loginGGShield(
         });
       }
     });
-;
 
     proc.stderr.on("data", (data) => {
       outputChannel.appendLine(`ggshield stderr: ${data.toString()}`);
     });
 
-    proc.on("close", (code) => {
+    proc.on("close", async (code) => {
       if (code !== 0) {
         outputChannel.appendLine(`ggshield process exited with code ${code}`);
-        resolve(false);
+        reject(new Error(`ggshield process exited with code ${code}`));
       } else {
         outputChannel.appendLine("ggshield login completed successfully");
-        resolve(true);
+        commands.executeCommand("setContext", "isAuthenticated", true);
+        await context.globalState.update('isAuthenticated', true);
+        resolve();
       }
     });
 
     proc.on("error", (err) => {
       outputChannel.appendLine(`ggshield process error: ${err.message}`);
-      resolve(false);
+      reject(err);
     });
   });
 }
 
-export function logoutGGShield(
-  configuration: GGShieldConfiguration
-): void {
+
+export async function logoutGGShield(
+  configuration: GGShieldConfiguration,
+  context: ExtensionContext
+): Promise<void> {
   runGGShieldCommand(configuration, ["auth", "logout"]);
+  commands.executeCommand('setContext', 'isAuthenticated', false);
+  await context.globalState.update('isAuthenticated', false);
+
 }
 
-export function ggshieldAuthStatus(
-  configuration: GGShieldConfiguration
-): boolean {
-  const proc = runGGShieldCommand(configuration, ["api-status"]);
-  if (proc.stderr || proc.error) {
-    if (proc.stderr.includes("Config key")){
-      window.showErrorMessage(`Gitguardian: ${proc.stderr}`);
+export async function ggshieldAuthStatus(
+  configuration: GGShieldConfiguration,
+  context: ExtensionContext
+  ): Promise<void> {
+    let isAuthenticated;
+    const proc = runGGShieldCommand(configuration, ["api-status", "--json"]);
+    if (proc.status === 0 && JSON.parse(proc.stdout).status_code === 200) {
+      console.log(proc.stdout, JSON.parse(proc.stdout).status_code === 200);
+      isAuthenticated = true;
     }
-    console.log(proc.stderr);
-    return false;
-  } else {
-    if (proc.stdout.includes("unhealthy")) {
-      return false;
-    }
-    console.log(proc.stdout);
-    return true;
-  }
+    else{
+      if (proc.stderr.includes("Config key")){
+        window.showErrorMessage(`Gitguardian: ${proc.stderr}`);
+
+      }
+      console.log(proc.stderr);
+      isAuthenticated = false;
+    } 
+
+    commands.executeCommand('setContext', 'isAuthenticated', isAuthenticated);
+    await context.globalState.update('isAuthenticated', isAuthenticated);
 }
 
 /**
