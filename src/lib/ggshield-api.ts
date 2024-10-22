@@ -241,7 +241,7 @@ export async function ggshieldAuthStatus(
       isAuthenticated = true;
     }
     else{
-      if (proc.stderr.includes("Config key")){
+      if (proc.stderr && proc.stderr.includes("Config key")){
         window.showErrorMessage(`Gitguardian: ${proc.stderr}`);
 
       }

@@ -261,7 +261,6 @@ export function activate(context: ExtensionContext) {
             ggshieldViewProvider.getView() as WebviewView,
             context
           ).then(() => {
-            console.log("»»»»»»»»»»»»»»»»»»»xxx", context.globalState.get("isAuthenticated", false));
             if (context.globalState.get("isAuthenticated", false)) {
               updateStatusBarItem(StatusBarStatus.ready, statusBar);
               setApiKey(configuration, ggshieldApiKey(configuration));
