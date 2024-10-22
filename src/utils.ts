@@ -1,6 +1,6 @@
 import * as vscode from "vscode";
 import { spawnSync } from "child_process";
-import path = require("path");
+import * as path from "path";
 
 const reDashboard = "dashboard";
 const reApi = "api";
@@ -20,7 +20,9 @@ export async function isGitInstalled(): Promise<boolean> {
 
 // Since git is required to use ggshield, we know that it is installed
 export function isFileGitignored(filePath: string): boolean {
-  let proc = spawnSync("git", ["check-ignore", filePath]);
+  let proc = spawnSync("git", ["check-ignore", filePath], {
+    cwd: path.dirname(filePath),
+  });
   return proc.status === 0;
 }
 

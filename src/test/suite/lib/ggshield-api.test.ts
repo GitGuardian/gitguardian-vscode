@@ -15,10 +15,12 @@ import { ggshieldAuthStatus } from "../../../lib/ggshield-api";
 suite("scanFile", () => {
   let updateStatusBarMock: simple.Stub<Function>;
   let runGGShieldCommandMock: simple.Stub<Function>;
+  let errorMessageMock = simple.mock(window, "showErrorMessage");
 
   setup(() => {
     updateStatusBarMock = simple.mock(statusBar, "updateStatusBarItem");
     runGGShieldCommandMock = simple.mock(runGGShield, "runGGShieldCommand");
+    errorMessageMock = simple.mock(window, "showErrorMessage");
   });
 
   teardown(() => {
@@ -65,7 +67,7 @@ suite("scanFile", () => {
     );
   });
 
-  test("skips the file if it is ignored", async () => {
+  test("skips the file if it is gitignored", async () => {
     const filePath = "out/test.py";
     await scanFile(filePath, Uri.file(filePath), {} as GGShieldConfiguration);
 
@@ -78,7 +80,6 @@ suite("scanFile", () => {
   });
 
   test("displays an error message if the scan command fails", async () => {
-    const errorMessageMock = simple.mock(window, "showErrorMessage");
     runGGShieldCommandMock.returnWith({
       status: 1,
       stdout: "",
@@ -90,6 +91,25 @@ suite("scanFile", () => {
     // The error message is displayed
     assert.strictEqual(errorMessageMock.callCount, 1);
     assert.strictEqual(errorMessageMock.lastCall.args[0], "ggshield: Error\n");
+  });
+
+  test("ignores the 'ignored file cannot be scanned' error", async () => {
+    runGGShieldCommandMock.returnWith({
+      status: 2,
+      stdout: "",
+      stderr: "Error: An ignored file or directory cannot be scanned.",
+    });
+
+    await scanFile("test", Uri.file("test"), {} as GGShieldConfiguration);
+
+    // No error message is displayed
+    assert.strictEqual(errorMessageMock.callCount, 0);
+    // The status bar displays "Ignored File"
+    assert.strictEqual(updateStatusBarMock.callCount, 1);
+    assert.strictEqual(
+      updateStatusBarMock.lastCall.args[0],
+      statusBar.StatusBarStatus.ignoredFile
+    );
   });
 });
 

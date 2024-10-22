@@ -10,10 +10,7 @@ import {
   scanFile,
   showAPIQuota,
 } from "./lib/ggshield-api";
-import {
-  getConfiguration,
-  setApiKey,
-} from "./lib/ggshield-configuration";
+import { getConfiguration, setApiKey } from "./lib/ggshield-configuration";
 import {
   ExtensionContext,
   Uri,
@@ -26,14 +23,17 @@ import {
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { getCurrentFile, isGitInstalled } from "./utils";
 import { GitGuardianWebviewProvider } from "./ggshield-webview/gitguardian-webview-view";
-import { createStatusBarItem, StatusBarStatus, updateStatusBarItem } from "./gitguardian-interface/gitguardian-status-bar";
+import {
+  createStatusBarItem,
+  StatusBarStatus,
+  updateStatusBarItem,
+} from "./gitguardian-interface/gitguardian-status-bar";
 import {
   generateSecretName,
   GitGuardianSecretHoverProvider,
 } from "./gitguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
-
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
@@ -76,7 +76,7 @@ function registerQuotaViewCommands(view: GitGuardianQuotaWebviewProvider) {
 
 export function activate(context: ExtensionContext) {
   // Check if ggshield if available
-  commands.executeCommand('setContext', 'isAuthenticated', false);
+  commands.executeCommand("setContext", "isAuthenticated", false);
 
   const outputChannel = window.createOutputChannel("GitGuardian");
   let configuration = getConfiguration(context);
@@ -92,11 +92,12 @@ export function activate(context: ExtensionContext) {
     context
   );
 
-  const ggshieldRemediationMessageViewProvider = new GitGuardianRemediationMessageWebviewProvider(
-    configuration,
-    context.extensionUri,
-    context
-  );
+  const ggshieldRemediationMessageViewProvider =
+    new GitGuardianRemediationMessageWebviewProvider(
+      configuration,
+      context.extensionUri,
+      context
+    );
   const ggshieldQuotaViewProvider = new GitGuardianQuotaWebviewProvider(
     configuration,
     context.extensionUri,
@@ -111,7 +112,11 @@ export function activate(context: ExtensionContext) {
     "gitguardianQuotaView",
     ggshieldQuotaViewProvider
   );
-  context.subscriptions.push(ggshieldViewProvider, ggshieldRemediationMessageViewProvider, ggshieldQuotaViewProvider);
+  context.subscriptions.push(
+    ggshieldViewProvider,
+    ggshieldRemediationMessageViewProvider,
+    ggshieldQuotaViewProvider
+  );
 
   createStatusBarItem(context);
 
@@ -134,7 +139,6 @@ export function activate(context: ExtensionContext) {
         ggshieldViewProvider.refresh();
         ggshieldRemediationMessageViewProvider.refresh();
         ggshieldQuotaViewProvider.refresh();
-
       } else {
         updateStatusBarItem(StatusBarStatus.unauthenticated);
       }
@@ -156,10 +160,13 @@ export function activate(context: ExtensionContext) {
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
           // Check if the document is inside the workspace
-          const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
-          console.log(context.globalState.get("isAuthenticated", false), workspaceFolder);
-          console.log('»»»»»»»»»»»»»»', context.globalState.get("isAuthenticated", false) && workspaceFolder);
-          if (context.globalState.get("isAuthenticated", false) && workspaceFolder) {
+          const workspaceFolder = workspace.getWorkspaceFolder(
+            textDocument.uri
+          );
+          if (
+            context.globalState.get("isAuthenticated", false) &&
+            workspaceFolder
+          ) {
             scanFile(
               textDocument.fileName,
               textDocument.uri,
@@ -182,9 +189,7 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand(
           "gitguardian.ignoreSecret",
           (diagnosticData) => {
-            window.showInformationMessage(
-              'Secret ignored.'
-            );
+            window.showInformationMessage("Secret ignored.");
             let currentFile = getCurrentFile();
             let secretName = generateSecretName(currentFile, diagnosticData);
 
@@ -196,7 +201,7 @@ export function activate(context: ExtensionContext) {
             scanFile(
               currentFile,
               Uri.file(currentFile),
-              ggshieldResolver.configuration,
+              ggshieldResolver.configuration
             );
           }
         ),
@@ -207,19 +212,21 @@ export function activate(context: ExtensionContext) {
             outputChannel,
             ggshieldViewProvider.getView() as WebviewView,
             context
-          ).then(() => {
-            if (context.globalState.get("isAuthenticated", false)) {
-              updateStatusBarItem(StatusBarStatus.ready);
-              setApiKey(configuration, ggshieldApiKey(configuration));
-            } else {
-              updateStatusBarItem(StatusBarStatus.unauthenticated);
-            }
-            ggshieldViewProvider.refresh();
-            ggshieldRemediationMessageViewProvider.refresh();
-            ggshieldQuotaViewProvider.refresh();
-          }).catch((err) => {
-            outputChannel.appendLine(`Authentication failed: ${err.message}`);
-          });
+          )
+            .then(() => {
+              if (context.globalState.get("isAuthenticated", false)) {
+                updateStatusBarItem(StatusBarStatus.ready);
+                setApiKey(configuration, ggshieldApiKey(configuration));
+              } else {
+                updateStatusBarItem(StatusBarStatus.unauthenticated);
+              }
+              ggshieldViewProvider.refresh();
+              ggshieldRemediationMessageViewProvider.refresh();
+              ggshieldQuotaViewProvider.refresh();
+            })
+            .catch((err) => {
+              outputChannel.appendLine(`Authentication failed: ${err.message}`);
+            });
         }),
         commands.registerCommand("gitguardian.logout", async () => {
           logoutGGShield(ggshieldResolver.configuration, context);
