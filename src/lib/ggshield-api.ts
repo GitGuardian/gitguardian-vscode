@@ -138,7 +138,12 @@ export function ggshieldScanFile(
 
   // Ignore errors concerning usage
   // This occurs when the path of the file is invalid (i.e.VSCode sending an event for files not on the file system)
-  if (proc.stderr.includes("Usage: ggshield secret scan path")) {
+  // or when the file is ignored in the .gitguardian.yaml
+  let ignoredErrors = [
+    "Error: An ignored file or directory cannot be scanned",
+    "Usage: ggshield secret scan path",
+  ];
+  if (ignoredErrors.some((error) => proc.stderr.includes(error))) {
     return undefined;
   }
   let errorMessage = "";
