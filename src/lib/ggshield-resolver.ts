@@ -1,11 +1,9 @@
 import * as vscode from "vscode";
 import {
-  getConfiguration,
   GGShieldConfiguration,
 } from "./ggshield-configuration";
-import { runGGShieldCommand } from "./ggshield-api";
+import { runGGShieldCommand } from "./run-ggshield";
 import { window } from "vscode";
-import * as os from "os";
 
 export class GGShieldResolver {
   channel: vscode.OutputChannel;
