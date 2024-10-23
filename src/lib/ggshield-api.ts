@@ -3,7 +3,7 @@ import {
   SpawnOptionsWithoutStdio,
   spawn,
 } from "child_process";
-import { window, WebviewView } from "vscode";
+import { window, WebviewView, ExtensionContext, commands } from "vscode";
 import axios from 'axios';
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
