@@ -8,7 +8,7 @@ import axios from 'axios';
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
 import * as os from "os";
-import { apiToDashboard, dasboardToApi } from "../utils";
+import { apiToDashboard, dasboardToApi, isFileGitignored } from "../utils";
 import { runGGShieldCommand } from "./run-ggshield";
 import { StatusBarStatus, updateStatusBarItem } from "../gitguardian-interface/gitguardian-status-bar";
 import { parseGGShieldResults } from "./ggshield-results-parser";
@@ -16,7 +16,7 @@ import { parseGGShieldResults } from "./ggshield-results-parser";
 /**
  * Extension diagnostic collection
  */
-let diagnosticCollection: DiagnosticCollection;
+export let diagnosticCollection: DiagnosticCollection;
 
 /**
  * Display API quota
@@ -153,6 +153,10 @@ export async function scanFile(
   fileUri: Uri,
   configuration: GGShieldConfiguration
 ): Promise<void> {
+  if (isFileGitignored(filePath)) {
+    updateStatusBarItem(StatusBarStatus.ignoredFile);
+    return;
+  }
   const proc = runGGShieldCommand(configuration, [
     "secret",
     "scan",

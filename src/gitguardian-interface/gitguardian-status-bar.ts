@@ -18,6 +18,7 @@ export enum StatusBarStatus {
   secretFound = "Secret found",
   noSecretFound = "No secret found",
   error = "Error",
+  ignoredFile = "Ignored file",
 }
 
 export function createStatusBarItem(context: ExtensionContext): void {
@@ -66,6 +67,11 @@ function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
         text: "GitGuardian - error",
         color: "statusBarItem.errorBackground",
         command: "gitguardian.showOutput",
+      };
+    case StatusBarStatus.ignoredFile:
+      return {
+        text: "GitGuardian - Ignored file",
+        color: "statusBarItem.warningBackground",
       };
     default:
       return { text: "", color: "statusBar.foreground" };
