@@ -133,6 +133,7 @@ export function ggshieldScanFile(
     "scan",
     "--json",
     "path",
+    "--use-gitignore",
     filePath,
   ]);
 
