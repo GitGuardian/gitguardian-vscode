@@ -234,21 +234,18 @@ export async function ggshieldAuthStatus(
   configuration: GGShieldConfiguration,
   context: ExtensionContext
   ): Promise<void> {
-    let isAuthenticated;
+    let isAuthenticated: boolean;
     const proc = runGGShieldCommand(configuration, ["api-status", "--json"]);
     if (proc.status === 0 && JSON.parse(proc.stdout).status_code === 200) {
-      console.log(proc.stdout, JSON.parse(proc.stdout).status_code === 200);
       isAuthenticated = true;
     }
     else{
       if (proc.stderr && proc.stderr.includes("Config key")){
         window.showErrorMessage(`Gitguardian: ${proc.stderr}`);
-
       }
       console.log(proc.stderr);
       isAuthenticated = false;
     } 
-
     commands.executeCommand('setContext', 'isAuthenticated', isAuthenticated);
     await context.globalState.update('isAuthenticated', isAuthenticated);
 }

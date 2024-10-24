@@ -1,15 +1,15 @@
 import * as assert from "assert";
 import { extensions, commands,} from "vscode";
 
-suite("Extension Functionality Tests", () => {
+suite("activate", () => {
 
-  test("Extension activates successfully", async () => {
+  test("Should activate extension successfully", async () => {
     const ext = extensions.getExtension("gitguardian-secret-security.gitguardian");
     await ext?.activate();
     assert.ok(ext?.isActive, "Extension should be active");
   });
 
-  test("Commands are registered", async () => {
+  test("Should register all gitguardian commands", async () => {
     const commandIds = [
         "gitguardian.quota",
         "gitguardian.ignore",

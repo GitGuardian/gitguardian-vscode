@@ -42,10 +42,8 @@ const results = `{
 "secrets_engine_version":"2.96.0"
 }`;
 
-suite("Result Parser Suite", () => {
-  window.showInformationMessage("Start all tests.");
-
-  test("test result parser", () => {
+suite("parseGGShieldResults", () => {
+  test("Should parse ggshield scan output", () => {
     const diagnostics = parseGGShieldResults(JSON.parse(results));
     assert.strictEqual(diagnostics.length, 1);
     const diagnostic = diagnostics[0];
@@ -58,7 +56,7 @@ suite("Result Parser Suite", () => {
     assert.strictEqual(diagnostic.severity, DiagnosticSeverity.Warning);
   });
 
-  test("test result parser with invalid json", () => {
+  test("Should return an empty array on an invalid ggshield output", () => {
     const diagnostics = parseGGShieldResults(JSON.parse("{}"));
 
     assert.strictEqual(diagnostics.length, 0);

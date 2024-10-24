@@ -9,6 +9,7 @@ suite('ggshieldAuthStatus', function () {
     let isAuthenticated: boolean;
     let mockGlobalState: Memento & { setKeysForSync(keys: readonly string[]): void; };
     let mockContext: Partial<ExtensionContext>;
+    let runGGShieldMock: simple.Stub<Function>;
 
     setup(function () {
         isAuthenticated = false;
@@ -28,15 +29,16 @@ suite('ggshieldAuthStatus', function () {
         mockContext = {
             globalState: mockGlobalState,
         };
+        runGGShieldMock = simple.mock(runGGShield, "runGGShieldCommand");
     });
     teardown(function () {
         simple.restore();
     });
 
     test('Valid authentication should update isAuthenticated to true', async function () {
-        simple.mock(runGGShield, "runGGShieldCommand").returnWith({
+        runGGShieldMock.returnWith({
             status: 0,
-            stdout: '{"detail": "Valid API key.", "status_code": 200, "app_version": "v2.111.0", "secrets_engine_version": "2.124.1"}',
+            stdout: '{"detail": "Valid API key.", "status_code": 200}',
             stderr: ''
         });
 
@@ -45,9 +47,9 @@ suite('ggshieldAuthStatus', function () {
     });
 
     test('Invalid authentication should keep isAuthenticated to false', async function () {
-        simple.mock(runGGShield, "runGGShieldCommand").returnWith({
+        runGGShieldMock.returnWith({
             status: 0,
-            stdout: '{"detail": "Invalid API key.", "status_code": 401, "app_version": "v2.111.0", "secrets_engine_version": "2.124.1"}',
+            stdout: '{"detail": "Invalid API key.", "status_code": 401}',
             stderr: ''
         });
 
