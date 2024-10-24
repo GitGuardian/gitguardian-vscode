@@ -3,13 +3,13 @@ import * as assert from "assert";
 import { parseGGShieldResults } from "../../lib/ggshield-results-parser";
 import { window, DiagnosticSeverity } from "vscode";
 
-const results = `{
-"id":"/Users/paulindenaurois/Development/gitguardian/ggshield-vscode-extension/sample_files/test.py",
+export const scanResultsWithIncident = `{
+"id":"test.py",
 "type":"path_scan",
 "entities_with_incidents":[
    {
       "mode":"FILE",
-      "filename":"/Users/paulindenaurois/Development/gitguardian/ggshield-vscode-extension/sample_files/test.py",
+      "filename":"test.py",
       "incidents":[
          {
             "policy":"Secrets detection",
@@ -46,7 +46,7 @@ suite("Extension Test Suite", () => {
   window.showInformationMessage("Start all tests.");
 
   test("test result parser", () => {
-    const diagnostics = parseGGShieldResults(JSON.parse(results));
+    const diagnostics = parseGGShieldResults(JSON.parse(scanResultsWithIncident));
     assert.strictEqual(diagnostics.length, 1);
     const diagnostic = diagnostics[0];
     assert.ok(diagnostic.message.includes("apikey"));
@@ -64,3 +64,4 @@ suite("Extension Test Suite", () => {
     assert.strictEqual(diagnostics.length, 0);
   });
 });
+

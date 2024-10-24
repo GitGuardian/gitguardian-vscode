@@ -18,6 +18,11 @@ export async function isGitInstalled(): Promise<boolean> {
   });
 }
 
+export function isFileGitignored(filePath: string): boolean {
+  let proc = spawnSync("git", ["check-ignore", filePath]);
+  return proc.status === 0;
+}
+
 export function getCurrentFile(): string {
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
