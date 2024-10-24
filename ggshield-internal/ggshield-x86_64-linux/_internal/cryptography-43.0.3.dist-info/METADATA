@@ -1,6 +1,6 @@
 Metadata-Version: 2.3
 Name: cryptography
-Version: 43.0.1
+Version: 43.0.3
 Classifier: Development Status :: 5 - Production/Stable
 Classifier: Intended Audience :: Developers
 Classifier: License :: OSI Approved :: Apache Software License
@@ -26,7 +26,7 @@ Classifier: Topic :: Security :: Cryptography
 Requires-Dist: cffi >=1.12 ; platform_python_implementation != 'PyPy'
 Requires-Dist: bcrypt >=3.1.5 ; extra == 'ssh'
 Requires-Dist: nox ; extra == 'nox'
-Requires-Dist: cryptography-vectors ==43.0.1 ; extra == 'test'
+Requires-Dist: cryptography-vectors ==43.0.3 ; extra == 'test'
 Requires-Dist: pytest >=6.2.0 ; extra == 'test'
 Requires-Dist: pytest-benchmark ; extra == 'test'
 Requires-Dist: pytest-cov ; extra == 'test'
