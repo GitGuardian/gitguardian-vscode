@@ -1,22 +1,20 @@
 import {
+  cleanUpFileDiagnostics,
+  createDiagnosticCollection,
   ggshieldApiKey,
   ggshieldAuthStatus,
-  ggshieldScanFile,
   ignoreLastFound,
   ignoreSecret,
   loginGGShield,
   logoutGGShield,
+  scanFile,
   showAPIQuota,
 } from "./lib/ggshield-api";
 import {
   getConfiguration,
-  GGShieldConfiguration,
   setApiKey,
 } from "./lib/ggshield-configuration";
-import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
-  Diagnostic,
-  DiagnosticCollection,
   ExtensionContext,
   Uri,
   commands,
@@ -36,49 +34,6 @@ import {
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
 
-/**
- * Extension diagnostic collection
- */
-let diagnosticCollection: DiagnosticCollection;
-/**
- * Scan a file using ggshield
- *
- * - retrieve configuration
- * - scan file using ggshield CLI application
- * - parse ggshield results
- * - set diagnostics collection so the incdients are visible to the user
- *
- * @param filePath path to file
- * @param fileUri file uri
- */
-export async function scanFile(
-  this: any,
-  filePath: string,
-  fileUri: Uri,
-  configuration: GGShieldConfiguration
-): Promise<void> {
-  const results = ggshieldScanFile(filePath, configuration);
-  if (!results) {
-    updateStatusBarItem(StatusBarStatus.ready);
-    return;
-  }
-  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
-  if (incidentsDiagnostics.length !== 0) {
-    updateStatusBarItem(StatusBarStatus.secretFound);
-  } else {
-    updateStatusBarItem(StatusBarStatus.noSecretFound);
-  }
-  diagnosticCollection.set(fileUri, incidentsDiagnostics);
-}
-
-/**
- * Clean up file diagnostics
- *
- * @param fileUri file uri
- */
-function cleanUpFileDiagnostics(fileUri: Uri): void {
-  diagnosticCollection.delete(fileUri);
-}
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
@@ -197,9 +152,7 @@ export function activate(context: ExtensionContext) {
     .then(() => {
       // Start scanning documents on activation events
       // (i.e. when a new document is opened or when the document is saved)
-      diagnosticCollection = languages.createDiagnosticCollection("ggshield");
-
-      context.subscriptions.push(diagnosticCollection);
+      createDiagnosticCollection(context);
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
           // Check if the document is inside the workspace
@@ -243,7 +196,7 @@ export function activate(context: ExtensionContext) {
             scanFile(
               currentFile,
               Uri.file(currentFile),
-              ggshieldResolver.configuration
+              ggshieldResolver.configuration,
             );
           }
         ),

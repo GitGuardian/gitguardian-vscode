@@ -3,14 +3,20 @@ import {
   SpawnOptionsWithoutStdio,
   spawn,
 } from "child_process";
-import { window, WebviewView, ExtensionContext, commands } from "vscode";
+import { window, WebviewView, DiagnosticCollection, commands, ExtensionContext, languages, Uri, Diagnostic } from "vscode";
 import axios from 'axios';
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { GGShieldScanResults } from "./api-types";
 import * as os from "os";
 import { apiToDashboard, dasboardToApi } from "../utils";
 import { runGGShieldCommand } from "./run-ggshield";
+import { StatusBarStatus, updateStatusBarItem } from "../gitguardian-interface/gitguardian-status-bar";
+import { parseGGShieldResults } from "./ggshield-results-parser";
 
+/**
+ * Extension diagnostic collection
+ */
+let diagnosticCollection: DiagnosticCollection;
 
 /**
  * Display API quota
@@ -115,19 +121,38 @@ export function ignoreSecret(
   }
 }
 
+export function createDiagnosticCollection(context: ExtensionContext): void {
+  diagnosticCollection = languages.createDiagnosticCollection("ggshield");
+  context.subscriptions.push(diagnosticCollection);
+}
+
 /**
- * Scan a file using ggshield CLI application
+ * Clean up file diagnostics
  *
- * Show error messages on failure
+ * @param fileUri file uri
+ */
+export function cleanUpFileDiagnostics(fileUri: Uri): void {
+  diagnosticCollection.delete(fileUri);
+}
+
+
+/**
+ * Scan a file using ggshield
+ *
+ * - retrieve configuration
+ * - scan file using ggshield CLI application
+ * - parse ggshield results
+ * - set diagnostics collection so the incdients are visible to the user
  *
  * @param filePath path to file
- * @param configuration ggshield configuration
- * @returns results or undefined if there was an error
+ * @param fileUri file uri
  */
-export function ggshieldScanFile(
+export async function scanFile(
+  this: any,
   filePath: string,
+  fileUri: Uri,
   configuration: GGShieldConfiguration
-): GGShieldScanResults | undefined {
+): Promise<void> {
   const proc = runGGShieldCommand(configuration, [
     "secret",
     "scan",
@@ -155,8 +180,21 @@ export function ggshieldScanFile(
     return undefined;
   }
 
-  return JSON.parse(proc.stdout);
+  const results = JSON.parse(proc.stdout);
+  if (!results) {
+    updateStatusBarItem(StatusBarStatus.ready);
+    return;
+  }
+  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
+  if (incidentsDiagnostics.length !== 0) {
+    updateStatusBarItem(StatusBarStatus.secretFound);
+  } else {
+    updateStatusBarItem(StatusBarStatus.noSecretFound);
+  }
+  
+  diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
+
 
 export async function loginGGShield(
   configuration: GGShieldConfiguration,
