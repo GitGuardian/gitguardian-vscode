@@ -35,3 +35,7 @@ out/
 
 # build files
 **/*.vsix
+
+# cache dir
+.cache_ggshield
+.vscode-test/

@@ -24,8 +24,8 @@ export class GGShieldResolver {
    * Ensures the availability of ggshield by determining the executable path.
    *
    * The function performs the following checks in order:
-   *  2. Checks if a custom path is configured in the settings and uses it.
-   *  3. Else, falls back to using the standalone version bundled with the extension.
+   *  1. Checks if a custom path is configured in the settings and uses it.
+   *  2. Else, falls back to using the standalone version bundled with the extension.
    *
    * @returns {Promise<void>} A promise that resolves once the `ggshield` path is determined.
    */
@@ -56,24 +56,12 @@ export class GGShieldResolver {
   async testConfiguration(
     configuration: GGShieldConfiguration
   ): Promise<void> {
-    let proc = runGGShieldCommand(configuration, ["quota"]);
-    if (proc.error || proc.stderr.length > 0) {
-      if (proc.error) { 
-        if (proc.error.message.includes("ENOENT")) {
-          throw new Error(
-            `GGShield path provided in settings is invalid: ${configuration.ggshieldPath}.`
-          );
-        } else {
-          throw new Error(proc.error.message);
-        }
-      } else if (proc.stderr.includes("Invalid API key")) {
-        throw new Error(
-          `API key provided in settings is invalid.`
-        );
-      }
-    } else {
-      this.configuration = configuration;
-      return;
+    // Check if the ggshield path is valid
+    let proc = runGGShieldCommand(configuration, ["--version"]);
+    if (proc.status !== 0) {
+      window.showErrorMessage(`GitGuardian: Invalid ggshield path. ${proc.stderr}`);
+      throw new Error(proc.stderr);
     }
   }
 }
+
