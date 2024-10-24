@@ -1,4 +1,8 @@
-import { StatusBarItem, ThemeColor } from "vscode";
+import { ExtensionContext, StatusBarAlignment, StatusBarItem, ThemeColor, window } from "vscode";
+
+
+let statusBarItem: StatusBarItem;
+
 
 export interface StatusBarConfig {
   text: string;
@@ -16,7 +20,13 @@ export enum StatusBarStatus {
   error = "Error",
 }
 
-export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
+export function createStatusBarItem(context: ExtensionContext): void {
+  statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left, 0);
+  updateStatusBarItem(StatusBarStatus.initialization);
+  context.subscriptions.push(statusBarItem);
+}
+
+function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
   switch (status) {
     case StatusBarStatus.initialization:
       return {
@@ -64,7 +74,6 @@ export function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
 
 export function updateStatusBarItem(
   status: StatusBarStatus,
-  statusBarItem: StatusBarItem
 ): void {
   const config = getStatusBarConfig(status);
   statusBarItem.text = config.text;
