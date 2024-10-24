@@ -18,6 +18,12 @@ export async function isGitInstalled(): Promise<boolean> {
   });
 }
 
+// Since git is required to use ggshield, we know that it is installed
+export function isFileGitignored(filePath: string): boolean {
+  let proc = spawnSync("git", ["check-ignore", filePath]);
+  return proc.status === 0;
+}
+
 export function getCurrentFile(): string {
   const activeEditor = vscode.window.activeTextEditor;
   if (activeEditor) {
@@ -28,7 +34,9 @@ export function getCurrentFile(): string {
 }
 
 export function dasboardToApi(dashboardUrl: string): string {
-  const domainMatch = gitGuardianDomains.some((domain) => dashboardUrl.includes(domain));
+  const domainMatch = gitGuardianDomains.some((domain) =>
+    dashboardUrl.includes(domain)
+  );
   if (domainMatch) {
     return dashboardUrl.replace(reDashboard, reApi);
   } else {
@@ -37,7 +45,9 @@ export function dasboardToApi(dashboardUrl: string): string {
 }
 
 export function apiToDashboard(apiUrl: string): string {
-  const domainMatch = gitGuardianDomains.some((domain) => apiUrl.includes(domain));
+  const domainMatch = gitGuardianDomains.some((domain) =>
+    apiUrl.includes(domain)
+  );
   if (domainMatch) {
     return apiUrl.replace(reApi, reDashboard);
   } else {
