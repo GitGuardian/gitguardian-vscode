@@ -1,4 +1,4 @@
-import { getRemediationMessage, ggshieldAuthStatus } from "../lib/ggshield-api";
+import { getRemediationMessage } from "../lib/ggshield-api";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 import * as vscode from "vscode";
 
@@ -13,7 +13,8 @@ export class GitGuardianRemediationMessageWebviewProvider
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
-    private readonly _extensionUri: vscode.Uri
+    private readonly _extensionUri: vscode.Uri,
+    private context: vscode.ExtensionContext
   ) {
     this.checkAuthenticationStatus();
     this.updateRemediationMessage();
@@ -36,7 +37,7 @@ export class GitGuardianRemediationMessageWebviewProvider
   }
 
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = ggshieldAuthStatus(this.ggshieldConfiguration);
+    this.isAuthenticated = this.context.globalState.get("isAuthenticated", false);
   }
 
   private async updateRemediationMessage() {
@@ -51,7 +52,7 @@ export class GitGuardianRemediationMessageWebviewProvider
     }
   }
 
-  private escapeHtml(unsafe: string):string  {
+  private escapeHtml(unsafe: string): string {
     return unsafe
          .replace(/&/g, "&amp;")
          .replace(/</g, "&lt;")
@@ -97,7 +98,7 @@ ${this.escapeHtml(this.remediationMessage)}
     this.updateWebViewContent(this._view);
 
     await this.checkAuthenticationStatus();
-    console.log("Well authentificated");
+    console.log("Well authenticated");
     await this.updateRemediationMessage();
 
     this.isLoading = false;
