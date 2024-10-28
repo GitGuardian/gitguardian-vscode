@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { spawnSync, SpawnSyncOptionsWithStringEncoding, SpawnSyncReturns } from "child_process";
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { workspace } from "vscode";
@@ -18,18 +19,15 @@ export function runGGShieldCommand(
     let env: {
       GITGUARDIAN_API_URL: string;
       GG_USER_AGENT: string;
-      GITGUARDIAN_DONT_LOAD_ENV: string;
       GITGUARDIAN_API_KEY?: string;
       } = {
       GITGUARDIAN_API_URL: apiUrl,
       GG_USER_AGENT: "gitguardian-vscode",
-      GITGUARDIAN_DONT_LOAD_ENV: "true",
     };
 
     if (apiKey) {
       env = {
         ...env,
-        // eslint-disable-next-line @typescript-eslint/naming-convention
         GITGUARDIAN_API_KEY: apiKey,
       };
     }
