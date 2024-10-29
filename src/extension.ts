@@ -1,36 +1,32 @@
 import {
+  cleanUpFileDiagnostics,
+  createDiagnosticCollection,
   ggshieldApiKey,
   ggshieldAuthStatus,
-  ggshieldScanFile,
   ignoreLastFound,
   ignoreSecret,
   loginGGShield,
   logoutGGShield,
+  scanFile,
   showAPIQuota,
 } from "./lib/ggshield-api";
 import {
   getConfiguration,
-  GGShieldConfiguration,
   setApiKey,
 } from "./lib/ggshield-configuration";
-import { parseGGShieldResults } from "./lib/ggshield-results-parser";
 import {
-  Diagnostic,
-  DiagnosticCollection,
   ExtensionContext,
   Uri,
   commands,
   languages,
   window,
   workspace,
-  StatusBarItem,
-  StatusBarAlignment,
   WebviewView,
 } from "vscode";
 import { GGShieldResolver } from "./lib/ggshield-resolver";
 import { getCurrentFile, isGitInstalled } from "./utils";
 import { GitGuardianWebviewProvider } from "./ggshield-webview/gitguardian-webview-view";
-import { StatusBarStatus, updateStatusBarItem } from "./gitguardian-interface/gitguardian-status-bar";
+import { createStatusBarItem, StatusBarStatus, updateStatusBarItem } from "./gitguardian-interface/gitguardian-status-bar";
 import {
   generateSecretName,
   GitGuardianSecretHoverProvider,
@@ -38,51 +34,6 @@ import {
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
 
-/**
- * Extension diagnostic collection
- */
-let diagnosticCollection: DiagnosticCollection;
-let statusBar: StatusBarItem;
-
-/**
- * Scan a file using ggshield
- *
- * - retrieve configuration
- * - scan file using ggshield CLI application
- * - parse ggshield results
- * - set diagnostics collection so the incdients are visible to the user
- *
- * @param filePath path to file
- * @param fileUri file uri
- */
-async function scanFile(
-  this: any,
-  filePath: string,
-  fileUri: Uri,
-  configuration: GGShieldConfiguration
-): Promise<void> {
-  const results = ggshieldScanFile(filePath, configuration);
-  if (!results) {
-    updateStatusBarItem(StatusBarStatus.ready, statusBar);
-    return;
-  }
-  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
-  if (incidentsDiagnostics.length !== 0) {
-    updateStatusBarItem(StatusBarStatus.secretFound, statusBar);
-  } else {
-    updateStatusBarItem(StatusBarStatus.noSecretFound, statusBar);
-  }
-  diagnosticCollection.set(fileUri, incidentsDiagnostics);
-}
-
-/**
- * Clean up file diagnostics
- *
- * @param fileUri file uri
- */
-function cleanUpFileDiagnostics(fileUri: Uri): void {
-  diagnosticCollection.delete(fileUri);
-}
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
@@ -162,13 +113,11 @@ export function activate(context: ExtensionContext) {
   );
   context.subscriptions.push(ggshieldViewProvider, ggshieldRemediationMessageViewProvider, ggshieldQuotaViewProvider);
 
-  statusBar = window.createStatusBarItem(StatusBarAlignment.Left, 0);
-  updateStatusBarItem(StatusBarStatus.initialization, statusBar);
+  createStatusBarItem(context);
 
   //generic commands to open correct view on status bar click
   registerOpenViewsCommands(context, outputChannel);
   registerQuotaViewCommands(ggshieldQuotaViewProvider);
-  context.subscriptions.push(statusBar);
 
   context.subscriptions.push(
     languages.registerHoverProvider("*", new GitGuardianSecretHoverProvider())
@@ -180,14 +129,14 @@ export function activate(context: ExtensionContext) {
       // Check if ggshield is authenticated
       ggshieldAuthStatus(configuration, context);
       if (context.globalState.get("isAuthenticated", false)) {
-        updateStatusBarItem(StatusBarStatus.ready, statusBar);
+        updateStatusBarItem(StatusBarStatus.ready);
         setApiKey(configuration, ggshieldApiKey(configuration));
         ggshieldViewProvider.refresh();
         ggshieldRemediationMessageViewProvider.refresh();
         ggshieldQuotaViewProvider.refresh();
 
       } else {
-        updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+        updateStatusBarItem(StatusBarStatus.unauthenticated);
       }
     })
     .then(async () => {
@@ -203,9 +152,7 @@ export function activate(context: ExtensionContext) {
     .then(() => {
       // Start scanning documents on activation events
       // (i.e. when a new document is opened or when the document is saved)
-      diagnosticCollection = languages.createDiagnosticCollection("ggshield");
-
-      context.subscriptions.push(diagnosticCollection);
+      createDiagnosticCollection(context);
       context.subscriptions.push(
         workspace.onDidSaveTextDocument((textDocument) => {
           // Check if the document is inside the workspace
@@ -249,7 +196,7 @@ export function activate(context: ExtensionContext) {
             scanFile(
               currentFile,
               Uri.file(currentFile),
-              ggshieldResolver.configuration
+              ggshieldResolver.configuration,
             );
           }
         ),
@@ -262,10 +209,10 @@ export function activate(context: ExtensionContext) {
             context
           ).then(() => {
             if (context.globalState.get("isAuthenticated", false)) {
-              updateStatusBarItem(StatusBarStatus.ready, statusBar);
+              updateStatusBarItem(StatusBarStatus.ready);
               setApiKey(configuration, ggshieldApiKey(configuration));
             } else {
-              updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+              updateStatusBarItem(StatusBarStatus.unauthenticated);
             }
             ggshieldViewProvider.refresh();
             ggshieldRemediationMessageViewProvider.refresh();
@@ -276,7 +223,7 @@ export function activate(context: ExtensionContext) {
         }),
         commands.registerCommand("gitguardian.logout", async () => {
           logoutGGShield(ggshieldResolver.configuration, context);
-          updateStatusBarItem(StatusBarStatus.unauthenticated, statusBar);
+          updateStatusBarItem(StatusBarStatus.unauthenticated);
           setApiKey(configuration, undefined);
           ggshieldViewProvider.refresh();
           ggshieldRemediationMessageViewProvider.refresh();
@@ -286,13 +233,8 @@ export function activate(context: ExtensionContext) {
     })
     .catch((error) => {
       outputChannel.appendLine(`Error: ${error.message}`);
-      updateStatusBarItem(StatusBarStatus.error, statusBar);
+      updateStatusBarItem(StatusBarStatus.error);
     });
 }
 
-export function deactivate() {
-  if (diagnosticCollection) {
-    diagnosticCollection.dispose();
-    statusBar.dispose();
-  }
-}
+export function deactivate() {}
