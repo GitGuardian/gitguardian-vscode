@@ -1,11 +1,8 @@
 import {
   cleanUpFileDiagnostics,
   createDiagnosticCollection,
-  ggshieldAuthStatus,
   ignoreLastFound,
   ignoreSecret,
-  loginGGShield,
-  logoutGGShield,
   scanFile,
   showAPIQuota,
 } from "./lib/ggshield-api";
@@ -33,6 +30,12 @@ import {
 } from "./gitguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
+import {
+  AuthenticationStatus,
+  loginGGShield,
+  logoutGGShield,
+  updateAuthenticationStatus,
+} from "./lib/authentication";
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
@@ -67,9 +70,6 @@ function registerOpenViewsCommands(
 }
 
 export function activate(context: ExtensionContext) {
-  // Check if ggshield if available
-  commands.executeCommand("setContext", "isAuthenticated", false);
-
   const outputChannel = window.createOutputChannel("GitGuardian");
   let configuration = getConfiguration(context);
 
@@ -123,20 +123,18 @@ export function activate(context: ExtensionContext) {
     languages.registerHoverProvider("*", new GitGuardianSecretHoverProvider())
   );
 
-  checkGitInstalled();
+  if (!checkGitInstalled()) {
+    updateStatusBarItem(StatusBarStatus.error);
+    return;
+  }
 
   ggshieldResolver.checkGGShieldConfiguration();
 
-  // Check if ggshield is authenticated
-  ggshieldAuthStatus(configuration, context).then(() => {
-    if (context.globalState.get("isAuthenticated", false)) {
-      updateStatusBarItem(StatusBarStatus.ready);
-      ggshieldViewProvider.refresh();
-      ggshieldRemediationMessageViewProvider.refresh();
-      ggshieldQuotaViewProvider.refresh();
-    } else {
-      updateStatusBarItem(StatusBarStatus.unauthenticated);
-    }
+  // update authentication status
+  updateAuthenticationStatus(context, configuration).then(() => {
+    ggshieldViewProvider.refresh();
+    ggshieldRemediationMessageViewProvider.refresh();
+    ggshieldQuotaViewProvider.refresh();
   });
 
   // Start scanning documents on activation events
@@ -146,10 +144,9 @@ export function activate(context: ExtensionContext) {
     workspace.onDidSaveTextDocument((textDocument) => {
       // Check if the document is inside the workspace
       const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
-      if (
-        context.globalState.get("isAuthenticated", false) &&
-        workspaceFolder
-      ) {
+      const authStatus: AuthenticationStatus | undefined =
+        context.workspaceState.get("authenticationStatus");
+      if (authStatus?.success && workspaceFolder) {
         scanFile(
           textDocument.fileName,
           textDocument.uri,
@@ -193,12 +190,8 @@ export function activate(context: ExtensionContext) {
         ggshieldViewProvider.getView() as WebviewView,
         context
       )
-        .then(() => {
-          if (context.globalState.get("isAuthenticated", false)) {
-            updateStatusBarItem(StatusBarStatus.ready);
-          } else {
-            updateStatusBarItem(StatusBarStatus.unauthenticated);
-          }
+        .then(async () => {
+          await updateAuthenticationStatus(context, configuration);
           ggshieldViewProvider.refresh();
           ggshieldRemediationMessageViewProvider.refresh();
           ggshieldQuotaViewProvider.refresh();
@@ -208,12 +201,20 @@ export function activate(context: ExtensionContext) {
         });
     }),
     commands.registerCommand("gitguardian.logout", async () => {
-      logoutGGShield(ggshieldResolver.configuration, context);
-      updateStatusBarItem(StatusBarStatus.unauthenticated);
+      await logoutGGShield(ggshieldResolver.configuration, context);
       ggshieldViewProvider.refresh();
       ggshieldRemediationMessageViewProvider.refresh();
       ggshieldQuotaViewProvider.refresh();
-    })
+    }),
+    commands.registerCommand(
+      "gitguardian.updateAuthenticationStatus",
+      async () => {
+        await updateAuthenticationStatus(context, configuration);
+        ggshieldViewProvider.refresh();
+        ggshieldRemediationMessageViewProvider.refresh();
+        ggshieldQuotaViewProvider.refresh();
+      }
+    )
   );
 }
 

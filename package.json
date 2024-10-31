@@ -38,7 +38,7 @@
         },
         "gitguardian.apiUrl": {
           "type": "string",
-          "default": "https://dashboard.gitguardian.com",
+          "default": "",
           "markdownDescription": "You can override the value here for On Premise installations"
         },
         "gitguardian.allowSelfSigned": {
@@ -64,6 +64,10 @@
       {
         "command": "gitguardian.logout",
         "title": "gitguardian: logout"
+      },
+      {
+        "command": "gitguardian.updateAuthenticationStatus",
+        "title": "gitguardian: Update authentication status"
       },
       {
         "command": "gitguardian.showOutput",
@@ -107,7 +111,7 @@
           "id": "gitguardianRemediationMessageView",
           "name": "remediation message",
           "collapsed": true,
-          "when": "isAuthenticated == true"
+          "when": "false"
         },
         {
           "type": "webview",

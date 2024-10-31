@@ -19,15 +19,15 @@ export function runGGShieldCommand(
   configuration: GGShieldConfiguration,
   args: string[]
 ): SpawnSyncReturns<string> {
-  const { ggshieldPath, apiUrl } = configuration;
   let env: NodeJS.ProcessEnv = {
     ...process.env,
-    GITGUARDIAN_INSTANCE: apiUrl,
     GG_USER_AGENT: "gitguardian-vscode",
   };
 
   let options: SpawnSyncOptionsWithStringEncoding = {
-    cwd: os.tmpdir(),
+    cwd: workspace.workspaceFolders
+      ? workspace.workspaceFolders[0].uri.fsPath
+      : os.tmpdir(),
     env: env,
     encoding: "utf-8",
     windowsHide: true,
@@ -41,7 +41,12 @@ export function runGGShieldCommand(
   if (configuration.allowSelfSigned) {
     args = ["--allow-self-signed"].concat(args);
   }
-  let proc = spawnSync(ggshieldPath, args, options);
+
+  if (configuration.apiUrl && !args.includes("--version")) {
+    args.push("--instance", configuration.apiUrl);
+  }
+
+  let proc = spawnSync(configuration.ggshieldPath, args, options);
 
   return proc;
 }

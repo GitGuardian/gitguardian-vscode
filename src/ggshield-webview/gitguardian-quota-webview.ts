@@ -1,24 +1,22 @@
+import { AuthenticationStatus } from "../lib/authentication";
 import { getAPIquota } from "../lib/ggshield-api";
-import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 import * as vscode from "vscode";
+import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 
 export class GitGuardianQuotaWebviewProvider
   implements vscode.WebviewViewProvider
 {
   public static readonly viewType = "gitguardian.gitguardianQuotaView";
   private _view?: vscode.WebviewView;
-  private isAuthenticated: boolean = false;
   private quota: number = 0;
   private isLoading: boolean = false;
+  private isAuthenticated: boolean = false;
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
     private readonly _extensionUri: vscode.Uri,
     private context: vscode.ExtensionContext
-  ) {
-    this.checkAuthenticationStatus();
-    this.updateQuota();
-  }
+  ) {}
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -36,38 +34,32 @@ export class GitGuardianQuotaWebviewProvider
     });
   }
 
-  private checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get(
-      "isAuthenticated",
-      false
-    );
-  }
-
   private updateQuota() {
-    if (this.isAuthenticated) {
+    const authStatus: AuthenticationStatus | undefined =
+      this.context.workspaceState.get("authenticationStatus");
+    this.isAuthenticated = authStatus?.success ?? false;
+    if (authStatus?.success) {
       this.quota = getAPIquota(this.ggshieldConfiguration);
     }
   }
 
-  private updateWebViewContent(webviewView?: vscode.WebviewView) {
-    if (webviewView) {
-      webviewView.webview.html = this.getHtmlForWebview();
+  private updateWebViewContent() {
+    if (this._view === undefined) {
+      return;
     }
-  }
 
-  private getHtmlForWebview(): string {
+    let computedHtml: string;
+
     if (this.isLoading) {
-      return `
+      computedHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <body>
           <p>Loading...</p>
         </body>
         </html>`;
-    }
-
-    if (this.isAuthenticated) {
-      return `
+    } else if (this.quota !== undefined) {
+      computedHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <body>
@@ -75,7 +67,7 @@ export class GitGuardianQuotaWebviewProvider
         </body>
         </html>`;
     } else {
-      return `
+      computedHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <body>
@@ -83,17 +75,17 @@ export class GitGuardianQuotaWebviewProvider
         </body>
         </html>`;
     }
+    this._view.webview.html = computedHtml;
   }
 
   public refresh() {
     this.isLoading = true;
-    this.updateWebViewContent(this._view);
+    this.updateWebViewContent();
 
-    this.checkAuthenticationStatus();
     this.updateQuota();
 
     this.isLoading = false;
-    this.updateWebViewContent(this._view);
+    this.updateWebViewContent();
   }
 
   dispose(): void {

@@ -3,8 +3,6 @@ import { ExtensionContext, workspace } from "vscode";
 import * as os from "os";
 import { GGShieldConfiguration } from "./ggshield-configuration";
 
-const apiUrlDefault = "https://dashboard.gitguardian.com/";
-
 /**
  * Retrieve configuration from settings
  *
@@ -23,7 +21,7 @@ export function getConfiguration(
     ggshieldPath
       ? ggshieldPath
       : getBinaryAbsolutePath(os.platform(), os.arch(), context),
-    apiUrl || apiUrlDefault,
+    apiUrl,
     allowSelfSigned || false
   );
 }

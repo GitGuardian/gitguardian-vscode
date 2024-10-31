@@ -1,20 +1,14 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { SpawnOptionsWithoutStdio, spawn } from "child_process";
 import {
   window,
-  WebviewView,
   DiagnosticCollection,
-  commands,
   ExtensionContext,
   languages,
   Uri,
   Diagnostic,
 } from "vscode";
-import axios from "axios";
 import { GGShieldConfiguration } from "./ggshield-configuration";
-import { GGShieldScanResults } from "./api-types";
-import * as os from "os";
-import { apiToDashboard, dasboardToApi, isFileGitignored } from "../utils";
+import { isFileGitignored } from "../utils";
 import { runGGShieldCommand } from "./run-ggshield";
 import {
   StatusBarStatus,
@@ -186,128 +180,4 @@ export function scanFile(
   const results = JSON.parse(proc.stdout);
   let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   diagnosticCollection.set(fileUri, incidentsDiagnostics);
-}
-
-export async function loginGGShield(
-  configuration: GGShieldConfiguration,
-  outputChannel: any,
-  webviewView: WebviewView,
-  context: ExtensionContext
-): Promise<void> {
-  const { ggshieldPath, apiUrl } = configuration;
-
-  let options: SpawnOptionsWithoutStdio = {
-    cwd: os.tmpdir(),
-    env: {
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GITGUARDIAN_API_URL: apiUrl,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
-      GG_USER_AGENT: "gitguardian-vscode",
-    },
-    windowsHide: true,
-  };
-
-  let args = ["auth", "login", "--method=web", "--debug"];
-
-  return new Promise<void>((resolve, reject) => {
-    const proc = spawn(ggshieldPath, args, options);
-
-    proc.stdout.on("data", (data) => {
-      const output = data.toString();
-      outputChannel.appendLine(`ggshield stdout: ${output}`);
-
-      const urlLine = output.match(/https:\/\/[^\s]+/);
-      if (urlLine) {
-        const authUrl = urlLine[0];
-        webviewView.webview.postMessage({
-          type: "authLink",
-          link: authUrl,
-        });
-      }
-    });
-
-    proc.stderr.on("data", (data) => {
-      outputChannel.appendLine(`ggshield stderr: ${data.toString()}`);
-    });
-
-    proc.on("close", async (code) => {
-      if (code !== 0) {
-        outputChannel.appendLine(`ggshield process exited with code ${code}`);
-        reject(new Error(`ggshield process exited with code ${code}`));
-      } else {
-        outputChannel.appendLine("ggshield login completed successfully");
-        commands.executeCommand("setContext", "isAuthenticated", true);
-        await context.globalState.update("isAuthenticated", true);
-        resolve();
-      }
-    });
-
-    proc.on("error", (err) => {
-      outputChannel.appendLine(`ggshield process error: ${err.message}`);
-      reject(err);
-    });
-  });
-}
-
-export async function logoutGGShield(
-  configuration: GGShieldConfiguration,
-  context: ExtensionContext
-): Promise<void> {
-  runGGShieldCommand(configuration, ["auth", "logout"]);
-  commands.executeCommand("setContext", "isAuthenticated", false);
-  await context.globalState.update("isAuthenticated", false);
-}
-
-export async function ggshieldAuthStatus(
-  configuration: GGShieldConfiguration,
-  context: ExtensionContext
-): Promise<void> {
-  let isAuthenticated: boolean;
-  const proc = runGGShieldCommand(configuration, ["api-status", "--json"]);
-  if (proc.status === 0 && JSON.parse(proc.stdout).status_code === 200) {
-    isAuthenticated = true;
-  } else {
-    if (proc.stderr && proc.stderr.includes("Config key")) {
-      window.showErrorMessage(`Gitguardian: ${proc.stderr}`);
-    }
-    console.log(proc.stderr);
-    isAuthenticated = false;
-  }
-  commands.executeCommand("setContext", "isAuthenticated", isAuthenticated);
-  await context.globalState.update("isAuthenticated", isAuthenticated);
-}
-
-/**
- * Get ggshield API key from ggshield config list
- *
- * Search for the correct instance section and return the token
- * */
-export function ggshieldApiKey(
-  configuration: GGShieldConfiguration
-): string | undefined {
-  const proc = runGGShieldCommand(configuration, ["config", "list"]);
-  if (proc.stderr || proc.error) {
-    console.log(proc.stderr);
-    return undefined;
-  } else {
-    const apiUrl = configuration.apiUrl;
-
-    const regexInstanceSection = `\\[${apiToDashboard(
-      apiUrl
-    )}\\]([\\s\\S]*?)(?=\\[|$)`;
-    const instanceSectionMatch = proc.stdout.match(regexInstanceSection);
-
-    if (instanceSectionMatch) {
-      const instanceSection = instanceSectionMatch[0];
-      const regexToken = /token:\s([a-zA-Z0-9]+)/;
-      const matchToken = instanceSection.match(regexToken);
-
-      // if the token is not found, or is not a valid token, return undefined
-      if (!matchToken || matchToken[1].trim().length !== 71) {
-        return undefined;
-      }
-
-      return matchToken[1].trim();
-    }
-  }
 }

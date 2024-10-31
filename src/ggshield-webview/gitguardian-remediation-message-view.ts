@@ -16,7 +16,6 @@ export class GitGuardianRemediationMessageWebviewProvider
     private readonly _extensionUri: vscode.Uri,
     private context: vscode.ExtensionContext
   ) {
-    this.checkAuthenticationStatus();
     this.updateRemediationMessage();
   }
 
@@ -37,8 +36,8 @@ export class GitGuardianRemediationMessageWebviewProvider
   }
 
   private checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get(
-      "isAuthenticated",
+    this.isAuthenticated = this.context.workspaceState.get(
+      "authenticationStatus",
       false
     );
   }

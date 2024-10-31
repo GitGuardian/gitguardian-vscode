@@ -13,3 +13,4 @@ export class GGShieldConfiguration {
     this.allowSelfSigned = allowSelfSigned;
   }
 }
+

@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { AuthenticationStatus, ConfigSource } from "../lib/authentication";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 
 const projectDiscussionUri = vscode.Uri.parse(
@@ -10,19 +11,19 @@ const projectIssuesUri = vscode.Uri.parse(
 const feedbackFormUri = vscode.Uri.parse(
   "https://docs.google.com/forms/d/e/1FAIpQLSc_BemGrdQfxp6lg7KgeDoB32XZg8yMfapk2gbemu0mVfskDQ/viewform"
 );
+const documentationUri = vscode.Uri.parse(
+  "https://docs.gitguardian.com/ggshield-docs/configuration"
+);
 
 export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "gitguardian.gitguardianView";
   private _view?: vscode.WebviewView;
-  private isAuthenticated: boolean = false;
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
     private readonly _extensionUri: vscode.Uri,
     private context: vscode.ExtensionContext
-  ) {
-    this.checkAuthenticationStatus();
-  }
+  ) {}
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
@@ -39,12 +40,10 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
       ],
     };
 
-    this.updateWebViewContent(webviewView);
+    this.updateWebViewContent();
 
     webviewView.webview.onDidReceiveMessage(async (data) => {
-      if (data.type === "authenticate") {
-        vscode.commands.executeCommand("gitguardian.authenticate");
-      }
+      await vscode.commands.executeCommand(`gitguardian.${data.type}`);
     });
   }
 
@@ -52,20 +51,15 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     return this._view;
   }
 
-  private checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get(
-      "isAuthenticated",
-      false
-    );
-  }
-
-  private updateWebViewContent(webviewView?: vscode.WebviewView) {
-    if (webviewView) {
-      webviewView.webview.html = this.getHtmlForWebview(webviewView.webview);
+  private updateWebViewContent() {
+    const authenticationStatus: AuthenticationStatus | undefined =
+      this.context.workspaceState.get("authenticationStatus");
+    if (this._view === undefined || authenticationStatus === undefined) {
+      return;
     }
-  }
 
-  private getHtmlForWebview(webview: vscode.Webview): string {
+    const webview = this._view.webview;
+
     const styleUri = webview.asWebviewUri(
       vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
     );
@@ -77,8 +71,10 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
       )
     );
 
-    if (this.isAuthenticated) {
-      return `
+    console.log(authenticationStatus);
+    let computedHtml: string;
+    if (authenticationStatus?.success) {
+      computedHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -101,8 +97,11 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
           <p><a href="${feedbackFormUri}" target="_blank">👉 Provide anonymous feedback</a></p>
         </body>
         </html>`;
-    } else {
-      return `
+    } else if (
+      authenticationStatus === undefined ||
+      authenticationStatus.keySource === ConfigSource.noKeyFound
+    ) {
+      computedHtml = `
         <!DOCTYPE html>
         <html lang="en">
         <head>
@@ -146,13 +145,59 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
         </body>
         </html>
     `;
+    } else {
+      computedHtml = `
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link href="${styleUri}" rel="stylesheet">
+          <title>GitGuardian - Authentication Error</title>
+        </head>
+        <body>
+          <div class="anonymous">
+            <h1>❌ Authentication failed.</strong></h1>
+            <img src="${logoUri}" alt="GitGuardian Logo" height="100px"; />
+
+          </div>
+          <p>Invalid API key for instance "${
+            authenticationStatus.instance
+          }".</p>
+          <p>Instance source: ${authenticationStatus.instanceSource}.</p>
+          <p>API key source: ${authenticationStatus.keySource}.</p>
+          ${
+            authenticationStatus.keySource === ConfigSource.keyGGShieldConfig
+              ? `
+            <p>To generate a valid key, please <a id="logout" href="">log out</a> and log back in.</p>
+            <script>
+            const vscode = acquireVsCodeApi();
+            
+            // On click event, logout
+            document.getElementById('logout').addEventListener('click', () => {
+              vscode.postMessage({ type: 'logout' });
+            });
+          </script>`
+              : `<p>Please change your settings then <a id='updateAuthenticationStatus' href=''>click here</a> or reload this window.</p>
+              <script>
+              const vscode = acquireVsCodeApi();
+              
+              // On click event, update the auth status
+              document.getElementById('updateAuthenticationStatus').addEventListener('click', () => {
+                vscode.postMessage({ type: 'updateAuthenticationStatus' });
+              });
+            </script>`
+          }
+          <p>For more information, please refer to our <a href="${documentationUri}">documentation</a>.</p>
+        </body>
+        </html>`;
     }
+
+    this._view.webview.html = computedHtml;
   }
 
   public refresh() {
-    this.checkAuthenticationStatus();
-
-    this.updateWebViewContent(this._view);
+    this.updateWebViewContent();
   }
 
   dispose(): void {

@@ -17,6 +17,7 @@ export interface StatusBarConfig {
 export enum StatusBarStatus {
   initialization = "Initialization",
   unauthenticated = "Unauthenticated",
+  authFailed = "Authentication failed",
   ready = "Ready",
   scanning = "Scanning",
   secretFound = "Secret found",
@@ -80,6 +81,12 @@ function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
       return {
         text: "GitGuardian - Ignored file",
         color: "statusBarItem.warningBackground",
+      };
+    case StatusBarStatus.authFailed:
+      return {
+        text: "GitGuardian - Authentication failed",
+        color: "statusBarItem.errorBackground",
+        command: "gitguardian.openSidebar",
       };
     default:
       return { text: "", color: "statusBar.foreground" };
