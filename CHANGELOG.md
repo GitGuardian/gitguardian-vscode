@@ -1,5 +1,13 @@
 # GitGuardian Secret Security Changelog
 
+## [0.4.0]
+### Modified
+- Load .env configuration and ensure environment specific settings are applied
+- Prevent scanning gitignored files
+- Status bar displays error when scanning ignored files 
+### Fixed
+- Stop displaying error when scanning file ignored in .gitguardian.yaml
+
 ## [0.3.0]
 ### Modified
 - Remove API key from settings
