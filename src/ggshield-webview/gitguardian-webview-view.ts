@@ -52,9 +52,11 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     return this._view;
   }
 
-
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get("isAuthenticated", false);
+    this.isAuthenticated = this.context.globalState.get(
+      "isAuthenticated",
+      false
+    );
   }
 
   private updateWebViewContent(webviewView?: vscode.WebviewView) {
@@ -155,7 +157,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
   dispose(): void {
     if (this._view) {
-      this._view.webview.onDidReceiveMessage(() => { });
+      this._view.webview.onDidReceiveMessage(() => {});
       this._view.webview.html = "";
       this._view = undefined;
     }

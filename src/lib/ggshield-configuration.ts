@@ -9,7 +9,11 @@ export class GGShieldConfiguration {
   apiUrl: string;
   apiKey: string;
 
-  constructor(ggshieldPath: string = "", apiUrl: string = "", apiKey: string = "") {
+  constructor(
+    ggshieldPath: string = "",
+    apiUrl: string = "",
+    apiKey: string = ""
+  ) {
     this.ggshieldPath = ggshieldPath;
     this.apiUrl = apiUrl;
     this.apiKey = apiKey;
@@ -32,12 +36,17 @@ export function getConfiguration(
   const apiKey: string | undefined = config.get("apiKey");
 
   return new GGShieldConfiguration(
-    ggshieldPath ? ggshieldPath : getBinaryAbsolutePath(os.platform(), os.arch(), context),
+    ggshieldPath
+      ? ggshieldPath
+      : getBinaryAbsolutePath(os.platform(), os.arch(), context),
     apiUrl ? apiUrl : apiUrlDefault,
     apiKey ? apiKey : ""
   );
 }
 
-export function setApiKey(configuration: GGShieldConfiguration, apiKey: string | undefined): void {
+export function setApiKey(
+  configuration: GGShieldConfiguration,
+  apiKey: string | undefined
+): void {
   configuration.apiKey = apiKey ? apiKey : "";
 }

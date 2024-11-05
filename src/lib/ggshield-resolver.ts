@@ -1,7 +1,5 @@
 import * as vscode from "vscode";
-import {
-  GGShieldConfiguration,
-} from "./ggshield-configuration";
+import { GGShieldConfiguration } from "./ggshield-configuration";
 import { runGGShieldCommand } from "./run-ggshield";
 import { window } from "vscode";
 
@@ -37,13 +35,10 @@ export class GGShieldResolver {
       );
       return;
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      this.channel.appendLine(
-        `${errorMessage}`
-      );
-      window.showErrorMessage(
-        `${errorMessage}`
-      );
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      this.channel.appendLine(`${errorMessage}`);
+      window.showErrorMessage(`${errorMessage}`);
       throw error;
     }
   }
@@ -53,15 +48,14 @@ export class GGShieldResolver {
    *
    * @returns {Promise<void>} A promise that resolves if the configuration is valid.
    */
-  async testConfiguration(
-    configuration: GGShieldConfiguration
-  ): Promise<void> {
+  async testConfiguration(configuration: GGShieldConfiguration): Promise<void> {
     // Check if the ggshield path is valid
     let proc = runGGShieldCommand(configuration, ["--version"]);
     if (proc.status !== 0) {
-      window.showErrorMessage(`GitGuardian: Invalid ggshield path. ${proc.stderr}`);
+      window.showErrorMessage(
+        `GitGuardian: Invalid ggshield path. ${proc.stderr}`
+      );
       throw new Error(proc.stderr);
     }
   }
 }
-

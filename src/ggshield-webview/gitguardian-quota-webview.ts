@@ -37,7 +37,10 @@ export class GitGuardianQuotaWebviewProvider
   }
 
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get("isAuthenticated", false);
+    this.isAuthenticated = this.context.globalState.get(
+      "isAuthenticated",
+      false
+    );
   }
 
   private async updateQuota() {

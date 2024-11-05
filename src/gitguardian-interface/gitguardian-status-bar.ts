@@ -1,8 +1,12 @@
-import { ExtensionContext, StatusBarAlignment, StatusBarItem, ThemeColor, window } from "vscode";
-
+import {
+  ExtensionContext,
+  StatusBarAlignment,
+  StatusBarItem,
+  ThemeColor,
+  window,
+} from "vscode";
 
 let statusBarItem: StatusBarItem;
-
 
 export interface StatusBarConfig {
   text: string;
@@ -78,9 +82,7 @@ function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
   }
 }
 
-export function updateStatusBarItem(
-  status: StatusBarStatus,
-): void {
+export function updateStatusBarItem(status: StatusBarStatus): void {
   const config = getStatusBarConfig(status);
   statusBarItem.text = config.text;
   statusBarItem.backgroundColor = new ThemeColor(config.color);

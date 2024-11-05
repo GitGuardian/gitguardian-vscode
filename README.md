@@ -45,14 +45,13 @@ With a free personal account, you have access to 10,000 API calls each month.
 
 ## Support, Feedback, Contributing
 
-This project is open to feature requests/suggestions, bug reports etc. 
+This project is open to feature requests/suggestions, bug reports etc.
 
 If you need support or found a bug : https://github.com/GitGuardian/gitguardian-vscode/issues/new/choose
 
 For ideas and general discussions : https://github.com/GitGuardian/gitguardian-vscode/discussions
 
 Security reports : Please report it using our [Vulnerability Disclosure Portal](https://vdp.gitguardian.com).
-
 
 ## Release Notes
 
