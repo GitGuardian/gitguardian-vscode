@@ -1,35 +1,34 @@
 body {
-    height: 100vh;
-    font-size: 16px;
+  height: 100vh;
+  font-size: 16px;
 }
 
 body.vscode-light {
-    color: black;
+  color: black;
 }
 
 body.vscode-dark {
-    color: white;
+  color: white;
 }
 
 h1 {
-    font-size: 1.3em;
+  font-size: 1.3em;
 }
 
-
 .anonymous {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 button.large {
-    background-color: #1b2d55;
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 2em 0;
+  background-color: #1b2d55;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 5px;
+  margin: 2em 0;
 }

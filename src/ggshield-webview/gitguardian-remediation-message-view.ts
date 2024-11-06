@@ -5,7 +5,8 @@ import * as vscode from "vscode";
 export class GitGuardianRemediationMessageWebviewProvider
   implements vscode.WebviewViewProvider
 {
-  public static readonly viewType = "gitguardian.gitguardianRemediationMessageView";
+  public static readonly viewType =
+    "gitguardian.gitguardianRemediationMessageView";
   private _view?: vscode.WebviewView;
   private isAuthenticated: boolean = false;
   private remediationMessage: string = "";
@@ -37,12 +38,17 @@ export class GitGuardianRemediationMessageWebviewProvider
   }
 
   private async checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get("isAuthenticated", false);
+    this.isAuthenticated = this.context.globalState.get(
+      "isAuthenticated",
+      false
+    );
   }
 
   private async updateRemediationMessage() {
     if (this.isAuthenticated) {
-      this.remediationMessage = await getRemediationMessage(this.ggshieldConfiguration);
+      this.remediationMessage = await getRemediationMessage(
+        this.ggshieldConfiguration
+      );
     }
   }
 
@@ -54,11 +60,11 @@ export class GitGuardianRemediationMessageWebviewProvider
 
   private escapeHtml(unsafe: string): string {
     return unsafe
-         .replace(/&/g, "&amp;")
-         .replace(/</g, "&lt;")
-         .replace(/>/g, "&gt;")
-         .replace(/"/g, "&quot;")
-         .replace(/'/g, "&#039;");
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
   }
 
   private getHtmlForWebview(): string {
