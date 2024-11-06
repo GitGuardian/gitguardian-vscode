@@ -20,20 +20,14 @@ export function runGGShieldCommand(
   args: string[]
 ): SpawnSyncReturns<string> {
   const { ggshieldPath, apiUrl, apiKey } = configuration;
-  let env: {
-    GITGUARDIAN_API_URL: string;
-    GG_USER_AGENT: string;
-    GITGUARDIAN_API_KEY?: string;
-  } = {
+  let env: NodeJS.ProcessEnv = {
+    ...process.env,
     GITGUARDIAN_API_URL: apiUrl,
     GG_USER_AGENT: "gitguardian-vscode",
   };
 
   if (apiKey) {
-    env = {
-      ...env,
-      GITGUARDIAN_API_KEY: apiKey,
-    };
+    env.GITGUARDIAN_API_KEY = apiKey;
   }
 
   let options: SpawnSyncOptionsWithStringEncoding = {
