@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.4.2]
+
+### Fixed
+
+- Default value for Gitguardian API Url is https://dashboard.gitguardian.com
+
 ## [0.4.1]
 
 ### Fixed
