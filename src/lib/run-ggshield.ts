@@ -22,7 +22,7 @@ export function runGGShieldCommand(
   const { ggshieldPath, apiUrl, apiKey } = configuration;
   let env: NodeJS.ProcessEnv = {
     ...process.env,
-    GITGUARDIAN_API_URL: apiUrl,
+    GITGUARDIAN_INSTANCE: apiUrl,
     GG_USER_AGENT: "gitguardian-vscode",
   };
 
