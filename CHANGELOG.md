@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.4.1]
+
+### Fixed
+
+- Ensure all global environment variables are loaded before making API calls
+
 ## [0.4.0]
 
 ### Modified

@@ -1,16 +1,26 @@
 {
   "name": "gitguardian",
   "repository": "https://github.com/GitGuardian/gitguardian-vscode",
-  "displayName": "GitGuardian",
-  "description": "Visual Studio Code extension designed to help developers safeguard their sensitive information from accidental leaks in their code",
+  "displayName": "GitGuardian - Secrets Security",
+  "description": "A safety net to help developers safeguard their sensitive information (passwords, API key, tokens, ..) from accidental leaks in their code",
   "icon": "images/icon.png",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "publisher": "gitguardian-secret-security",
   "engines": {
     "vscode": "^1.81.0"
   },
+  "galleryBanner": {
+    "color": "#081736"
+  },
   "categories": [
     "Other"
+  ],
+  "keywords": [
+    "security",
+    "secrets",
+    "password",
+    "scan",
+    "devsecops"
   ],
   "activationEvents": [
     "onStartupFinished"
