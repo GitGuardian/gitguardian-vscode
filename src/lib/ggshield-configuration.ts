@@ -1,8 +1,8 @@
 import { getBinaryAbsolutePath } from "./ggshield-resolver-utils";
-import { ConfigurationTarget, ExtensionContext, workspace } from "vscode";
+import { ExtensionContext, workspace } from "vscode";
 import * as os from "os";
 
-const apiUrlDefault = "https://api.gitguardian.com/";
+const apiUrlDefault = "https://dashboard.gitguardian.com/";
 
 export class GGShieldConfiguration {
   ggshieldPath: string;

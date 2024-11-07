@@ -27,7 +27,7 @@
         },
         "gitguardian.apiUrl": {
           "type": "string",
-          "default": "https://api.gitguardian.com",
+          "default": "https://dashboard.gitguardian.com",
           "markdownDescription": "You can override the value here for On Premise installations"
         },
         "gitguardian.apiKey": {
