@@ -1,24 +1,14 @@
 import * as simple from "simple-mock";
 import assert = require("assert");
 import { ExtensionContext, workspace } from "vscode";
-import * as GGShieldConfiguration from "../../../lib/ggshield-configuration";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
 
 suite("getConfiguration", () => {
   let getConfigurationMock: simple.Stub<Function>;
-  let constructorMock: simple.Stub<Function>;
-  let context: Partial<ExtensionContext>;
 
   setup(() => {
     // Mock workspace.getConfiguration
     getConfigurationMock = simple.mock(workspace, "getConfiguration");
-
-    // Mock the GGShieldConfiguration constructor globally
-    constructorMock = simple.mock(
-      GGShieldConfiguration,
-      "GGShieldConfiguration"
-    );
-    context = {} as ExtensionContext;
   });
 
   teardown(() => {
@@ -42,25 +32,18 @@ suite("getConfiguration", () => {
         }
       },
     });
-    constructorMock.returnWith({});
-
-    getConfiguration(context as ExtensionContext);
+    const configuration = getConfiguration({} as ExtensionContext);
 
     // Assert both workspace.getConfiguration  and GGShieldConfiguration constructor were called
     assert(
       getConfigurationMock.called,
       "getConfiguration should be called once"
     );
-    assert(
-      constructorMock.called,
-      "GGShieldConfiguration constructor should be called once"
-    );
 
-    // Check the arguments passed to GGShieldConfiguration constructor
-    const ggshieldConfigurationArgs = constructorMock.lastCall.args;
-    assert.strictEqual(ggshieldConfigurationArgs[0], "path/to/ggshield");
-    assert.strictEqual(ggshieldConfigurationArgs[1], "https://custom-url.com");
-    assert.strictEqual(ggshieldConfigurationArgs[2], "test-api-key");
-    assert.strictEqual(ggshieldConfigurationArgs[3], true);
+    // Assert that the configuration has the expected values
+    assert.strictEqual(configuration.ggshieldPath, "path/to/ggshield");
+    assert.strictEqual(configuration.apiUrl, "https://custom-url.com");
+    assert.strictEqual(configuration.apiKey, "test-api-key");
+    assert.strictEqual(configuration.allowSelfSigned, true);
   });
 });

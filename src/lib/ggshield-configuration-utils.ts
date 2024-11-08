@@ -24,9 +24,9 @@ export function getConfiguration(
     ggshieldPath
       ? ggshieldPath
       : getBinaryAbsolutePath(os.platform(), os.arch(), context),
-    apiUrl ? apiUrl : apiUrlDefault,
-    apiKey ? apiKey : "",
-    allowSelfSigned ? allowSelfSigned : false
+    apiUrl || apiUrlDefault,
+    apiKey || "",
+    allowSelfSigned || false
   );
 }
 

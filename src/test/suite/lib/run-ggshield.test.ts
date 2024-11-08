@@ -61,7 +61,7 @@ suite("runGGShieldCommand", () => {
           apiKey: "",
           allowSelfSigned: allowSelfSigned,
         } as GGShieldConfiguration,
-        []
+        ["test"]
       );
 
       assert(spawnSyncMock.called, "spawnSync should be called once");
@@ -69,7 +69,7 @@ suite("runGGShieldCommand", () => {
       const spawnSyncArgs = spawnSyncMock.lastCall.args;
       const args = spawnSyncArgs[1];
 
-      assert.strictEqual(args.includes("--allow-self-signed"), allowSelfSigned);
+      assert.strictEqual(args[0] === "--allow-self-signed", allowSelfSigned);
     });
   });
 });
