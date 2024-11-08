@@ -8,15 +8,18 @@ export class GGShieldConfiguration {
   ggshieldPath: string;
   apiUrl: string;
   apiKey: string;
+  allowSelfSigned: boolean;
 
   constructor(
     ggshieldPath: string = "",
     apiUrl: string = "",
-    apiKey: string = ""
+    apiKey: string = "",
+    allowSelfSigned: boolean = false
   ) {
     this.ggshieldPath = ggshieldPath;
     this.apiUrl = apiUrl;
     this.apiKey = apiKey;
+    this.allowSelfSigned = allowSelfSigned;
   }
 }
 
@@ -34,13 +37,15 @@ export function getConfiguration(
   const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
   const apiKey: string | undefined = config.get("apiKey");
+  const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
 
   return new GGShieldConfiguration(
     ggshieldPath
       ? ggshieldPath
       : getBinaryAbsolutePath(os.platform(), os.arch(), context),
     apiUrl ? apiUrl : apiUrlDefault,
-    apiKey ? apiKey : ""
+    apiKey ? apiKey : "",
+    allowSelfSigned ? allowSelfSigned : false
   );
 }
 

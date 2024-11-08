@@ -34,6 +34,11 @@
           "type": "string",
           "default": "",
           "markdownDescription": "Your API Key"
+        },
+        "gitguardian.allowSelfSigned": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Allow Self Signed Certificates"
         }
       }
     },
