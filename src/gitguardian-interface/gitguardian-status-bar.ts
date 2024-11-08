@@ -46,7 +46,11 @@ function getStatusBarConfig(status: StatusBarStatus): StatusBarConfig {
         command: "gitguardian.openSidebar",
       };
     case StatusBarStatus.ready:
-      return { text: "GitGuardian is ready", color: "statusBar.foreground" };
+      return {
+        text: "GitGuardian is ready",
+        color: "statusBar.foreground",
+        command: "gitguardian.openSidebar",
+      };
     case StatusBarStatus.scanning:
       return {
         text: "GitGuardian - Scanning...",
