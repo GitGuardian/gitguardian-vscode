@@ -17,8 +17,6 @@ suite("runGGShieldCommand", () => {
 
   test("Global env variables are set correctly", async () => {
     process.env.TEST_GLOBAL_VAR = "GlobalValue";
-
-    const spawnSyncSpy = simple.mock(childProcess, "spawnSync");
     runGGShield.runGGShieldCommand(
       {
         ggshieldPath: "path/to/ggshield",
@@ -29,14 +27,49 @@ suite("runGGShieldCommand", () => {
     );
 
     // Assert that spawnSync was called
-    assert(spawnSyncSpy.called, "spawnSync should be called once");
+    assert(spawnSyncMock.called, "spawnSync should be called once");
 
     // Check the arguments passed to spawnSync
-    const spawnSyncArgs = spawnSyncSpy.lastCall.args;
+    const spawnSyncArgs = spawnSyncMock.lastCall.args;
     const options = spawnSyncArgs[2];
     assert.strictEqual(options.env.TEST_GLOBAL_VAR, "GlobalValue");
 
-    simple.restore();
     delete process.env.TEST_GLOBAL_VAR;
+  });
+
+  const testCasesAllowSelfSigned = [
+    {
+      allowSelfSigned: true,
+      description:
+        "GGshield is called with flag --allow-self-signed when allowSelfSigned is true",
+    },
+    {
+      allowSelfSigned: false,
+      description:
+        "GGshield is not called with flag --allow-self-signed when allowSelfSigned is false",
+    },
+  ];
+
+  testCasesAllowSelfSigned.forEach(({ allowSelfSigned, description }) => {
+    test(description, async () => {
+      process.env.TEST_GLOBAL_VAR = "GlobalValue";
+
+      runGGShield.runGGShieldCommand(
+        {
+          ggshieldPath: "path/to/ggshield",
+          apiUrl: "",
+          apiKey: "",
+          allowSelfSigned: allowSelfSigned,
+        } as GGShieldConfiguration,
+        ["test"]
+      );
+
+      assert(spawnSyncMock.called, "spawnSync should be called once");
+
+      const spawnSyncArgs = spawnSyncMock.lastCall.args;
+      const args = spawnSyncArgs[1];
+
+      assert.strictEqual(args[0] === "--allow-self-signed", allowSelfSigned);
+    });
   });
 });

@@ -41,6 +41,10 @@ export function runGGShieldCommand(
   if (workspace.workspaceFolders?.length || 0 > 0) {
     options["cwd"] = workspace.workspaceFolders![0].uri.fsPath;
   }
+  // if allowSelfSigned is enabled, add the --allow-self-signed flag
+  if (configuration.allowSelfSigned) {
+    args = ["--allow-self-signed"].concat(args);
+  }
   let proc = spawnSync(ggshieldPath, args, options);
 
   return proc;

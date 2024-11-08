@@ -10,7 +10,10 @@ import {
   scanFile,
   showAPIQuota,
 } from "./lib/ggshield-api";
-import { getConfiguration, setApiKey } from "./lib/ggshield-configuration";
+import {
+  getConfiguration,
+  setApiKey,
+} from "./lib/ggshield-configuration-utils";
 import {
   ExtensionContext,
   Uri,
