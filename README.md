@@ -1,62 +1,36 @@
-# GitGuardian for VSCode
+# GitGuardian for VS Code
 
-Simply install the extension and let GitGuardian protect you from accidentally exposing secrets in your code. With GitGuardian, you can code with confidence, knowing that your sensitive information is safe from leaks.
+Detect secrets in real time and retroactively across extensive sources, with no limit to your team’s scale. GitGuardian grows with you, securing both new and legacy codebases with unmatched precision.
 
-We detect more than 400+ types of secrets directly from VSCode using [GitGuardian CLI (ggshield)](https://www.gitguardian.com/ggshield).
-
-### Features
-
-- When a file is saved, it is scanned using the GitGuardian CLI (ggshield) application bundled with the extension
-- Found secrets are highlighted in code and available in the `Problems` panel as warnings
-- Secrets can be ignored running the command `gitguardian: Ignore last found incidents` or via the UI
-- Your API quota can be checked running the command `gitguardian: Show quota`
+Whether you’re a solo developer or part of a team, GitGuardian scales with you, catching secrets in every language, every repo, and every branch.
 
 ![Incident highlighted](https://raw.githubusercontent.com/GitGuardian/gitguardian-vscode/main/doc/incident_highlighted_dark.png)
 
-## Getting started
+### Key Features
 
-### Authentication
+- **Automatic Scanning**: Each time you save a file, GitGuardian scans for over 400+ types of secrets using the bundled GitGuardian CLI (`ggshield`).
+- **Secret Detection & Alerts**: Detected secrets are highlighted in your code and displayed as warnings in the `Problems` panel.
+- **Easy Ignore Option**: Ignore secrets quickly with the command `GitGuardian: Ignore Last Found Incidents` or directly via the UI.
 
-Once the extension is installed, simply click on "Link your IDE to your account" for automatic authentication. If you are a user with an on-premise instance of GitGuardian, go to the extension settings to enter your URL and API key.
+### Get Started in 3 Steps
 
-### Scan for secrets
+1. **Authenticate**: Link your IDE to your GitGuardian account with one click. For on-premise users, enter your custom URL and API key in settings.
+2. **Scan on Save**: Save a file to trigger an automatic scan. Incidents show up instantly in your file and Problems panel.
+3. **Remediate with Guidance**: View remediation tips right in the extension’s side panel. Security teams can customize messages for precise guidance.
 
-The scanning is triggered automatically when saving a file. Incidents are highlighted in file and available in the `Problems` panel as warnings.
+### Additional Features
 
-### How to remediate incidents?
+- **Ignore Secrets**: After a scan, hover over the identified secret and select "GitGuardian: Ignore Secret" to add it to `.gitguardian.yaml`.
+- **Quota Tracking**: Run "GitGuardian: Show Quota" to monitor API call usage. Personal accounts include up to 10,000 monthly API calls.
+    - **Check API Quota**: Stay aware of usage by running "GitGuardian: Show Quota."
 
-Remediation guidelines are conveniently displayed directly in the extension's side panel. Your security team can customize these messages to provide you with the most accurate information, enabling you to address issues promptly and effectively.
+### Support & Contributions
 
-For more info on how to remediate incidents, you can take a look at GitGuardian's [documentation](https://docs.gitguardian.com/internal-repositories-monitoring/remediate/remediate-incidents).
+- **Report Issues**: [Submit bug reports](https://github.com/GitGuardian/gitguardian-vscode/issues/new/choose).
+- **Feature Requests & Ideas**: [Join discussions](https://github.com/GitGuardian/gitguardian-vscode/discussions).
+- **Security Reports**: Use our [Vulnerability Disclosure Portal](https://vdp.gitguardian.com).
 
-### Ignore secrets (only when working in a workspace)
+### Release Notes & License
 
-Immediately after saving a file, if any incidents are detected, you can hover over the identified secret and click on "GitGuardian: Ignore Secret."
-
-This action will create or update the .gitguardian.yaml file in the root of your workspace, allowing you to ignore the detected secrets.
-
-For more information, please refer to the GitGuardian CLI (ggshield) documentation.
-
-### Check my quota
-
-Run the command `gitguardian: Show quota` from VSCode command palette to check the current status of your API quota.
-
-With a free personal account, you have access to 10,000 API calls each month.
-
-## Support, Feedback, Contributing
-
-This project is open to feature requests/suggestions, bug reports etc.
-
-If you need support or found a bug : https://github.com/GitGuardian/gitguardian-vscode/issues/new/choose
-
-For ideas and general discussions : https://github.com/GitGuardian/gitguardian-vscode/discussions
-
-Security reports : Please report it using our [Vulnerability Disclosure Portal](https://vdp.gitguardian.com).
-
-## Release Notes
-
-See [Change log](https://github.com/GitGuardian/gitguardian-vscode/blob/main/CHANGELOG.md)
-
-## License
-
-GitGuardian CLI (ggshield) and this extension are MIT licensed.
+- **Updates**: See the [Changelog](https://github.com/GitGuardian/gitguardian-vscode/blob/main/CHANGELOG.md).
+- **License**: GitGuardian CLI (`ggshield`) and this extension are MIT licensed.
