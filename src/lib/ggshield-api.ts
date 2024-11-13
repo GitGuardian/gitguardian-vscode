@@ -172,47 +172,42 @@ export async function scanFile(
     filePath,
   ]);
 
-  // Ignore errors concerning usage
-  // This occurs when the path of the file is invalid (i.e.VSCode sending an event for files not on the file system)
-  // or when the file is ignored in the .gitguardian.yaml
-  if (
-    proc.stderr.includes(
-      "Error: An ignored file or directory cannot be scanned"
-    )
-  ) {
-    updateStatusBarItem(StatusBarStatus.ignoredFile);
-    return;
-  }
-  if (proc.stderr.includes("Usage: ggshield secret scan path")) {
-    return undefined;
-  }
-  let errorMessage = "";
-  proc.stderr.split("\n").forEach((stderrLine) => {
-    if (
-      stderrLine.length > 0 &&
-      !stderrLine.includes("Scanning Path...") // ggshield outputs this info message on stderr, ignore it
-    ) {
-      errorMessage += stderrLine + "\n";
+  if (proc.status === 128 || proc.status === 3) {
+    let errorMessage = "";
+    proc.stderr.split("\n").forEach((stderrLine) => {
+      if (
+        stderrLine.length > 0 &&
+        !stderrLine.includes("Scanning Path...") // ggshield outputs this info message on stderr, ignore it
+      ) {
+        errorMessage += stderrLine + "\n";
+      }
+    });
+    if (errorMessage.length > 0) {
+      window.showErrorMessage(`ggshield: ${errorMessage}`);
+      return undefined;
     }
-  });
-  if (errorMessage.length > 0) {
-    window.showErrorMessage(`ggshield: ${errorMessage}`);
+  } else if (proc.status === 2) {
+    // Ignore errors concerning usage
+    // This occurs when the path of the file is invalid (i.e.VSCode sending an event for files not on the file system)
+    // or when the file is ignored in the .gitguardian.yaml
+    if (
+      proc.stderr.includes(
+        "Error: An ignored file or directory cannot be scanned"
+      )
+    ) {
+      updateStatusBarItem(StatusBarStatus.ignoredFile);
+      return;
+    }
     return undefined;
-  }
-
-  const results = JSON.parse(proc.stdout);
-  if (!results) {
-    updateStatusBarItem(StatusBarStatus.ready);
-    return;
-  }
-  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
-  if (incidentsDiagnostics.length !== 0) {
-    updateStatusBarItem(StatusBarStatus.secretFound);
-  } else {
+  } else if (proc.status === 0) {
     updateStatusBarItem(StatusBarStatus.noSecretFound);
+    return;
+  } else {
+    const results = JSON.parse(proc.stdout);
+    let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
+    updateStatusBarItem(StatusBarStatus.secretFound);
+    diagnosticCollection.set(fileUri, incidentsDiagnostics);
   }
-
-  diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
 
 export async function loginGGShield(
