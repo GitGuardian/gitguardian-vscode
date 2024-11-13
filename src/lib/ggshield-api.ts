@@ -173,15 +173,13 @@ export async function scanFile(
   ]);
 
   if (proc.status === 128 || proc.status === 3) {
-    let errorMessage = "";
-    proc.stderr.split("\n").forEach((stderrLine) => {
-      if (
-        stderrLine.length > 0 &&
-        !stderrLine.includes("Scanning Path...") // ggshield outputs this info message on stderr, ignore it
-      ) {
-        errorMessage += stderrLine + "\n";
-      }
-    });
+    const errorMessage = proc.stderr
+      .split("\n")
+      .filter(
+        (stderrLine) =>
+          stderrLine.length > 0 && !stderrLine.includes("Scanning Path...") // ggshield outputs this info message on stderr, ignore it
+      )
+      .join("\n");
     if (errorMessage.length > 0) {
       window.showErrorMessage(`ggshield: ${errorMessage}`);
       return undefined;
@@ -203,11 +201,11 @@ export async function scanFile(
     updateStatusBarItem(StatusBarStatus.noSecretFound);
     return;
   } else {
-    const results = JSON.parse(proc.stdout);
-    let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
     updateStatusBarItem(StatusBarStatus.secretFound);
-    diagnosticCollection.set(fileUri, incidentsDiagnostics);
   }
+  const results = JSON.parse(proc.stdout);
+  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
+  diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }
 
 export async function loginGGShield(

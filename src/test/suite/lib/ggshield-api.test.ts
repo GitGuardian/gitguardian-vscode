@@ -78,7 +78,7 @@ suite("scanFile", () => {
       statusBar.StatusBarStatus.ignoredFile
     );
   });
-  
+
   const errorCodes = [128, 3];
   errorCodes.forEach((code) => {
     test(`displays an error message if the scan command fails with error code ${code}`, async () => {
@@ -88,11 +88,15 @@ suite("scanFile", () => {
         stderr: "Error",
       });
 
-      await scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
+      await scanFile(
+        "test.py",
+        Uri.file("test.py"),
+        {} as GGShieldConfiguration
+      );
 
       // The error message is displayed
       assert.strictEqual(errorMessageMock.callCount, 1);
-      assert.strictEqual(errorMessageMock.lastCall.args[0], "ggshield: Error\n");
+      assert.strictEqual(errorMessageMock.lastCall.args[0], "ggshield: Error");
     });
   });
 

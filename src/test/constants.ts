@@ -39,3 +39,48 @@ export const scanResultsWithIncident = `{
     "total_occurrences":1,
     "secrets_engine_version":"2.96.0"
     }`;
+
+export const scanResultsWithUriIncident = `{
+  "id": "test.py",
+  "type": "path_scan",
+  "entities_with_incidents": [
+    {
+      "mode": "FILE",
+      "filename": "test.py",
+      "incidents": [
+        {
+          "policy": "Secrets detection",
+          "occurrences": [
+            {
+              "match": "postgres:************************************4/thegift",
+              "type": "connection_uri",
+              "line_start": 1,
+              "line_end": 1,
+              "index_start": 16,
+              "index_end": 70
+            },
+            {
+              "match": "po****es",
+              "type": "scheme",
+              "line_start": 1,
+              "line_end": 1,
+              "index_start": 16,
+              "index_end": 24
+            }
+          ],
+          "type": "PostgreSQL Credentials",
+          "validity": "failed_to_check",
+          "ignore_sha": "981de92451ea2b27f7a163d39c92b566de7cdcc52280fdd9cf7b331d6d53ad86",
+          "total_occurrences": 1,
+          "incident_url": "",
+          "known_secret": false
+        }
+      ],
+      "total_incidents": 1,
+      "total_occurrences": 1
+    }
+  ],
+  "total_incidents": 1,
+  "total_occurrences": 1,
+  "secrets_engine_version": "2.126.0"
+}`;
