@@ -10,7 +10,8 @@
     "vscode": "^1.81.0"
   },
   "galleryBanner": {
-    "color": "#081736"
+    "color": "#081736",
+    "theme": "dark"
   },
   "categories": [
     "Other"
