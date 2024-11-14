@@ -15,7 +15,7 @@ suite("runGGShieldCommand", () => {
     simple.restore();
   });
 
-  test("Global env variables are set correctly", async () => {
+  test("Global env variables are set correctly", () => {
     process.env.TEST_GLOBAL_VAR = "GlobalValue";
     runGGShield.runGGShieldCommand(
       {
@@ -50,7 +50,7 @@ suite("runGGShieldCommand", () => {
   ];
 
   testCasesAllowSelfSigned.forEach(({ allowSelfSigned, description }) => {
-    test(description, async () => {
+    test(description, () => {
       process.env.TEST_GLOBAL_VAR = "GlobalValue";
 
       runGGShield.runGGShieldCommand(

@@ -48,9 +48,7 @@ export function showAPIQuota(configuration: GGShieldConfiguration): undefined {
   }
 }
 
-export async function getAPIquota(
-  configuration: GGShieldConfiguration
-): Promise<number> {
+export function getAPIquota(configuration: GGShieldConfiguration): number {
   try {
     const proc = runGGShieldCommand(configuration, ["quota", "--json"]);
     return JSON.parse(proc.stdout).remaining;
@@ -137,12 +135,11 @@ export function cleanUpFileDiagnostics(fileUri: Uri): void {
  * @param filePath path to file
  * @param fileUri file uri
  */
-export async function scanFile(
-  this: any,
+export function scanFile(
   filePath: string,
   fileUri: Uri,
   configuration: GGShieldConfiguration
-): Promise<void> {
+): void {
   if (isFileGitignored(filePath)) {
     updateStatusBarItem(StatusBarStatus.ignoredFile);
     return;

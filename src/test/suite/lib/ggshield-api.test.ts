@@ -27,14 +27,14 @@ suite("scanFile", () => {
     simple.restore();
   });
 
-  test("successfully scans a file with no incidents", async () => {
+  test("successfully scans a file with no incidents", () => {
     runGGShieldCommandMock.returnWith({
       status: 0,
       stdout: scanResultsNoIncident,
       stderr: "",
     });
 
-    await scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
+    scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
 
     // The status bar displays "No Secret Found"
     assert.strictEqual(updateStatusBarMock.callCount, 1);
@@ -44,14 +44,14 @@ suite("scanFile", () => {
     );
   });
 
-  test("successfully scans a file with incidents", async () => {
+  test("successfully scans a file with incidents", () => {
     runGGShieldCommandMock.returnWith({
       status: 1,
       stdout: scanResultsWithIncident,
       stderr: "",
     });
 
-    await scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
+    scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
 
     // The status bar displays "Secret Found"
     assert.strictEqual(updateStatusBarMock.callCount, 1);
@@ -67,9 +67,9 @@ suite("scanFile", () => {
     );
   });
 
-  test("skips the file if it is gitignored", async () => {
+  test("skips the file if it is gitignored", () => {
     const filePath = "out/test.py";
-    await scanFile(filePath, Uri.file(filePath), {} as GGShieldConfiguration);
+    scanFile(filePath, Uri.file(filePath), {} as GGShieldConfiguration);
 
     // The status bar displays "Ignored File"
     assert.strictEqual(updateStatusBarMock.callCount, 1);
@@ -81,14 +81,14 @@ suite("scanFile", () => {
 
   const errorCodes = [128, 3];
   errorCodes.forEach((code) => {
-    test(`displays an error message if the scan command fails with error code ${code}`, async () => {
+    test(`displays an error message if the scan command fails with error code ${code}`, () => {
       runGGShieldCommandMock.returnWith({
         status: code,
         stdout: "",
         stderr: "Error",
       });
 
-      await scanFile(
+      scanFile(
         "test.py",
         Uri.file("test.py"),
         {} as GGShieldConfiguration
@@ -100,14 +100,14 @@ suite("scanFile", () => {
     });
   });
 
-  test("ignores the 'ignored file cannot be scanned' error", async () => {
+  test("ignores the 'ignored file cannot be scanned' error", () => {
     runGGShieldCommandMock.returnWith({
       status: 2,
       stdout: "",
       stderr: "Error: An ignored file or directory cannot be scanned.",
     });
 
-    await scanFile("test", Uri.file("test"), {} as GGShieldConfiguration);
+    scanFile("test", Uri.file("test"), {} as GGShieldConfiguration);
 
     // No error message is displayed
     assert.strictEqual(errorMessageMock.callCount, 0);

@@ -15,7 +15,7 @@ suite("getConfiguration", () => {
     simple.restore();
   });
 
-  test("Vscode settings are correctly read", async () => {
+  test("Vscode settings are correctly read", () => {
     getConfigurationMock.returnWith({
       get: (key: string) => {
         if (key === "GGShieldPath") {

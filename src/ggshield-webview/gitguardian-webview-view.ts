@@ -24,7 +24,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     this.checkAuthenticationStatus();
   }
 
-  public async resolveWebviewView(
+  public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
@@ -52,7 +52,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     return this._view;
   }
 
-  private async checkAuthenticationStatus() {
+  private checkAuthenticationStatus() {
     this.isAuthenticated = this.context.globalState.get(
       "isAuthenticated",
       false

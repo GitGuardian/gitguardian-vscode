@@ -20,7 +20,7 @@ export class GitGuardianRemediationMessageWebviewProvider
     this.updateRemediationMessage();
   }
 
-  public async resolveWebviewView(
+  public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
@@ -36,14 +36,14 @@ export class GitGuardianRemediationMessageWebviewProvider
     });
   }
 
-  private async checkAuthenticationStatus() {
+  private checkAuthenticationStatus() {
     this.isAuthenticated = this.context.globalState.get(
       "isAuthenticated",
       false
     );
   }
 
-  private async updateRemediationMessage() {
+  private updateRemediationMessage() {
     if (this.isAuthenticated) {
       //TODO: Get remediation message
       this.remediationMessage = "";
@@ -97,13 +97,13 @@ ${this.escapeHtml(this.remediationMessage)}
     }
   }
 
-  public async refresh() {
+  public refresh() {
     this.isLoading = true;
     this.updateWebViewContent(this._view);
 
-    await this.checkAuthenticationStatus();
+    this.checkAuthenticationStatus();
     console.log("Well authenticated");
-    await this.updateRemediationMessage();
+    this.updateRemediationMessage();
 
     this.isLoading = false;
     this.updateWebViewContent(this._view);

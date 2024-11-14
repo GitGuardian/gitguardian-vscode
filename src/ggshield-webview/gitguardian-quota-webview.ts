@@ -20,7 +20,7 @@ export class GitGuardianQuotaWebviewProvider
     this.updateQuota();
   }
 
-  public async resolveWebviewView(
+  public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
@@ -36,16 +36,16 @@ export class GitGuardianQuotaWebviewProvider
     });
   }
 
-  private async checkAuthenticationStatus() {
+  private checkAuthenticationStatus() {
     this.isAuthenticated = this.context.globalState.get(
       "isAuthenticated",
       false
     );
   }
 
-  private async updateQuota() {
+  private updateQuota() {
     if (this.isAuthenticated) {
-      this.quota = await getAPIquota(this.ggshieldConfiguration);
+      this.quota = getAPIquota(this.ggshieldConfiguration);
     }
   }
 
@@ -85,12 +85,12 @@ export class GitGuardianQuotaWebviewProvider
     }
   }
 
-  public async refresh() {
+  public refresh() {
     this.isLoading = true;
     this.updateWebViewContent(this._view);
 
-    await this.checkAuthenticationStatus();
-    await this.updateQuota();
+    this.checkAuthenticationStatus();
+    this.updateQuota();
 
     this.isLoading = false;
     this.updateWebViewContent(this._view);

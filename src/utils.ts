@@ -6,16 +6,15 @@ const reDashboard = "dashboard";
 const reApi = "api";
 const gitGuardianDomains = ["gitguardian.tech", "gitguardian.com"];
 
-export async function isGitInstalled(): Promise<boolean> {
-  return new Promise((resolve) => {
-    let proc = spawnSync("git", ["--version"]);
-    if (proc.error || proc.stderr.length > 0) {
-      console.log(`git is not installed.`);
-      resolve(false);
-    } else {
-      resolve(true);
-    }
-  });
+export function checkGitInstalled(): boolean {
+  let proc = spawnSync("git", ["--version"]);
+  const success = proc.status === 0;
+  if (!success) {
+    vscode.window.showErrorMessage(
+      `GGShield requires git to work correctly. Please install git.`
+    );
+  }
+  return success;
 }
 
 // Since git is required to use ggshield, we know that it is installed
@@ -32,17 +31,6 @@ export function getCurrentFile(): string {
     return activeEditor.document.fileName;
   } else {
     return "";
-  }
-}
-
-export function dasboardToApi(dashboardUrl: string): string {
-  const domainMatch = gitGuardianDomains.some((domain) =>
-    dashboardUrl.includes(domain)
-  );
-  if (domainMatch) {
-    return dashboardUrl.replace(reDashboard, reApi);
-  } else {
-    return dashboardUrl;
   }
 }
 
