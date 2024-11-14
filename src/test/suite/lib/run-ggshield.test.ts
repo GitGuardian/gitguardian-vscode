@@ -21,7 +21,6 @@ suite("runGGShieldCommand", () => {
       {
         ggshieldPath: "path/to/ggshield",
         apiUrl: "",
-        apiKey: "",
       } as GGShieldConfiguration,
       []
     );
@@ -58,7 +57,6 @@ suite("runGGShieldCommand", () => {
         {
           ggshieldPath: "path/to/ggshield",
           apiUrl: "",
-          apiKey: "",
           allowSelfSigned: allowSelfSigned,
         } as GGShieldConfiguration,
         ["test"]

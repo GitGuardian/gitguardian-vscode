@@ -1,4 +1,3 @@
-import { getRemediationMessage } from "../lib/ggshield-api";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 import * as vscode from "vscode";
 
@@ -46,9 +45,8 @@ export class GitGuardianRemediationMessageWebviewProvider
 
   private async updateRemediationMessage() {
     if (this.isAuthenticated) {
-      this.remediationMessage = await getRemediationMessage(
-        this.ggshieldConfiguration
-      );
+      //TODO: Get remediation message
+      this.remediationMessage = "";
     }
   }
 

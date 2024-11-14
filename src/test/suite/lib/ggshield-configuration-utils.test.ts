@@ -24,9 +24,6 @@ suite("getConfiguration", () => {
         if (key === "apiUrl") {
           return "https://custom-url.com";
         }
-        if (key === "apiKey") {
-          return "test-api-key";
-        }
         if (key === "allowSelfSigned") {
           return true;
         }
@@ -43,7 +40,6 @@ suite("getConfiguration", () => {
     // Assert that the configuration has the expected values
     assert.strictEqual(configuration.ggshieldPath, "path/to/ggshield");
     assert.strictEqual(configuration.apiUrl, "https://custom-url.com");
-    assert.strictEqual(configuration.apiKey, "test-api-key");
     assert.strictEqual(configuration.allowSelfSigned, true);
   });
 });

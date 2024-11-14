@@ -10,10 +10,7 @@ import {
   scanFile,
   showAPIQuota,
 } from "./lib/ggshield-api";
-import {
-  getConfiguration,
-  setApiKey,
-} from "./lib/ggshield-configuration-utils";
+import { getConfiguration } from "./lib/ggshield-configuration-utils";
 import {
   ExtensionContext,
   Uri,
@@ -138,7 +135,6 @@ export function activate(context: ExtensionContext) {
       ggshieldAuthStatus(configuration, context);
       if (context.globalState.get("isAuthenticated", false)) {
         updateStatusBarItem(StatusBarStatus.ready);
-        setApiKey(configuration, ggshieldApiKey(configuration));
         ggshieldViewProvider.refresh();
         ggshieldRemediationMessageViewProvider.refresh();
         ggshieldQuotaViewProvider.refresh();
@@ -219,7 +215,6 @@ export function activate(context: ExtensionContext) {
             .then(() => {
               if (context.globalState.get("isAuthenticated", false)) {
                 updateStatusBarItem(StatusBarStatus.ready);
-                setApiKey(configuration, ggshieldApiKey(configuration));
               } else {
                 updateStatusBarItem(StatusBarStatus.unauthenticated);
               }
@@ -234,7 +229,6 @@ export function activate(context: ExtensionContext) {
         commands.registerCommand("gitguardian.logout", async () => {
           logoutGGShield(ggshieldResolver.configuration, context);
           updateStatusBarItem(StatusBarStatus.unauthenticated);
-          setApiKey(configuration, undefined);
           ggshieldViewProvider.refresh();
           ggshieldRemediationMessageViewProvider.refresh();
           ggshieldQuotaViewProvider.refresh();

@@ -59,23 +59,6 @@ export async function getAPIquota(
   }
 }
 
-export async function getRemediationMessage(
-  configuration: GGShieldConfiguration
-): Promise<string> {
-  const apiUrl = dasboardToApi(configuration.apiUrl);
-  const path = require("node:path");
-  try {
-    const response = await axios.get(path.join(apiUrl, "v1/metadata"), {
-      headers: {
-        authorization: `Token ${configuration.apiKey}`,
-      },
-    });
-    return response.data.remediation_messages.pre_commit;
-  } catch (error) {
-    return "An error occurred.";
-  }
-}
-
 /**
  * Ignore last found secrets
  *
@@ -214,7 +197,7 @@ export async function loginGGShield(
   webviewView: WebviewView,
   context: ExtensionContext
 ): Promise<void> {
-  const { ggshieldPath, apiUrl, apiKey } = configuration;
+  const { ggshieldPath, apiUrl } = configuration;
 
   let options: SpawnOptionsWithoutStdio = {
     cwd: os.tmpdir(),
