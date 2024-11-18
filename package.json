@@ -31,11 +31,6 @@
     "configuration": {
       "title": "GitGuardian",
       "properties": {
-        "gitguardian.GGShieldPath": {
-          "type": "string",
-          "default": null,
-          "markdownDescription": "You can override the embedded GitGuardian CLI binary (ggshield) with a custom path"
-        },
         "gitguardian.apiUrl": {
           "type": "string",
           "default": "",

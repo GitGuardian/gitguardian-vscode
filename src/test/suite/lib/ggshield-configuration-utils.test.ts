@@ -16,11 +16,10 @@ suite("getConfiguration", () => {
   });
 
   test("Vscode settings are correctly read", () => {
+    const context = {} as ExtensionContext;
+    simple.mock(context, "asAbsolutePath").returnWith("");
     getConfigurationMock.returnWith({
       get: (key: string) => {
-        if (key === "GGShieldPath") {
-          return "path/to/ggshield";
-        }
         if (key === "apiUrl") {
           return "https://custom-url.com";
         }
@@ -29,7 +28,7 @@ suite("getConfiguration", () => {
         }
       },
     });
-    const configuration = getConfiguration({} as ExtensionContext);
+    const configuration = getConfiguration(context);
 
     // Assert both workspace.getConfiguration  and GGShieldConfiguration constructor were called
     assert(
@@ -38,7 +37,6 @@ suite("getConfiguration", () => {
     );
 
     // Assert that the configuration has the expected values
-    assert.strictEqual(configuration.ggshieldPath, "path/to/ggshield");
     assert.strictEqual(configuration.apiUrl, "https://custom-url.com");
     assert.strictEqual(configuration.allowSelfSigned, true);
   });

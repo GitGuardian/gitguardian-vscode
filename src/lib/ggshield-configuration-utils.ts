@@ -18,9 +18,7 @@ export function getConfiguration(
   const apiUrl: string | undefined = config.get("apiUrl");
   const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
   return new GGShieldConfiguration(
-    ggshieldPath
-      ? ggshieldPath
-      : getBinaryAbsolutePath(os.platform(), os.arch(), context),
+    getBinaryAbsolutePath(os.platform(), os.arch(), context),
     apiUrl,
     allowSelfSigned || false
   );
