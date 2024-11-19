@@ -31,20 +31,10 @@
     "configuration": {
       "title": "GitGuardian",
       "properties": {
-        "gitguardian.GGShieldPath": {
-          "type": "string",
-          "default": null,
-          "markdownDescription": "You can override the embedded GitGuardian CLI binary (ggshield) with a custom path"
-        },
         "gitguardian.apiUrl": {
           "type": "string",
-          "default": "https://dashboard.gitguardian.com",
-          "markdownDescription": "You can override the value here for On Premise installations"
-        },
-        "gitguardian.apiKey": {
-          "type": "string",
           "default": "",
-          "markdownDescription": "Your API Key"
+          "markdownDescription": "You can override the value here for On Premise installations"
         },
         "gitguardian.allowSelfSigned": {
           "type": "boolean",
@@ -69,6 +59,10 @@
       {
         "command": "gitguardian.logout",
         "title": "gitguardian: logout"
+      },
+      {
+        "command": "gitguardian.updateAuthenticationStatus",
+        "title": "gitguardian: Update authentication status"
       },
       {
         "command": "gitguardian.showOutput",
@@ -112,7 +106,7 @@
           "id": "gitguardianRemediationMessageView",
           "name": "remediation message",
           "collapsed": true,
-          "when": "isAuthenticated == true"
+          "when": "false"
         },
         {
           "type": "webview",

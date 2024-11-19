@@ -1,4 +1,3 @@
-import { getRemediationMessage } from "../lib/ggshield-api";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 import * as vscode from "vscode";
 
@@ -17,11 +16,10 @@ export class GitGuardianRemediationMessageWebviewProvider
     private readonly _extensionUri: vscode.Uri,
     private context: vscode.ExtensionContext
   ) {
-    this.checkAuthenticationStatus();
     this.updateRemediationMessage();
   }
 
-  public async resolveWebviewView(
+  public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
     _token: vscode.CancellationToken
@@ -37,18 +35,17 @@ export class GitGuardianRemediationMessageWebviewProvider
     });
   }
 
-  private async checkAuthenticationStatus() {
-    this.isAuthenticated = this.context.globalState.get(
-      "isAuthenticated",
+  private checkAuthenticationStatus() {
+    this.isAuthenticated = this.context.workspaceState.get(
+      "authenticationStatus",
       false
     );
   }
 
-  private async updateRemediationMessage() {
+  private updateRemediationMessage() {
     if (this.isAuthenticated) {
-      this.remediationMessage = await getRemediationMessage(
-        this.ggshieldConfiguration
-      );
+      //TODO: Get remediation message
+      this.remediationMessage = "";
     }
   }
 
@@ -99,13 +96,13 @@ ${this.escapeHtml(this.remediationMessage)}
     }
   }
 
-  public async refresh() {
+  public refresh() {
     this.isLoading = true;
     this.updateWebViewContent(this._view);
 
-    await this.checkAuthenticationStatus();
+    this.checkAuthenticationStatus();
     console.log("Well authenticated");
-    await this.updateRemediationMessage();
+    this.updateRemediationMessage();
 
     this.isLoading = false;
     this.updateWebViewContent(this._view);

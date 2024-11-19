@@ -25,11 +25,11 @@ export class GGShieldResolver {
    *  1. Checks if a custom path is configured in the settings and uses it.
    *  2. Else, falls back to using the standalone version bundled with the extension.
    *
-   * @returns {Promise<void>} A promise that resolves once the `ggshield` path is determined.
+   * @returns {void} A promise that resolves once the `ggshield` path is determined.
    */
-  async checkGGShieldConfiguration(): Promise<void> {
+  checkGGShieldConfiguration(): void {
     try {
-      await this.testConfiguration(this.configuration);
+      this.testConfiguration(this.configuration);
       this.channel.appendLine(
         `Using ggshield at: ${this.configuration.ggshieldPath}, to change this go to settings.`
       );
@@ -46,9 +46,9 @@ export class GGShieldResolver {
   /**
    * Tries the configuration from settings.
    *
-   * @returns {Promise<void>} A promise that resolves if the configuration is valid.
+   * @returns {void} A promise that resolves if the configuration is valid.
    */
-  async testConfiguration(configuration: GGShieldConfiguration): Promise<void> {
+  testConfiguration(configuration: GGShieldConfiguration): void {
     // Check if the ggshield path is valid
     let proc = runGGShieldCommand(configuration, ["--version"]);
     if (proc.status !== 0) {
