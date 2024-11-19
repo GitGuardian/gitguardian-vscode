@@ -58,7 +58,7 @@ export class GitGuardianQuotaWebviewProvider
           <p>Loading...</p>
         </body>
         </html>`;
-    } else if (this.quota !== undefined) {
+    } else if (this.quota !== 0 && this.isAuthenticated) {
       computedHtml = `
         <!DOCTYPE html>
         <html lang="en">
