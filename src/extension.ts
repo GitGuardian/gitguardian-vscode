@@ -114,9 +114,8 @@ export function activate(context: ExtensionContext) {
 
   //generic commands to open correct view on status bar click
   registerOpenViewsCommands(context, outputChannel);
-  commands.registerCommand(
-    "gitguardian.refreshQuota",
-    ggshieldQuotaViewProvider.refresh
+  commands.registerCommand("gitguardian.refreshQuota", () =>
+    ggshieldQuotaViewProvider.refresh()
   );
 
   context.subscriptions.push(
