@@ -46,19 +46,23 @@
     "commands": [
       {
         "command": "gitguardian.quota",
-        "title": "gitguardian: Show quota"
+        "title": "Show quota",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.ignore",
-        "title": "gitguardian: Ignore last found incidents"
+        "title": "Ignore last found incidents",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.authenticate",
-        "title": "gitguardian: Authenticate"
+        "title": "Authenticate",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.logout",
-        "title": "gitguardian: logout"
+        "title": "Logout",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.updateAuthenticationStatus",
@@ -66,19 +70,23 @@
       },
       {
         "command": "gitguardian.showOutput",
-        "title": "Show Output"
+        "title": "Show Output",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.openSidebar",
-        "title": "Open Sidebar"
+        "title": "Open Sidebar",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.openProblems",
-        "title": "Open Problems"
+        "title": "Open Problems",
+        "category": "GitGuardian"
       },
       {
         "command": "gitguardian.refreshQuota",
         "title": "Refresh Quota",
+        "category": "GitGuardian",
         "icon": {
           "light": "images/refresh-light.svg",
           "dark": "images/refresh-dark.svg"
@@ -99,19 +107,19 @@
         {
           "type": "webview",
           "id": "gitguardianView",
-          "name": "gitguardian"
+          "name": "GitGuardian"
         },
         {
           "type": "webview",
           "id": "gitguardianRemediationMessageView",
-          "name": "remediation message",
+          "name": "Remediation message",
           "collapsed": true,
           "when": "false"
         },
         {
           "type": "webview",
           "id": "gitguardianQuotaView",
-          "name": "quota",
+          "name": "Quota",
           "collapsed": true,
           "when": "isAuthenticated == true"
         }
