@@ -9,8 +9,15 @@ export class GGShieldConfiguration {
     allowSelfSigned: boolean = false
   ) {
     this.ggshieldPath = ggshieldPath;
-    this.apiUrl = apiUrl;
     this.allowSelfSigned = allowSelfSigned;
+    if (apiUrl === "https://api.gitguardian.com/v1") {
+      this.apiUrl = "https://dashboard.gitguardian.com/v1";
+  } else if (apiUrl === "https://api.eu1.gitguardian.com/v1") {
+    this.apiUrl = "https://dashboard.eu1.gitguardian.com/v1";
+  }
+  else {
+    this.apiUrl = apiUrl;
+  }
   }
 }
 
