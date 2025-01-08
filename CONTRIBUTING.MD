@@ -4,7 +4,7 @@
 
 Found a bug? Before reporting it:
 
-1. Verify you can reproduce it in the latest version of GGShield.
+1. Verify you can reproduce it in the latest version of GitGuardian VSCode Extension.
 2. Search for other issues [issue tracker](https://github.com/GitGuardian/gitguardian-vscode/issues) to make sure it has not already been reported.
 3. File a [bug report](https://github.com/GitGuardian/gitguardian-vscode/issues/new?assignees=&labels=bug&projects=&template=bug_report.md&title=).
 
