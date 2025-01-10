@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.6.0]
+
+### Fixed
+
+- Fix 'refresh quota' button
+
 ## [0.5.0]
 
 ### Removed
