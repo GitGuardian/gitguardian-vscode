@@ -2,7 +2,7 @@
 
 ## [0.7.0]
 
-### Fixed
+### Added
 
 - Updated to [ggshield 1.36.0](https://github.com/GitGuardian/ggshield/releases/v1.36.0).
 
