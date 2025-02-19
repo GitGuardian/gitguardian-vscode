@@ -71,7 +71,7 @@ function registerOpenViewsCommands(
 
 export function activate(context: ExtensionContext) {
   const outputChannel = window.createOutputChannel("GitGuardian");
-  let configuration = getConfiguration(context);
+  let configuration = getConfiguration(context, outputChannel);
 
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,

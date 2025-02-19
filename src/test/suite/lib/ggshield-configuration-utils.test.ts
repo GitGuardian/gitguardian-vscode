@@ -1,14 +1,26 @@
 import * as simple from "simple-mock";
 import assert = require("assert");
-import { ExtensionContext, workspace } from "vscode";
+import { ExtensionContext, workspace, window } from "vscode";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
+import * as ggshieldResolverUtils from "../../../lib/ggshield-resolver-utils";
 
 suite("getConfiguration", () => {
   let getConfigurationMock: simple.Stub<Function>;
+  let getGGShieldAbsolutePathMock: simple.Stub<
+    (
+      platform: NodeJS.Platform,
+      arch: string,
+      context: ExtensionContext
+    ) => string
+  >;
 
   setup(() => {
     // Mock workspace.getConfiguration
     getConfigurationMock = simple.mock(workspace, "getConfiguration");
+    // Mock getGGShieldAbsolutePath
+    getGGShieldAbsolutePathMock = simple
+      .mock(ggshieldResolverUtils, "getGGShieldAbsolutePath")
+      .returnWith(() => "/mock/path/to/ggshield");
   });
 
   teardown(() => {
@@ -17,7 +29,9 @@ suite("getConfiguration", () => {
 
   test("Vscode settings are correctly read", () => {
     const context = {} as ExtensionContext;
+    const outputChannel = window.createOutputChannel("GitGuardian");
     simple.mock(context, "asAbsolutePath").returnWith("");
+
     getConfigurationMock.returnWith({
       get: (key: string) => {
         if (key === "apiUrl") {
@@ -28,9 +42,9 @@ suite("getConfiguration", () => {
         }
       },
     });
-    const configuration = getConfiguration(context);
+    const configuration = getConfiguration(context, outputChannel);
 
-    // Assert both workspace.getConfiguration  and GGShieldConfiguration constructor were called
+    // Assert both workspace.getConfiguration and GGShieldConfiguration constructor were called
     assert(
       getConfigurationMock.called,
       "getConfiguration should be called once"
