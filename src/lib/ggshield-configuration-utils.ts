@@ -1,7 +1,7 @@
 import { ExtensionContext, OutputChannel, workspace } from "vscode";
 import * as os from "os";
 import { GGShieldConfiguration } from "./ggshield-configuration";
-import { getGGShieldAbsolutePath } from "./ggshield-resolver-utils";
+import { getGGShield } from "./ggshield-resolver-utils";
 
 /**
  * Retrieve configuration from settings
@@ -17,7 +17,7 @@ export function getConfiguration(
   const apiUrl: string | undefined = config.get("apiUrl");
   const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
 
-  const ggshieldAbsolutePath: string = getGGShieldAbsolutePath(
+  const pathToGGShield: string = getGGShield(
     os.platform(),
     os.arch(),
     context,
@@ -25,7 +25,7 @@ export function getConfiguration(
   );
 
   return new GGShieldConfiguration(
-    ggshieldAbsolutePath,
+    pathToGGShield,
     apiUrl,
     allowSelfSigned || false
   );

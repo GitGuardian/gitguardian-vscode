@@ -6,7 +6,7 @@ import * as ggshieldResolverUtils from "../../../lib/ggshield-resolver-utils";
 
 suite("getConfiguration", () => {
   let getConfigurationMock: simple.Stub<Function>;
-  let getGGShieldAbsolutePathMock: simple.Stub<
+  let getGGShieldMock: simple.Stub<
     (
       platform: NodeJS.Platform,
       arch: string,
@@ -17,9 +17,9 @@ suite("getConfiguration", () => {
   setup(() => {
     // Mock workspace.getConfiguration
     getConfigurationMock = simple.mock(workspace, "getConfiguration");
-    // Mock getGGShieldAbsolutePath
-    getGGShieldAbsolutePathMock = simple
-      .mock(ggshieldResolverUtils, "getGGShieldAbsolutePath")
+    // Mock getGGShield
+    getGGShieldMock = simple
+      .mock(ggshieldResolverUtils, "getGGShield")
       .returnWith(() => "/mock/path/to/ggshield");
   });
 

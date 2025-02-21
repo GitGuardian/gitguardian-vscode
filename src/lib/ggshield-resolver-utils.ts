@@ -5,13 +5,14 @@ import * as tar from "tar";
 const AdmZip = require("adm-zip");
 
 /**
- * Get the absolute path to the GGShield binary
+ * Get the absolute path to GGShield binary. If it doesn't exist, it will be installed.
  * @param platform The platform of the user
  * @param arch The architecture of the user
- * @param context The extension context
+ * @param context The extension context 
+ * @param outputChannel The output channel to use
  * @returns The absolute path to the GGShield binary
  */
-export function getGGShieldAbsolutePath(
+export function getGGShield(
   platform: NodeJS.Platform,
   arch: string,
   context: ExtensionContext,
@@ -89,7 +90,7 @@ function computeGGShieldFolderName(
       archString = "arm64";
       break;
     default:
-      console.log(`Unsupported architecture - ${arch}`);
+      console.log(`Unsupported architecture: ${arch}`);
       throw new Error(`Unsupported architecture: ${arch}`);
   }
   switch (platform) {
@@ -132,7 +133,7 @@ function installGGShield(
       extension = "tar.gz";
       break;
     default:
-      console.log(`Unsupported platform - ${platform}`);
+      console.log(`Unsupported platform: ${platform}`);
       throw new Error(`Unsupported platform: ${platform}`);
   }
   const fileName: string = `${computeGGShieldFolderName(
@@ -202,8 +203,8 @@ export function computeGGShieldPath(
   ggshieldFolder: string,
   version: string
 ): string {
-  let executable: string = "";
   console.log(`Platform: ${platform}; Arch: ${arch}`);
+  let executable: string = "";
   switch (platform) {
     case "win32":
       executable = "ggshield.exe";
@@ -213,7 +214,7 @@ export function computeGGShieldPath(
       executable = "ggshield";
       break;
     default:
-      console.log(`Unsupported platform - ${platform}`);
+      console.log(`Unsupported platform: ${platform}`);
       throw new Error(`Unsupported platform: ${platform}`);
   }
   return path.join(
