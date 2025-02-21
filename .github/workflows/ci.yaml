@@ -12,19 +12,37 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: 👩‍💻 Checkout code
+        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: ⚙️ Set up Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: "18"
 
-      - name: Install dependencies
+      - name: ⚙️ Install dependencies
         run: yarn install
 
-      - name: Run tests
-        run: xvfb-run --auto-servernum yarn test
+        # We use xvfb-run on Linux to run tests because we need a display.
+        # xvfb-run is not available on macOS, so we use XQuartz instead.
+        # The default GitHub Actions runner for Windows (windows-latest) has a GUI session
+      - name: ⚙️ Install XQuartz on macOS
+        if: runner.os == 'macOS'
+        run: brew install xquartz xorg-server
+
+      - name: 🧪 Run tests
+        shell: bash # Ensure bash is used for Linux/macOS
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run --auto-servernum yarn test
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            bash ./scripts/xvfb-run-macos.sh yarn test
+          else
+            bash -c "yarn test"
+          fi

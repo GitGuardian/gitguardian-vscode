@@ -30,9 +30,6 @@ export class GGShieldResolver {
   checkGGShieldConfiguration(): void {
     try {
       this.testConfiguration(this.configuration);
-      this.channel.appendLine(
-        `Using ggshield at: ${this.configuration.ggshieldPath}, to change this go to settings.`
-      );
       return;
     } catch (error) {
       const errorMessage =

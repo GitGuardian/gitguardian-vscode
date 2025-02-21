@@ -1,24 +1,31 @@
-import { getBinaryAbsolutePath } from "./ggshield-resolver-utils";
-import { ExtensionContext, workspace } from "vscode";
+import { ExtensionContext, OutputChannel, workspace } from "vscode";
 import * as os from "os";
 import { GGShieldConfiguration } from "./ggshield-configuration";
+import { getGGShield } from "./ggshield-resolver-utils";
 
 /**
  * Retrieve configuration from settings
- *
- * TODO: Check with Mathieu if this behaviour is expected
  * @returns {GGShieldConfiguration} from the extension settings
  */
 export function getConfiguration(
-  context: ExtensionContext
+  context: ExtensionContext,
+  outputChannel: OutputChannel
 ): GGShieldConfiguration {
   const config = workspace.getConfiguration("gitguardian");
 
   const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
   const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
+
+  const pathToGGShield: string = getGGShield(
+    os.platform(),
+    os.arch(),
+    context,
+    outputChannel
+  );
+
   return new GGShieldConfiguration(
-    getBinaryAbsolutePath(os.platform(), os.arch(), context),
+    pathToGGShield,
     apiUrl,
     allowSelfSigned || false
   );

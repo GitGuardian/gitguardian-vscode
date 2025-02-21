@@ -39,3 +39,6 @@ out/
 # cache dir
 .cache_ggshield
 .vscode-test/
+
+# ggshield internal
+ggshield-internal/
