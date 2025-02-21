@@ -1,14 +1,14 @@
 import * as path from "path";
-import { ExtensionContext, OutputChannel } from "vscode";
 import * as fs from "fs";
 import * as tar from "tar";
 const AdmZip = require("adm-zip");
+import { ExtensionContext, OutputChannel } from "vscode";
 
 /**
  * Get the absolute path to GGShield binary. If it doesn't exist, it will be installed.
  * @param platform The platform of the user
  * @param arch The architecture of the user
- * @param context The extension context 
+ * @param context The extension context
  * @param outputChannel The output channel to use
  * @returns The absolute path to the GGShield binary
  */
@@ -57,7 +57,7 @@ export function getGGShield(
  * Get the latest version of GGShield
  * @returns The latest version of GGShield
  */
-function getGGShieldLatestVersion(): string {
+export function getGGShieldLatestVersion(): string {
   const response = require("sync-request")(
     "GET",
     "https://api.github.com/repos/GitGuardian/ggshield/releases/latest",
@@ -74,7 +74,7 @@ function getGGShieldLatestVersion(): string {
  * @param version The version of GGShield
  * @returns The folder name of the GGShield binary
  */
-function computeGGShieldFolderName(
+export function computeGGShieldFolderName(
   platform: NodeJS.Platform,
   arch: string,
   version: string
@@ -117,7 +117,7 @@ function computeGGShieldFolderName(
  * @param ggshieldFolder The folder of the GGShield binary
  * @param version The version of GGShield
  */
-function installGGShield(
+export function installGGShield(
   platform: NodeJS.Platform,
   arch: string,
   ggshieldFolder: string,
