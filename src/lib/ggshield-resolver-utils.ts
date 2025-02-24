@@ -18,7 +18,9 @@ export function getGGShield(
   context: ExtensionContext,
   outputChannel: OutputChannel
 ): string {
-  const version = getGGShieldLatestVersion();
+  const version = fs
+    .readFileSync(path.join(context.extensionPath, ".ggshield_version"), "utf8")
+    .trim();
   console.log(`Latest GGShield version: ${version}`);
   const ggshieldFolder: string = path.join(
     context.extensionPath,
