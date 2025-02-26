@@ -23,10 +23,10 @@ suite("getGGShield integration tests", () => {
     mockContext = {
       extensionPath: tempDir,
     } as ExtensionContext;
-    // copying .ggshield_version file to tempDir
+    // copying ggshield_version file to tempDir
     fs.copyFileSync(
-      path.join(__dirname, "..", "..", "..", "..", ".ggshield_version"),
-      path.join(tempDir, ".ggshield_version")
+      path.join(__dirname, "..", "..", "..", "..", "ggshield_version"),
+      path.join(tempDir, "ggshield_version")
     );
     output = ""; // Reset captured output before each test
     originalLog = console.log; // Store original console.log
@@ -91,7 +91,7 @@ suite("getGGShield integration tests", () => {
     );
   });
 
-  test("updates binary when newer version set by .ggshield_version file", () => {
+  test("updates binary when newer version set by ggshield_version file", () => {
     const oldBinaryPath: string = createFakeBinary(
       tempDir,
       platform,
