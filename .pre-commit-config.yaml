@@ -28,3 +28,10 @@ repos:
     hooks:
       - id: codespell
         exclude: ^(ggshield-internal)
+
+  - repo: https://github.com/gitguardian/ggshield
+    rev: v1.36.0
+    hooks:
+      - id: ggshield
+        language_version: python3
+        stages: [pre-commit]
