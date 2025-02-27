@@ -9,6 +9,8 @@ import {
   scanResultsWithIncident,
 } from "../../constants";
 import * as assert from "assert";
+import * as path from "path";
+import * as utils from "../../../utils";
 
 suite("scanFile", () => {
   let updateStatusBarMock: simple.Stub<Function>;
@@ -32,7 +34,8 @@ suite("scanFile", () => {
       stderr: "",
     });
 
-    scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
+    const testFile: string = path.join("test", "test.py");
+    scanFile(testFile, Uri.file(testFile), {} as GGShieldConfiguration);
 
     // The status bar displays "No Secret Found"
     assert.strictEqual(updateStatusBarMock.callCount, 1);
@@ -49,7 +52,8 @@ suite("scanFile", () => {
       stderr: "",
     });
 
-    scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
+    const testFile: string = path.join("test", "test.py");
+    scanFile(testFile, Uri.file(testFile), {} as GGShieldConfiguration);
 
     // The status bar displays "Secret Found"
     assert.strictEqual(updateStatusBarMock.callCount, 1);
@@ -59,17 +63,20 @@ suite("scanFile", () => {
     );
 
     // The diagnostic collection contains the incident
-    assert.strictEqual(
-      diagnosticCollection.get(Uri.file("test.py"))?.length,
-      1
-    );
+    assert.strictEqual(diagnosticCollection.get(Uri.file(testFile))?.length, 1);
   });
 
   test("skips the file if it is gitignored", () => {
-    const filePath = "out/test.py";
+    // Mock isFileGitignored to return true
+    simple.mock(utils, "isFileGitignored").returnWith(true);
+
+    const filePath = path.join("out", "test.py");
     scanFile(filePath, Uri.file(filePath), {} as GGShieldConfiguration);
 
-    // The status bar displays "Ignored File"
+    // Verify that runGGShieldCommand was never called
+    assert.strictEqual(runGGShieldCommandMock.callCount, 0);
+
+    // Verify status bar was updated correctly
     assert.strictEqual(updateStatusBarMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarMock.lastCall.args[0],
@@ -86,7 +93,8 @@ suite("scanFile", () => {
         stderr: "Error",
       });
 
-      scanFile("test.py", Uri.file("test.py"), {} as GGShieldConfiguration);
+      const testFile: string = path.join("test", "test.py");
+      scanFile(testFile, Uri.file(testFile), {} as GGShieldConfiguration);
 
       // The error message is displayed
       assert.strictEqual(errorMessageMock.callCount, 1);
@@ -101,7 +109,8 @@ suite("scanFile", () => {
       stderr: "Error: An ignored file or directory cannot be scanned.",
     });
 
-    scanFile("test", Uri.file("test"), {} as GGShieldConfiguration);
+    const testFile: string = path.join("test", "test");
+    scanFile(testFile, Uri.file(testFile), {} as GGShieldConfiguration);
 
     // No error message is displayed
     assert.strictEqual(errorMessageMock.callCount, 0);
