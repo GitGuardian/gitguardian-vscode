@@ -1,8 +1,15 @@
 # GitGuardian Secret Security Changelog
 
+## [0.8.0]
+
+### Changed
+
+- Updated to [ggshield 1.37.0](https://github.com/GitGuardian/ggshield/releases/v1.37.0).
+- ggshield binaries are no longer bundled in the extension, the correct binary is downloaded at startup. This makes the extension much lighter while still not requiring installing ggshield manually.
+
 ## [0.7.0]
 
-### Added
+### Changed
 
 - Updated to [ggshield 1.36.0](https://github.com/GitGuardian/ggshield/releases/v1.36.0).
 
