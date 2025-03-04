@@ -24,8 +24,14 @@ yarn-error.log*
 
 .eslintcache
 
-# jetbrains tools
+# IDE
 .idea
+.vscode/*
+!.vscode/settings.json.default
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
 
 # TypeScript cache
 tsconfig.base.tsbuildinfo%
