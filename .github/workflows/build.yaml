@@ -1,8 +1,12 @@
 name: vsixbuilder
 
 on:
+  pull_request:
   push:
-    branches: [main]
+    branches:
+      - "main"
+    tags:
+      - "v*"
 
 permissions:
   contents: read
@@ -28,10 +32,9 @@ jobs:
       - name: Build extension
         run: |
           vsce package --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ --allow-missing-repository
-          mv *.vsix gitguardian-vscode.vsix
 
       - name: Upload extension package
         uses: actions/upload-artifact@v4
         with:
-          name: gitguardian-vscode.vsix
-          path: gitguardian-vscode.vsix
+          name: gitguardian.vsix
+          path: gitguardian-*.vsix
