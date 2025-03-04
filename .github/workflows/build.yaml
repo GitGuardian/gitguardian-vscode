@@ -1,8 +1,12 @@
 name: vsixbuilder
 
 on:
+  pull_request:
   push:
-    branches: [main]
+    branches:
+      - "main"
+    tags:
+      - "v*"
 
 permissions:
   contents: read
