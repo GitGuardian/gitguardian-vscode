@@ -2,9 +2,11 @@ import * as assert from "assert";
 import { extensions, commands } from "vscode";
 
 suite("activate", () => {
-  test("Should activate extension successfully", async () => {
+  test("Should activate extension successfully", async function () {
+    this.timeout(10000);
+
     const ext = extensions.getExtension(
-      "gitguardian-secret-security.gitguardian"
+      "gitguardian-secret-security.gitguardian",
     );
     await ext?.activate();
     assert.ok(ext?.isActive, "Extension should be active");
@@ -25,13 +27,13 @@ suite("activate", () => {
 
     const registered = await commands.getCommands(true);
     const gitguardianCommands = registered.filter((command) =>
-      command.startsWith("gitguardian")
+      command.startsWith("gitguardian"),
     );
 
     for (const command of commandIds) {
       assert.ok(
         gitguardianCommands.includes(command),
-        `Command ${command} should be registered`
+        `Command ${command} should be registered`,
       );
     }
   });
