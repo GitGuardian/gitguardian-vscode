@@ -54,7 +54,8 @@ suite("getGGShield integration tests", async () => {
       platform,
       arch,
       mockContext,
-      outputChannel
+      outputChannel,
+      false
     );
 
     assert.strictEqual(result, binaryPath);
@@ -79,7 +80,8 @@ suite("getGGShield integration tests", async () => {
       platform,
       arch,
       mockContext,
-      outputChannel
+      outputChannel,
+      false
     );
 
     assert(fs.existsSync(result));
@@ -102,7 +104,8 @@ suite("getGGShield integration tests", async () => {
       platform,
       arch,
       mockContext,
-      outputChannel
+      outputChannel,
+      false
     );
 
     assert(fs.existsSync(result));

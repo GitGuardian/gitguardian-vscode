@@ -2,6 +2,7 @@ import * as path from "path";
 import * as fs from "fs";
 import * as tar from "tar";
 import axios, { AxiosRequestConfig} from "axios";
+import { Agent } from "https";
 
 const AdmZip = require("adm-zip");
 import { ExtensionContext, OutputChannel } from "vscode";
@@ -23,7 +24,8 @@ export async function getGGShield(
   platform: NodeJS.Platform,
   arch: string,
   context: ExtensionContext,
-  outputChannel: OutputChannel
+  outputChannel: OutputChannel,
+  ignoreSSLErrors: boolean
 ): Promise<string> {
   const version = fs
     .readFileSync(path.join(context.extensionPath, "ggshield_version"), "utf8")
@@ -54,7 +56,7 @@ export async function getGGShield(
   }
   fs.mkdirSync(ggshieldFolder);
   // install GGShield
-  await installGGShield(platform, arch, ggshieldFolder, version);
+  await installGGShield(platform, arch, ggshieldFolder, version, ignoreSSLErrors);
   outputChannel.appendLine(
     `Updated to GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`
   );
@@ -132,7 +134,8 @@ export async function installGGShield(
   platform: NodeJS.Platform,
   arch: string,
   ggshieldFolder: string,
-  version: string
+  version: string,
+  ignoreSSLErrors: boolean,
 ): Promise<void> {
   let extension: string = "";
   switch (platform) {
@@ -153,7 +156,7 @@ export async function installGGShield(
     version
   )}.${extension}`;
   const downloadUrl: string = `https://github.com/GitGuardian/ggshield/releases/download/v${version}/${fileName}`;
-  await downloadGGShieldFromGitHub(fileName, downloadUrl, ggshieldFolder);
+  await downloadGGShieldFromGitHub(fileName, downloadUrl, ggshieldFolder, ignoreSSLErrors);
   extractGGShieldBinary(path.join(ggshieldFolder, fileName), ggshieldFolder);
 }
 
@@ -189,12 +192,19 @@ export function extractGGShieldBinary(
 async function downloadGGShieldFromGitHub(
   fileName: string,
   downloadUrl: string,
-  ggshieldFolder: string
+  ggshieldFolder: string,
+  ignoreSSLErrors: boolean
 ): Promise<void> {
   console.log(`Downloading GGShield from ${downloadUrl}`);
+
+  const instance = ignoreSSLErrors ? new Agent({
+    rejectUnauthorized: true
+  }): undefined;
+
   const { data } = await axios.get(downloadUrl, {
     ...defaultRequestConfig,
-    responseType: 'arraybuffer'
+    responseType: 'arraybuffer',
+    httpsAgent: instance
   });
 
   fs.writeFileSync(path.join(ggshieldFolder, fileName), data);
