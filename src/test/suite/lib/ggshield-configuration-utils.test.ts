@@ -27,7 +27,7 @@ suite("getConfiguration", () => {
     simple.restore();
   });
 
-  test("Vscode settings are correctly read", () => {
+  test("Vscode settings are correctly read", async () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
     simple.mock(context, "asAbsolutePath").returnWith("");
@@ -42,7 +42,7 @@ suite("getConfiguration", () => {
         }
       },
     });
-    const configuration = getConfiguration(context, outputChannel);
+    const configuration = await getConfiguration(context, outputChannel);
 
     // Assert both workspace.getConfiguration and GGShieldConfiguration constructor were called
     assert(

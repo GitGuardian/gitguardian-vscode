@@ -7,13 +7,13 @@ const AdmZip = require("adm-zip");
 import * as getGGShieldUtils from "../../../lib/ggshield-resolver-utils";
 import { ExtensionContext, window, OutputChannel } from "vscode";
 
-suite("getGGShield integration tests", () => {
+suite("getGGShield integration tests", async () => {
   let tempDir: string;
   let mockContext: ExtensionContext;
   let outputChannel: OutputChannel = window.createOutputChannel("GitGuardian");
   const platform = process.platform;
   const arch = process.arch;
-  const latestVersion = getGGShieldUtils.getGGShieldLatestVersion();
+  const latestVersion = await getGGShieldUtils.getGGShieldLatestVersion();
   let originalLog: (message?: any, ...optionalParams: any[]) => void;
   let output: string;
 
@@ -66,7 +66,7 @@ suite("getGGShield integration tests", () => {
     );
   });
 
-  test("installs binary when it doesn't exist", () => {
+  test("installs binary when it doesn't exist", async () => {
     const expectedBinaryPath: string = getGGShieldUtils.computeGGShieldPath(
       platform,
       arch,
@@ -75,7 +75,7 @@ suite("getGGShield integration tests", () => {
     );
     assert(!fs.existsSync(expectedBinaryPath));
 
-    const result = getGGShieldUtils.getGGShield(
+    const result = await getGGShieldUtils.getGGShield(
       platform,
       arch,
       mockContext,
@@ -91,14 +91,14 @@ suite("getGGShield integration tests", () => {
     );
   });
 
-  test("updates binary when newer version set by ggshield_version file", () => {
+  test("updates binary when newer version set by ggshield_version file", async () => {
     const oldBinaryPath: string = createFakeBinary(
       tempDir,
       platform,
       arch,
       "1.0.0"
     );
-    const result = getGGShieldUtils.getGGShield(
+    const result = await getGGShieldUtils.getGGShield(
       platform,
       arch,
       mockContext,

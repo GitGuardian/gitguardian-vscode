@@ -1,8 +1,15 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as tar from "tar";
+import axios, { AxiosRequestConfig} from "axios";
+
 const AdmZip = require("adm-zip");
 import { ExtensionContext, OutputChannel } from "vscode";
+
+const defaultRequestConfig = {
+  headers: { "User-Agent": "GitGuardian-VSCode-Extension" },
+  timeout: 30_000
+} satisfies AxiosRequestConfig;
 
 /**
  * Get the absolute path to GGShield binary. If it doesn't exist, it will be installed.
@@ -12,12 +19,12 @@ import { ExtensionContext, OutputChannel } from "vscode";
  * @param outputChannel The output channel to use
  * @returns The absolute path to the GGShield binary
  */
-export function getGGShield(
+export async function getGGShield(
   platform: NodeJS.Platform,
   arch: string,
   context: ExtensionContext,
   outputChannel: OutputChannel
-): string {
+): Promise<string> {
   const version = fs
     .readFileSync(path.join(context.extensionPath, "ggshield_version"), "utf8")
     .trim();
@@ -47,7 +54,7 @@ export function getGGShield(
   }
   fs.mkdirSync(ggshieldFolder);
   // install GGShield
-  installGGShield(platform, arch, ggshieldFolder, version);
+  await installGGShield(platform, arch, ggshieldFolder, version);
   outputChannel.appendLine(
     `Updated to GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`
   );
@@ -59,14 +66,16 @@ export function getGGShield(
  * Get the latest version of GGShield
  * @returns The latest version of GGShield
  */
-export function getGGShieldLatestVersion(): string {
-  const response = require("sync-request")(
-    "GET",
+export async function getGGShieldLatestVersion(): Promise<string> {
+  const { data } = await axios.get<{tag_name?: string}>(
     "https://api.github.com/repos/GitGuardian/ggshield/releases/latest",
-    { headers: { "User-Agent": "GitGuardian-VSCode-Extension" } }
+    {
+      ...defaultRequestConfig,
+      responseEncoding: 'utf8'
+    }
   );
-  const data = JSON.parse(response.getBody("utf8"));
-  return data.tag_name?.replace(/^v/, "");
+
+  return data.tag_name?.replace(/^v/, "") ?? "";
 }
 
 /**
@@ -119,12 +128,12 @@ export function computeGGShieldFolderName(
  * @param ggshieldFolder The folder of the GGShield binary
  * @param version The version of GGShield
  */
-export function installGGShield(
+export async function installGGShield(
   platform: NodeJS.Platform,
   arch: string,
   ggshieldFolder: string,
   version: string
-): void {
+): Promise<void> {
   let extension: string = "";
   switch (platform) {
     case "win32":
@@ -144,7 +153,7 @@ export function installGGShield(
     version
   )}.${extension}`;
   const downloadUrl: string = `https://github.com/GitGuardian/ggshield/releases/download/v${version}/${fileName}`;
-  downloadGGShieldFromGitHub(fileName, downloadUrl, ggshieldFolder);
+  await downloadGGShieldFromGitHub(fileName, downloadUrl, ggshieldFolder);
   extractGGShieldBinary(path.join(ggshieldFolder, fileName), ggshieldFolder);
 }
 
@@ -177,16 +186,18 @@ export function extractGGShieldBinary(
  * @param downloadUrl The URL of the GGShield binary
  * @param ggshieldFolder The folder of the GGShield binary
  */
-function downloadGGShieldFromGitHub(
+async function downloadGGShieldFromGitHub(
   fileName: string,
   downloadUrl: string,
   ggshieldFolder: string
-): void {
+): Promise<void> {
   console.log(`Downloading GGShield from ${downloadUrl}`);
-  const response = require("sync-request")("GET", downloadUrl, {
-    headers: { "User-Agent": "GitGuardian-VSCode-Extension" },
+  const { data } = await axios.get(downloadUrl, {
+    ...defaultRequestConfig,
+    responseType: 'arraybuffer'
   });
-  fs.writeFileSync(path.join(ggshieldFolder, fileName), response.getBody());
+
+  fs.writeFileSync(path.join(ggshieldFolder, fileName), data);
   console.log(
     `GGShield archive downloaded to ${path.join(ggshieldFolder, fileName)}`
   );
