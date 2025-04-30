@@ -29,11 +29,6 @@ suite("getGGShield integration tests", async () => {
       path.join(tempDir, "ggshield_version"),
     );
     version = getGGShieldUtils.getGGShieldVersion(mockContext);
-    // copying ggshield_version file to tempDir
-    fs.copyFileSync(
-      path.join(__dirname, "..", "..", "..", "..", "ggshield_version"),
-      path.join(tempDir, "ggshield_version"),
-    );
     output = ""; // Reset captured output before each test
     originalLog = console.log; // Store original console.log
 
