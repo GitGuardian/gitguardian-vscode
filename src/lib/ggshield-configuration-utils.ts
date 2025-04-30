@@ -9,26 +9,25 @@ import { getGGShield } from "./ggshield-resolver-utils";
  */
 export async function getConfiguration(
   context: ExtensionContext,
-  outputChannel: OutputChannel
+  outputChannel: OutputChannel,
 ): Promise<GGShieldConfiguration> {
   const config = workspace.getConfiguration("gitguardian");
 
   const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
   const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
-  const ignoreSSLErrors = allowSelfSigned;
 
   const pathToGGShield: string = await getGGShield(
     os.platform(),
     os.arch(),
     context,
     outputChannel,
-    ignoreSSLErrors
+    allowSelfSigned,
   );
 
   return new GGShieldConfiguration(
     pathToGGShield,
     apiUrl,
-    allowSelfSigned || false
+    allowSelfSigned || false,
   );
 }

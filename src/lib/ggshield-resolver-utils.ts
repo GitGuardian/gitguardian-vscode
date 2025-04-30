@@ -36,7 +36,7 @@ export async function getGGShield(
   arch: string,
   context: ExtensionContext,
   outputChannel: OutputChannel,
-  ignoreSSLErrors: boolean,
+  allowSelfSigned: boolean,
 ): Promise<string> {
   const version = getGGShieldVersion(context);
   console.log(`Latest GGShield version: ${version}`);
@@ -70,7 +70,7 @@ export async function getGGShield(
     arch,
     ggshieldFolder,
     version,
-    ignoreSSLErrors,
+    allowSelfSigned,
   );
   outputChannel.appendLine(
     `Updated to GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`,
@@ -134,7 +134,7 @@ export async function installGGShield(
   arch: string,
   ggshieldFolder: string,
   version: string,
-  ignoreSSLErrors: boolean,
+  allowSelfSigned: boolean,
 ): Promise<void> {
   let extension: string = "";
   switch (platform) {
@@ -159,7 +159,7 @@ export async function installGGShield(
     fileName,
     downloadUrl,
     ggshieldFolder,
-    ignoreSSLErrors,
+    allowSelfSigned,
   );
   extractGGShieldBinary(path.join(ggshieldFolder, fileName), ggshieldFolder);
 }
@@ -197,14 +197,14 @@ async function downloadGGShieldFromGitHub(
   fileName: string,
   downloadUrl: string,
   ggshieldFolder: string,
-  ignoreSSLErrors: boolean,
+  allowSelfSigned: boolean,
 ): Promise<void> {
   console.log(`Downloading GGShield from ${downloadUrl}`);
 
-  const instance = ignoreSSLErrors
+  const instance = allowSelfSigned
     ? new Agent({
         rejectUnauthorized: false,
-    })
+      })
     : undefined;
 
   const { data } = await axios.get(downloadUrl, {
