@@ -1,5 +1,15 @@
 # GitGuardian Secret Security Changelog
 
+## [0.1O.0]
+
+### Changed
+
+- Updated to [ggshield 1.39.0](https://github.com/GitGuardian/ggshield/releases/v1.39.0).
+
+### Fixed
+
+- Tentatively fix certificate errors encountered during extension installation.
+
 ## [0.9.0]
 
 ### Changed
