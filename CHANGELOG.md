@@ -1,6 +1,6 @@
 # GitGuardian Secret Security Changelog
 
-## [0.1O.0]
+## [0.10.0]
 
 ### Changed
 
