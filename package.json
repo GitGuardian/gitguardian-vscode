@@ -156,7 +156,6 @@
     "@types/node": "20.2.5",
     "@types/simple-mock": "^0.8.6",
     "@types/tar": "^6.1.13",
-    "@types/unzipper": "^0.10.10",
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
@@ -169,7 +168,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.5.16",
-    "sync-request": "^6.1.0",
+    "axios": "^1.9.0",
     "tar": "^7.4.3"
   }
 }

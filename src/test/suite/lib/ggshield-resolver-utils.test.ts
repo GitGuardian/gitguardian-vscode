@@ -7,13 +7,13 @@ const AdmZip = require("adm-zip");
 import * as getGGShieldUtils from "../../../lib/ggshield-resolver-utils";
 import { ExtensionContext, window, OutputChannel } from "vscode";
 
-suite("getGGShield integration tests", () => {
+suite("getGGShield integration tests", async () => {
   let tempDir: string;
   let mockContext: ExtensionContext;
+  let version: string;
   let outputChannel: OutputChannel = window.createOutputChannel("GitGuardian");
   const platform = process.platform;
   const arch = process.arch;
-  const latestVersion = getGGShieldUtils.getGGShieldLatestVersion();
   let originalLog: (message?: any, ...optionalParams: any[]) => void;
   let output: string;
 
@@ -23,11 +23,12 @@ suite("getGGShield integration tests", () => {
     mockContext = {
       extensionPath: tempDir,
     } as ExtensionContext;
-    // copying ggshield_version file to tempDir
+    // copy ggshield_version file to tempDir
     fs.copyFileSync(
       path.join(__dirname, "..", "..", "..", "..", "ggshield_version"),
-      path.join(tempDir, "ggshield_version")
+      path.join(tempDir, "ggshield_version"),
     );
+    version = getGGShieldUtils.getGGShieldVersion(mockContext);
     output = ""; // Reset captured output before each test
     originalLog = console.log; // Store original console.log
 
@@ -43,74 +44,77 @@ suite("getGGShield integration tests", () => {
     }
   });
 
-  test("returns existing binary path when binary exists", () => {
+  test("returns existing binary path when binary exists", async () => {
     const binaryPath: string = createFakeBinary(
       tempDir,
       platform,
       arch,
-      latestVersion
+      version,
     );
-    const result = getGGShieldUtils.getGGShield(
+    const result = await getGGShieldUtils.getGGShield(
       platform,
       arch,
       mockContext,
-      outputChannel
+      outputChannel,
+      false,
     );
 
     assert.strictEqual(result, binaryPath);
     assert(fs.existsSync(result));
-    assert(result.includes(latestVersion));
+    assert(result.includes(version));
     assert(
       !output.includes("Updated to GGShield"),
-      "installGGShield should not be called when binary exists"
+      "installGGShield should not be called when binary exists",
     );
   });
 
-  test("installs binary when it doesn't exist", () => {
+  test("installs binary when it doesn't exist", async () => {
     const expectedBinaryPath: string = getGGShieldUtils.computeGGShieldPath(
       platform,
       arch,
       path.join(tempDir, "ggshield-internal"),
-      latestVersion
+      version,
     );
     assert(!fs.existsSync(expectedBinaryPath));
 
-    const result = getGGShieldUtils.getGGShield(
+    const result = await getGGShieldUtils.getGGShield(
       platform,
       arch,
       mockContext,
-      outputChannel
+      outputChannel,
+      false,
     );
 
     assert(fs.existsSync(result));
     assert.strictEqual(result, expectedBinaryPath);
-    assert(result.includes(latestVersion));
+    assert(result.includes(version));
     assert(
       !output.includes("Updated to GGShield"),
-      "installGGShield should be called once when binary doesn't exist"
+      "installGGShield should be called once when binary doesn't exist",
     );
   });
 
-  test("updates binary when newer version set by ggshield_version file", () => {
+  test("updates binary when newer version set by ggshield_version file", async () => {
     const oldBinaryPath: string = createFakeBinary(
       tempDir,
       platform,
       arch,
-      "1.0.0"
+      "1.0.0",
     );
-    const result = getGGShieldUtils.getGGShield(
+    const result = await getGGShieldUtils.getGGShield(
       platform,
       arch,
       mockContext,
-      outputChannel
+      outputChannel,
+      false,
     );
 
     assert(fs.existsSync(result));
-    assert(result.includes(latestVersion));
+    assert(result.includes(version));
     assert(!fs.existsSync(oldBinaryPath));
     assert(
       !output.includes("Updated to GGShield"),
-      "installGGShield should be called once when updating binary"
+      "installGGShield should be called once when updating binary",
     );
   });
 });
@@ -119,13 +123,13 @@ function createFakeBinary(
   tempDir: string,
   platform: NodeJS.Platform,
   arch: string,
-  version: string
+  version: string,
 ): string {
   const ggshieldFolder: string = path.join(tempDir, "ggshield-internal");
   const binaryName: string = platform === "win32" ? "ggshield.exe" : "ggshield";
   const versionFolder: string = path.join(
     ggshieldFolder,
-    `${getGGShieldUtils.computeGGShieldFolderName(platform, arch, version)}`
+    `${getGGShieldUtils.computeGGShieldFolderName(platform, arch, version)}`,
   );
   const binaryPath: string = path.join(versionFolder, binaryName);
   fs.mkdirSync(versionFolder, { recursive: true });
@@ -143,15 +147,15 @@ suite("ggshield-resolver-utils", () => {
         "win32",
         "x64",
         ggshieldFolder,
-        version
+        version,
       );
       assert.strictEqual(
         result,
         path.join(
           ggshieldFolder,
           "ggshield-1.0.0-x86_64-pc-windows-msvc",
-          "ggshield.exe"
-        )
+          "ggshield.exe",
+        ),
       );
     });
 
@@ -160,15 +164,15 @@ suite("ggshield-resolver-utils", () => {
         "linux",
         "x64",
         ggshieldFolder,
-        version
+        version,
       );
       assert.strictEqual(
         result,
         path.join(
           ggshieldFolder,
           "ggshield-1.0.0-x86_64-unknown-linux-gnu",
-          "ggshield"
-        )
+          "ggshield",
+        ),
       );
     });
 
@@ -177,15 +181,15 @@ suite("ggshield-resolver-utils", () => {
         "darwin",
         "x64",
         ggshieldFolder,
-        version
+        version,
       );
       assert.strictEqual(
         result,
         path.join(
           ggshieldFolder,
           "ggshield-1.0.0-x86_64-apple-darwin",
-          "ggshield"
-        )
+          "ggshield",
+        ),
       );
     });
 
@@ -194,15 +198,15 @@ suite("ggshield-resolver-utils", () => {
         "darwin",
         "arm64",
         ggshieldFolder,
-        version
+        version,
       );
       assert.strictEqual(
         result,
         path.join(
           ggshieldFolder,
           "ggshield-1.0.0-arm64-apple-darwin",
-          "ggshield"
-        )
+          "ggshield",
+        ),
       );
     });
 
@@ -212,7 +216,7 @@ suite("ggshield-resolver-utils", () => {
           "sunos",
           "x64",
           ggshieldFolder,
-          version
+          version,
         );
       }, /Unsupported platform/);
     });
@@ -223,7 +227,7 @@ suite("ggshield-resolver-utils", () => {
           "darwin",
           "mips",
           ggshieldFolder,
-          version
+          version,
         );
       }, /Unsupported architecture/);
     });
@@ -253,7 +257,7 @@ suite("ggshield-resolver-utils", () => {
           cwd: tempDir,
           sync: true,
         },
-        [testFileName]
+        [testFileName],
       );
 
       // Create zip archive
@@ -276,7 +280,7 @@ suite("ggshield-resolver-utils", () => {
 
       const extractedContent = fs.readFileSync(
         path.join(extractDir, testFileName),
-        "utf8"
+        "utf8",
       );
       assert.strictEqual(extractedContent, testContent);
     });
@@ -289,7 +293,7 @@ suite("ggshield-resolver-utils", () => {
 
       const extractedContent = fs.readFileSync(
         path.join(extractDir, testFileName),
-        "utf8"
+        "utf8",
       );
       assert.strictEqual(extractedContent, testContent);
     });

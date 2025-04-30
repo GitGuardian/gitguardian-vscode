@@ -18,8 +18,8 @@ repos:
         stages: [commit-msg]
         additional_dependencies: [ggcommitizen]
 
-  - repo: https://github.com/pre-commit/mirrors-prettier # to format JSON, YAML and markdown files among others
-    rev: v2.6.2 # Keep synchronize with .gitlab-ci.yml
+  - repo: https://github.com/pre-commit/mirrors-prettier
+    rev: v3.1.0
     hooks:
       - id: prettier
 

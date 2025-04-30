@@ -1,8 +1,27 @@
 import * as path from "path";
 import * as fs from "fs";
 import * as tar from "tar";
+import axios, { AxiosRequestConfig } from "axios";
+import { Agent } from "https";
+
 const AdmZip = require("adm-zip");
 import { ExtensionContext, OutputChannel } from "vscode";
+
+const defaultRequestConfig = {
+  headers: { "User-Agent": "GitGuardian-VSCode-Extension" },
+  timeout: 30_000,
+} satisfies AxiosRequestConfig;
+
+/**
+ * Get the version of GGShield
+ * @param context The extension context
+ * @returns The version of GGShield
+ */
+export function getGGShieldVersion(context: ExtensionContext): string {
+  return fs
+    .readFileSync(path.join(context.extensionPath, "ggshield_version"), "utf8")
+    .trim();
+}
 
 /**
  * Get the absolute path to GGShield binary. If it doesn't exist, it will be installed.
@@ -12,31 +31,30 @@ import { ExtensionContext, OutputChannel } from "vscode";
  * @param outputChannel The output channel to use
  * @returns The absolute path to the GGShield binary
  */
-export function getGGShield(
+export async function getGGShield(
   platform: NodeJS.Platform,
   arch: string,
   context: ExtensionContext,
-  outputChannel: OutputChannel
-): string {
-  const version = fs
-    .readFileSync(path.join(context.extensionPath, "ggshield_version"), "utf8")
-    .trim();
+  outputChannel: OutputChannel,
+  allowSelfSigned: boolean,
+): Promise<string> {
+  const version = getGGShieldVersion(context);
   console.log(`Latest GGShield version: ${version}`);
   const ggshieldFolder: string = path.join(
     context.extensionPath,
-    "ggshield-internal"
+    "ggshield-internal",
   );
   const ggshieldBinaryPath: string = computeGGShieldPath(
     platform,
     arch,
     ggshieldFolder,
-    version
+    version,
   );
 
   // if exists, return the path
   if (fs.existsSync(ggshieldBinaryPath)) {
     outputChannel.appendLine(
-      `Using GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`
+      `Using GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`,
     );
     console.log(`GGShield already exists at ${ggshieldBinaryPath}`);
     return ggshieldBinaryPath;
@@ -47,26 +65,18 @@ export function getGGShield(
   }
   fs.mkdirSync(ggshieldFolder);
   // install GGShield
-  installGGShield(platform, arch, ggshieldFolder, version);
+  await installGGShield(
+    platform,
+    arch,
+    ggshieldFolder,
+    version,
+    allowSelfSigned,
+  );
   outputChannel.appendLine(
-    `Updated to GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`
+    `Updated to GGShield v${version}. Checkout https://github.com/GitGuardian/ggshield for more info.`,
   );
   console.log(`GGShield binary installed at ${ggshieldBinaryPath}`);
   return ggshieldBinaryPath;
-}
-
-/**
- * Get the latest version of GGShield
- * @returns The latest version of GGShield
- */
-export function getGGShieldLatestVersion(): string {
-  const response = require("sync-request")(
-    "GET",
-    "https://api.github.com/repos/GitGuardian/ggshield/releases/latest",
-    { headers: { "User-Agent": "GitGuardian-VSCode-Extension" } }
-  );
-  const data = JSON.parse(response.getBody("utf8"));
-  return data.tag_name?.replace(/^v/, "");
 }
 
 /**
@@ -79,7 +89,7 @@ export function getGGShieldLatestVersion(): string {
 export function computeGGShieldFolderName(
   platform: NodeJS.Platform,
   arch: string,
-  version: string
+  version: string,
 ): string {
   let archString: string = "";
   let platformString: string = "";
@@ -119,12 +129,13 @@ export function computeGGShieldFolderName(
  * @param ggshieldFolder The folder of the GGShield binary
  * @param version The version of GGShield
  */
-export function installGGShield(
+export async function installGGShield(
   platform: NodeJS.Platform,
   arch: string,
   ggshieldFolder: string,
-  version: string
-): void {
+  version: string,
+  allowSelfSigned: boolean,
+): Promise<void> {
   let extension: string = "";
   switch (platform) {
     case "win32":
@@ -141,10 +152,15 @@ export function installGGShield(
   const fileName: string = `${computeGGShieldFolderName(
     platform,
     arch,
-    version
+    version,
   )}.${extension}`;
   const downloadUrl: string = `https://github.com/GitGuardian/ggshield/releases/download/v${version}/${fileName}`;
-  downloadGGShieldFromGitHub(fileName, downloadUrl, ggshieldFolder);
+  await downloadGGShieldFromGitHub(
+    fileName,
+    downloadUrl,
+    ggshieldFolder,
+    allowSelfSigned,
+  );
   extractGGShieldBinary(path.join(ggshieldFolder, fileName), ggshieldFolder);
 }
 
@@ -155,7 +171,7 @@ export function installGGShield(
  */
 export function extractGGShieldBinary(
   filePath: string,
-  ggshieldFolder: string
+  ggshieldFolder: string,
 ): void {
   if (filePath.endsWith(".tar.gz")) {
     tar.x({
@@ -177,18 +193,29 @@ export function extractGGShieldBinary(
  * @param downloadUrl The URL of the GGShield binary
  * @param ggshieldFolder The folder of the GGShield binary
  */
-function downloadGGShieldFromGitHub(
+async function downloadGGShieldFromGitHub(
   fileName: string,
   downloadUrl: string,
-  ggshieldFolder: string
-): void {
+  ggshieldFolder: string,
+  allowSelfSigned: boolean,
+): Promise<void> {
   console.log(`Downloading GGShield from ${downloadUrl}`);
-  const response = require("sync-request")("GET", downloadUrl, {
-    headers: { "User-Agent": "GitGuardian-VSCode-Extension" },
+
+  const instance = allowSelfSigned
+    ? new Agent({
+        rejectUnauthorized: false,
+      })
+    : undefined;
+
+  const { data } = await axios.get(downloadUrl, {
+    ...defaultRequestConfig,
+    responseType: "arraybuffer",
+    httpsAgent: instance,
   });
-  fs.writeFileSync(path.join(ggshieldFolder, fileName), response.getBody());
+
+  fs.writeFileSync(path.join(ggshieldFolder, fileName), data);
   console.log(
-    `GGShield archive downloaded to ${path.join(ggshieldFolder, fileName)}`
+    `GGShield archive downloaded to ${path.join(ggshieldFolder, fileName)}`,
   );
 }
 
@@ -203,7 +230,7 @@ export function computeGGShieldPath(
   platform: NodeJS.Platform,
   arch: string,
   ggshieldFolder: string,
-  version: string
+  version: string,
 ): string {
   console.log(`Platform: ${platform}; Arch: ${arch}`);
   let executable: string = "";
@@ -222,6 +249,6 @@ export function computeGGShieldPath(
   return path.join(
     ggshieldFolder,
     computeGGShieldFolderName(platform, arch, version),
-    executable
+    executable,
   );
 }
