@@ -100,6 +100,10 @@ export function computeGGShieldFolderName(
       break;
     case "arm64":
       archString = "arm64";
+      // win32 + arm64 -> rely on x86_64 emulation on ARM
+      if (platform === "win32") {
+        archString = "x86_64";
+      }
       break;
     default:
       console.log(`Unsupported architecture: ${arch}`);
