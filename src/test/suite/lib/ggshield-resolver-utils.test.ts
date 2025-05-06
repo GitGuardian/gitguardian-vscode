@@ -158,6 +158,22 @@ suite("ggshield-resolver-utils", () => {
         ),
       );
     });
+    test("computes correct path for Windows arm64", () => {
+      const result = getGGShieldUtils.computeGGShieldPath(
+        "win32",
+        "arm64",
+        ggshieldFolder,
+        version,
+      );
+      assert.strictEqual(
+        result,
+        path.join(
+          ggshieldFolder,
+          "ggshield-1.0.0-x86_64-pc-windows-msvc",
+          "ggshield.exe",
+        ),
+      );
+    });
 
     test("computes correct path for Linux", () => {
       const result = getGGShieldUtils.computeGGShieldPath(
