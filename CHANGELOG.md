@@ -1,5 +1,13 @@
 # GitGuardian Secret Security Changelog
 
+### Changed
+
+- Updated to [ggshield 1.40.0](https://github.com/GitGuardian/ggshield/releases/v1.40.0).
+
+### Fixed
+
+- The extension now works correctly on Windows ARM machines (#84).
+
 ## [0.10.0]
 
 ### Changed
