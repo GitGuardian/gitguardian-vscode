@@ -28,7 +28,8 @@ export const scanResultsWithIncident = `{
                 "ignore_sha":"38353eb1a2aac5b24f39ed67912234d4b4a2e23976d504a88b28137ed2b9185e",
                 "total_occurrences":1,
                 "incident_url":"",
-                "known_secret":false
+                "known_secret":false,
+                "secret_vaulted": false
              }
           ],
           "total_incidents":1,
