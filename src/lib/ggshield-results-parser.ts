@@ -34,7 +34,7 @@ const validityDisplayName: Record<Validity, string> = {
  */
 function filterUriOccurrences(occurrences: Occurrence[]): Occurrence[] {
   const uriOccurrence = occurrences.find(
-    ({ type }) => type === "connection_uri"
+    ({ type }) => type === "connection_uri",
   );
   return uriOccurrence ? [uriOccurrence] : occurrences;
 }
@@ -46,7 +46,7 @@ function filterUriOccurrences(occurrences: Occurrence[]): Occurrence[] {
  * @returns incidents diagnostics
  */
 export function parseGGShieldResults(
-  results: GGShieldScanResults
+  results: GGShieldScanResults,
 ): Diagnostic[] {
   let diagnostics: Diagnostic[] = [];
 
@@ -61,7 +61,7 @@ export function parseGGShieldResults(
             (occurrence: Occurrence) => {
               let range = new Range(
                 new Position(occurrence.line_start - 1, occurrence.index_start),
-                new Position(occurrence.line_end - 1, occurrence.index_end)
+                new Position(occurrence.line_end - 1, occurrence.index_end),
               );
               let diagnostic = new Diagnostic(
                 range,
@@ -72,16 +72,17 @@ Validity: ${validityDisplayName[incident.validity]}
 Known by GitGuardian dashboard: ${incident.known_secret ? "YES" : "NO"}
 Total occurrences: ${incident.total_occurrences}
 Incident URL: ${incident.incident_url || "N/A"}
-Secret SHA: ${incident.ignore_sha}`,
-                DiagnosticSeverity.Warning
+Secret SHA: ${incident.ignore_sha}
+Secret in Secrets Manager: ${incident.secret_vaulted ? "YES" : "NO"}`,
+                DiagnosticSeverity.Warning,
               );
 
               diagnostic.source = "gitguardian";
               diagnostics.push(diagnostic);
-            }
+            },
           );
         });
-      }
+      },
     );
   } catch (e) {
     console.error(e);

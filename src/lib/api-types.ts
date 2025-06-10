@@ -24,6 +24,7 @@ export interface Incident {
   known_secret: boolean;
   incident_url: string;
   total_occurrences: number;
+  secret_vaulted: boolean;
 }
 
 export interface EntityWithIncidents {

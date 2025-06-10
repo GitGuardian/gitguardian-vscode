@@ -11,12 +11,13 @@ import {
 suite("parseGGShieldResults", () => {
   test("Should parse ggshield scan output", () => {
     const diagnostics = parseGGShieldResults(
-      JSON.parse(scanResultsWithIncident)
+      JSON.parse(scanResultsWithIncident),
     );
     assert.strictEqual(diagnostics.length, 1);
     const diagnostic = diagnostics[0];
     assert.ok(diagnostic.message.includes("apikey"));
     assert.ok(diagnostic.message.includes("Generic High Entropy Secret"));
+    assert.ok(diagnostic.message.includes("Secret in Secrets Manager: NO"));
     assert.strictEqual(diagnostic.range.start.line, 3);
     assert.strictEqual(diagnostic.range.start.character, 11);
     assert.strictEqual(diagnostic.range.end.line, 3);
@@ -36,7 +37,7 @@ suite("parseGGShieldResults", () => {
 
   test("Should only return the 'connection_uri' match if the secret is an URI", () => {
     const diagnostics = parseGGShieldResults(
-      JSON.parse(scanResultsWithUriIncident)
+      JSON.parse(scanResultsWithUriIncident),
     );
     assert.strictEqual(diagnostics.length, 1);
     assert.ok(diagnostics[0].message.includes("connection_uri"));
