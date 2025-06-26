@@ -1,5 +1,12 @@
 # GitGuardian Secret Security Changelog
 
+## [0.12.0]
+
+### Changed
+
+- Updated to [ggshield 1.41.0](https://github.com/GitGuardian/ggshield/releases/v1.41.0).
+- Show if secret is vaulted in results.
+
 ## [0.11.0]
 
 ### Changed
