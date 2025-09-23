@@ -25,6 +25,10 @@ export interface Incident {
   incident_url: string;
   total_occurrences: number;
   secret_vaulted: boolean;
+  vault_type: string;
+  vault_name: string;
+  vault_path: string;
+  vault_path_count: number;
 }
 
 export interface EntityWithIncidents {
