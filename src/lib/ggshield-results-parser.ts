@@ -13,6 +13,7 @@ import {
   Occurrence,
   Validity,
 } from "./api-types";
+import { pluralize } from "../utils";
 
 const validityDisplayName: Record<Validity, string> = {
   unknown: "Unknown",
@@ -45,9 +46,6 @@ function filterUriOccurrences(occurrences: Occurrence[]): Occurrence[] {
  * @param results ggshield scan results
  * @returns incidents diagnostics
  */
-
-const pluralize = (num: number, word: string, plural = word + "s") =>
-  [1, -1].includes(Number(num)) ? word : plural;
 
 export function parseGGShieldResults(
   results: GGShieldScanResults,

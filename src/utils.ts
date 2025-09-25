@@ -29,3 +29,7 @@ export function getCurrentFile(): string {
     return "";
   }
 }
+
+export function pluralize(num: number, word: string): string {
+  return `${[1, -1].includes(num) ? word : word + "s"}`
+}
