@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.15.0]
+
+### Changed
+
+- Show vault information in results.
+
 ## [0.14.0]
 
 ### Changed
