@@ -11,6 +11,18 @@ on:
       - "README.md"
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Run pre-commit
+        run: pipx run pre-commit run --all-files --show-diff-on-failure
+        env:
+          # SKIP ggshield check: it's done by the "scanning" job
+          SKIP: ggshield
+
   build-and-test:
     runs-on: ${{ matrix.os }}
     strategy:
