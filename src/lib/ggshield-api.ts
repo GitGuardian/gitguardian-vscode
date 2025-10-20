@@ -57,7 +57,7 @@ export function getAPIquota(configuration: GGShieldConfiguration): number {
  * Show error message on failure
  */
 export function ignoreLastFound(
-  configuration: GGShieldConfiguration
+  configuration: GGShieldConfiguration,
 ): undefined {
   if (!configuration) {
     window.showErrorMessage("ggshield: Missing settings");
@@ -86,7 +86,7 @@ export function ignoreLastFound(
 export function ignoreSecret(
   configuration: GGShieldConfiguration,
   secretSha: string,
-  secretName: string
+  secretName: string,
 ): boolean {
   const proc = runGGShieldCommand(configuration, [
     "secret",
@@ -132,7 +132,7 @@ export function cleanUpFileDiagnostics(fileUri: Uri): void {
 export function scanFile(
   filePath: string,
   fileUri: Uri,
-  configuration: GGShieldConfiguration
+  configuration: GGShieldConfiguration,
 ): void {
   if (isFileGitignored(filePath)) {
     updateStatusBarItem(StatusBarStatus.ignoredFile);
@@ -151,7 +151,7 @@ export function scanFile(
       .split("\n")
       .filter(
         (stderrLine) =>
-          stderrLine.length > 0 && !stderrLine.includes("Scanning Path...") // ggshield outputs this info message on stderr, ignore it
+          stderrLine.length > 0 && !stderrLine.includes("Scanning Path..."), // ggshield outputs this info message on stderr, ignore it
       )
       .join("\n");
     if (errorMessage.length > 0) {
@@ -164,7 +164,7 @@ export function scanFile(
     // or when the file is ignored in the .gitguardian.yaml
     if (
       proc.stderr.includes(
-        "Error: An ignored file or directory cannot be scanned"
+        "Error: An ignored file or directory cannot be scanned",
       )
     ) {
       updateStatusBarItem(StatusBarStatus.ignoredFile);

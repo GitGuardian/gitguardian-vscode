@@ -60,7 +60,7 @@ function getSource(sourceString: string, isInstance: boolean): ConfigSource {
  */
 export async function updateAuthenticationStatus(
   context: ExtensionContext,
-  configuration: GGShieldConfiguration
+  configuration: GGShieldConfiguration,
 ): Promise<void> {
   const proc = runGGShieldCommand(configuration, ["api-status", "--json"]);
 
@@ -103,7 +103,7 @@ export async function loginGGShield(
   configuration: GGShieldConfiguration,
   outputChannel: any,
   webviewView: WebviewView,
-  context: ExtensionContext
+  context: ExtensionContext,
 ): Promise<void> {
   const { ggshieldPath } = configuration;
 
@@ -162,7 +162,7 @@ export async function loginGGShield(
 
 export async function logoutGGShield(
   configuration: GGShieldConfiguration,
-  context: ExtensionContext
+  context: ExtensionContext,
 ): Promise<void> {
   let cmd = ["auth", "logout"];
   const authStatus: AuthenticationStatus | undefined =

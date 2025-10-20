@@ -6,11 +6,10 @@ export class GGShieldConfiguration {
   constructor(
     ggshieldPath: string = "",
     apiUrl: string = "",
-    allowSelfSigned: boolean = false
+    allowSelfSigned: boolean = false,
   ) {
     this.ggshieldPath = ggshieldPath;
     this.apiUrl = apiUrl;
     this.allowSelfSigned = allowSelfSigned;
   }
 }
-

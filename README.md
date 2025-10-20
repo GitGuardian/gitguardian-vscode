@@ -22,7 +22,7 @@ Whether you’re a solo developer or part of a team, GitGuardian scales with you
 
 - **Ignore Secrets**: After a scan, hover over the identified secret and select "GitGuardian: Ignore Secret" to add it to `.gitguardian.yaml`.
 - **Quota Tracking**: Run "GitGuardian: Show Quota" to monitor API call usage. Personal accounts include up to 10,000 monthly API calls.
-    - **Check API Quota**: Stay aware of usage by running "GitGuardian: Show Quota."
+  - **Check API Quota**: Stay aware of usage by running "GitGuardian: Show Quota."
 
 ### Support & Contributions
 

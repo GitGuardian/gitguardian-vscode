@@ -15,13 +15,13 @@ export class GitGuardianQuotaWebviewProvider
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
     private readonly _extensionUri: vscode.Uri,
-    private context: vscode.ExtensionContext
+    private context: vscode.ExtensionContext,
   ) {}
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    _token: vscode.CancellationToken,
   ) {
     this._view = webviewView;
     this.refresh();

@@ -11,7 +11,7 @@ export class GGShieldResolver {
   constructor(
     channel: vscode.OutputChannel,
     context: vscode.ExtensionContext,
-    configuration: GGShieldConfiguration
+    configuration: GGShieldConfiguration,
   ) {
     this.channel = channel;
     this.context = context;
@@ -50,7 +50,7 @@ export class GGShieldResolver {
     let proc = runGGShieldCommand(configuration, ["--version"]);
     if (proc.status !== 0) {
       window.showErrorMessage(
-        `GitGuardian: Invalid ggshield path. ${proc.stderr}`
+        `GitGuardian: Invalid ggshield path. ${proc.stderr}`,
       );
       throw new Error(proc.stderr);
     }

@@ -10,7 +10,7 @@ suite("getConfiguration", () => {
     (
       platform: NodeJS.Platform,
       arch: string,
-      context: ExtensionContext
+      context: ExtensionContext,
     ) => string
   >;
 
@@ -47,7 +47,7 @@ suite("getConfiguration", () => {
     // Assert both workspace.getConfiguration and GGShieldConfiguration constructor were called
     assert(
       getConfigurationMock.called,
-      "getConfiguration should be called once"
+      "getConfiguration should be called once",
     );
 
     // Assert that the configuration has the expected values

@@ -36,7 +36,7 @@ suite("GitGuardianQuotaWebviewProvider", () => {
     provider = new GitGuardianQuotaWebviewProvider(
       {} as GGShieldConfiguration,
       Uri.parse("file:///mock"),
-      mockContext as ExtensionContext
+      mockContext as ExtensionContext,
     );
 
     mockWebviewView = {
@@ -69,7 +69,9 @@ suite("GitGuardianQuotaWebviewProvider", () => {
     provider["updateWebViewContent"]();
 
     assert.ok(
-      provider["_view"]?.webview.html.includes("<p>Your current quota: 100</p>")
+      provider["_view"]?.webview.html.includes(
+        "<p>Your current quota: 100</p>",
+      ),
     );
   });
 
@@ -81,8 +83,8 @@ suite("GitGuardianQuotaWebviewProvider", () => {
 
     assert.ok(
       provider["_view"]?.webview.html.includes(
-        "<p>Please authenticate to see your quota.</p>"
-      )
+        "<p>Please authenticate to see your quota.</p>",
+      ),
     );
   });
 });
