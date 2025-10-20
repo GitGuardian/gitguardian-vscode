@@ -1,7 +1,7 @@
 default_stages: [pre-commit]
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v6.0.0
     hooks:
       # not python related
       - id: check-added-large-files
@@ -11,7 +11,7 @@ repos:
         args: [--allow-multiple-documents]
 
   - repo: https://github.com/commitizen-tools/commitizen
-    rev: v3.12.0
+    rev: v4.9.1
     hooks:
       - id: commitizen
         # don't forget to run pre-commit install --hook-type commit-msg for this hook to run
@@ -24,13 +24,13 @@ repos:
       - id: prettier
 
   - repo: https://github.com/codespell-project/codespell
-    rev: v2.2.6
+    rev: v2.4.1
     hooks:
       - id: codespell
         exclude: ^(ggshield-internal)
 
   - repo: https://github.com/gitguardian/ggshield
-    rev: v1.36.0
+    rev: v1.43.0
     hooks:
       - id: ggshield
         language_version: python3
