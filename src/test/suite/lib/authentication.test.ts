@@ -57,7 +57,7 @@ suite("updateAuthenticationStatus", () => {
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
-      {} as GGShieldConfiguration
+      {} as GGShieldConfiguration,
     );
 
     assert.deepStrictEqual(authenticationStatus, {
@@ -69,7 +69,7 @@ suite("updateAuthenticationStatus", () => {
     assert.strictEqual(updateStatusBarItemMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarItemMock.lastCall.args[0],
-      statusBar.StatusBarStatus.unauthenticated
+      statusBar.StatusBarStatus.unauthenticated,
     );
 
     assert.strictEqual(executeCommandMock.callCount, 1);
@@ -94,7 +94,7 @@ suite("updateAuthenticationStatus", () => {
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
-      {} as GGShieldConfiguration
+      {} as GGShieldConfiguration,
     );
 
     assert.deepStrictEqual(authenticationStatus, {
@@ -107,7 +107,7 @@ suite("updateAuthenticationStatus", () => {
     assert.strictEqual(updateStatusBarItemMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarItemMock.lastCall.args[0],
-      statusBar.StatusBarStatus.ready
+      statusBar.StatusBarStatus.ready,
     );
 
     assert.strictEqual(executeCommandMock.callCount, 1);
@@ -132,7 +132,7 @@ suite("updateAuthenticationStatus", () => {
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
-      {} as GGShieldConfiguration
+      {} as GGShieldConfiguration,
     );
 
     assert.deepStrictEqual(authenticationStatus, {
@@ -145,7 +145,7 @@ suite("updateAuthenticationStatus", () => {
     assert.strictEqual(updateStatusBarItemMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarItemMock.lastCall.args[0],
-      statusBar.StatusBarStatus.authFailed
+      statusBar.StatusBarStatus.authFailed,
     );
 
     assert.strictEqual(executeCommandMock.callCount, 1);

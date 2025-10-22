@@ -41,7 +41,7 @@ suite("scanFile", () => {
     assert.strictEqual(updateStatusBarMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarMock.lastCall.args[0],
-      statusBar.StatusBarStatus.noSecretFound
+      statusBar.StatusBarStatus.noSecretFound,
     );
   });
 
@@ -59,7 +59,7 @@ suite("scanFile", () => {
     assert.strictEqual(updateStatusBarMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarMock.lastCall.args[0],
-      statusBar.StatusBarStatus.secretFound
+      statusBar.StatusBarStatus.secretFound,
     );
 
     // The diagnostic collection contains the incident
@@ -80,7 +80,7 @@ suite("scanFile", () => {
     assert.strictEqual(updateStatusBarMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarMock.lastCall.args[0],
-      statusBar.StatusBarStatus.ignoredFile
+      statusBar.StatusBarStatus.ignoredFile,
     );
   });
 
@@ -118,7 +118,7 @@ suite("scanFile", () => {
     assert.strictEqual(updateStatusBarMock.callCount, 1);
     assert.strictEqual(
       updateStatusBarMock.lastCall.args[0],
-      statusBar.StatusBarStatus.ignoredFile
+      statusBar.StatusBarStatus.ignoredFile,
     );
   });
 });

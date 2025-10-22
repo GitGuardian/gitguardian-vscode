@@ -16,15 +16,17 @@ export type Validity =
   | "invalid"
   | "valid";
 
-type IncidentVaultProperties = {
-  secret_vaulted: false;
-} | {
-  secret_vaulted: true;
-  vault_type: string;
-  vault_name: string;
-  vault_path: string;
-  vault_path_count: number;
-}
+type IncidentVaultProperties =
+  | {
+      secret_vaulted: false;
+    }
+  | {
+      secret_vaulted: true;
+      vault_type: string;
+      vault_name: string;
+      vault_path: string;
+      vault_path_count: number;
+    };
 
 export type Incident = {
   type: string;
@@ -34,7 +36,7 @@ export type Incident = {
   known_secret: boolean;
   incident_url: string;
   total_occurrences: number;
-} & IncidentVaultProperties
+} & IncidentVaultProperties;
 
 export interface EntityWithIncidents {
   incidents: Incident[];

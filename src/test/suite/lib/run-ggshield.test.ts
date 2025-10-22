@@ -22,7 +22,7 @@ suite("runGGShieldCommand", () => {
         ggshieldPath: "path/to/ggshield",
         apiUrl: "",
       } as GGShieldConfiguration,
-      []
+      [],
     );
 
     // Assert that spawnSync was called
@@ -59,7 +59,7 @@ suite("runGGShieldCommand", () => {
           apiUrl: "",
           allowSelfSigned: allowSelfSigned,
         } as GGShieldConfiguration,
-        ["test"]
+        ["test"],
       );
 
       assert(spawnSyncMock.called, "spawnSync should be called once");
@@ -77,7 +77,7 @@ suite("runGGShieldCommand", () => {
         ggshieldPath: "path/to/ggshield",
         apiUrl: "https://example.com",
       } as GGShieldConfiguration,
-      ["test"]
+      ["test"],
     );
 
     assert(spawnSyncMock.called, "spawnSync should be called once");
@@ -95,7 +95,7 @@ suite("runGGShieldCommand", () => {
         ggshieldPath: "path/to/ggshield",
         apiUrl: "https://example.com",
       } as GGShieldConfiguration,
-      ["--version"]
+      ["--version"],
     );
 
     assert(spawnSyncMock.called, "spawnSync should be called once");

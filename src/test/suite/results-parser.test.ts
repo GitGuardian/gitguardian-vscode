@@ -27,14 +27,20 @@ suite("parseGGShieldResults", () => {
   });
 
   test("Should parse vault information", () => {
-    const diagnostics = parseGGShieldResults(
-      JSON.parse(scanResultsVaulted),
-    );
+    const diagnostics = parseGGShieldResults(JSON.parse(scanResultsVaulted));
     const diagnostic = diagnostics[0];
     assert.ok(diagnostic.message.includes("Secret found in vault: YES"));
-    assert.ok(diagnostic.message.includes("├─ Vault Type: AWS Secrets Manager"));
-    assert.ok(diagnostic.message.includes("├─ Vault Name: 463175827647/us-west-2"));
-    assert.ok(diagnostic.message.includes("└─ Secret Path: arn:aws:secretsmanager:us-west-2:463175827647:secret:xav-test-svef2q:pwd"));
+    assert.ok(
+      diagnostic.message.includes("├─ Vault Type: AWS Secrets Manager"),
+    );
+    assert.ok(
+      diagnostic.message.includes("├─ Vault Name: 463175827647/us-west-2"),
+    );
+    assert.ok(
+      diagnostic.message.includes(
+        "└─ Secret Path: arn:aws:secretsmanager:us-west-2:463175827647:secret:xav-test-svef2q:pwd",
+      ),
+    );
   });
 
   test("Should return an empty array if there are no incidents", () => {

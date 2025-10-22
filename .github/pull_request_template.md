@@ -30,5 +30,4 @@ For example:
 ## PR check list
 
 - [ ] As much as possible, the changes include tests
-- [ ] If the changes affect the end user (new feature, behavior change, bug fix) then the PR has a changelog entry. 
-
+- [ ] If the changes affect the end user (new feature, behavior change, bug fix) then the PR has a changelog entry.

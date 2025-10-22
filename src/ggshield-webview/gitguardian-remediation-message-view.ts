@@ -14,7 +14,7 @@ export class GitGuardianRemediationMessageWebviewProvider
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
     private readonly _extensionUri: vscode.Uri,
-    private context: vscode.ExtensionContext
+    private context: vscode.ExtensionContext,
   ) {
     this.updateRemediationMessage();
   }
@@ -22,7 +22,7 @@ export class GitGuardianRemediationMessageWebviewProvider
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    _token: vscode.CancellationToken,
   ) {
     this._view = webviewView;
     this.refresh();
@@ -38,7 +38,7 @@ export class GitGuardianRemediationMessageWebviewProvider
   private checkAuthenticationStatus() {
     this.isAuthenticated = this.context.workspaceState.get(
       "authenticationStatus",
-      false
+      false,
     );
   }
 

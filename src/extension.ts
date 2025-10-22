@@ -39,33 +39,33 @@ import {
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
-  outputChannel: any
+  outputChannel: any,
 ) {
   const showOutputCommand = commands.registerCommand(
     "gitguardian.showOutput",
     () => {
       outputChannel.show();
-    }
+    },
   );
 
   const openSidebarCommand = commands.registerCommand(
     "gitguardian.openSidebar",
     () => {
       commands.executeCommand("workbench.view.extension.gitguardian");
-    }
+    },
   );
 
   const openProblemsCommand = commands.registerCommand(
     "gitguardian.openProblems",
     () => {
       commands.executeCommand("workbench.actions.view.problems");
-    }
+    },
   );
 
   context.subscriptions.push(
     showOutputCommand,
     openSidebarCommand,
-    openProblemsCommand
+    openProblemsCommand,
   );
 }
 
@@ -76,38 +76,38 @@ export async function activate(context: ExtensionContext) {
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
     context,
-    configuration
+    configuration,
   );
   const ggshieldViewProvider = new GitGuardianWebviewProvider(
     configuration,
     context.extensionUri,
-    context
+    context,
   );
 
   const ggshieldRemediationMessageViewProvider =
     new GitGuardianRemediationMessageWebviewProvider(
       configuration,
       context.extensionUri,
-      context
+      context,
     );
   const ggshieldQuotaViewProvider = new GitGuardianQuotaWebviewProvider(
     configuration,
     context.extensionUri,
-    context
+    context,
   );
   window.registerWebviewViewProvider("gitguardianView", ggshieldViewProvider);
   window.registerWebviewViewProvider(
     "gitguardianRemediationMessageView",
-    ggshieldRemediationMessageViewProvider
+    ggshieldRemediationMessageViewProvider,
   );
   window.registerWebviewViewProvider(
     "gitguardianQuotaView",
-    ggshieldQuotaViewProvider
+    ggshieldQuotaViewProvider,
   );
   context.subscriptions.push(
     ggshieldViewProvider,
     ggshieldRemediationMessageViewProvider,
-    ggshieldQuotaViewProvider
+    ggshieldQuotaViewProvider,
   );
 
   createStatusBarItem(context);
@@ -115,11 +115,11 @@ export async function activate(context: ExtensionContext) {
   //generic commands to open correct view on status bar click
   registerOpenViewsCommands(context, outputChannel);
   commands.registerCommand("gitguardian.refreshQuota", () =>
-    ggshieldQuotaViewProvider.refresh()
+    ggshieldQuotaViewProvider.refresh(),
   );
 
   context.subscriptions.push(
-    languages.registerHoverProvider("*", new GitGuardianSecretHoverProvider())
+    languages.registerHoverProvider("*", new GitGuardianSecretHoverProvider()),
   );
 
   if (!checkGitInstalled()) {
@@ -149,12 +149,12 @@ export async function activate(context: ExtensionContext) {
         scanFile(
           textDocument.fileName,
           textDocument.uri,
-          ggshieldResolver.configuration
+          ggshieldResolver.configuration,
         );
       }
     }),
     workspace.onDidCloseTextDocument((textDocument) =>
-      cleanUpFileDiagnostics(textDocument.uri)
+      cleanUpFileDiagnostics(textDocument.uri),
     ),
     commands.registerCommand("gitguardian.quota", () => {
       showAPIQuota(ggshieldResolver.configuration);
@@ -173,12 +173,12 @@ export async function activate(context: ExtensionContext) {
       ignoreSecret(
         ggshieldResolver.configuration,
         diagnosticData.secretSha,
-        secretName
+        secretName,
       );
       scanFile(
         currentFile,
         Uri.file(currentFile),
-        ggshieldResolver.configuration
+        ggshieldResolver.configuration,
       );
     }),
     commands.registerCommand("gitguardian.authenticate", async () => {
@@ -187,7 +187,7 @@ export async function activate(context: ExtensionContext) {
         ggshieldResolver.configuration,
         outputChannel,
         ggshieldViewProvider.getView() as WebviewView,
-        context
+        context,
       )
         .then(async () => {
           await updateAuthenticationStatus(context, configuration);
@@ -212,8 +212,8 @@ export async function activate(context: ExtensionContext) {
         ggshieldViewProvider.refresh();
         ggshieldRemediationMessageViewProvider.refresh();
         ggshieldQuotaViewProvider.refresh();
-      }
-    )
+      },
+    ),
   );
 }
 

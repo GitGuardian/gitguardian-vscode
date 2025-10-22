@@ -70,7 +70,9 @@ export function parseGGShieldResults(
 
               if (incident.secret_vaulted) {
                 if (incident.vault_path_count !== null) {
-                  vaultInfo += `Secret found in vault: YES (${incident.vault_path_count} ${pluralize(incident.vault_path_count, "location")})
+                  vaultInfo += `Secret found in vault: YES (${
+                    incident.vault_path_count
+                  } ${pluralize(incident.vault_path_count, "location")})
 ├─ Vault Type: ${incident.vault_type}
 ├─ Vault Name: ${incident.vault_name}
 └─ Secret Path: ${incident.vault_path}`;

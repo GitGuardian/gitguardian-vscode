@@ -7,7 +7,7 @@ export function checkGitInstalled(): boolean {
   const success = proc.status === 0;
   if (!success) {
     vscode.window.showErrorMessage(
-      `GGShield requires git to work correctly. Please install git.`
+      `GGShield requires git to work correctly. Please install git.`,
     );
   }
   return success;
@@ -31,5 +31,5 @@ export function getCurrentFile(): string {
 }
 
 export function pluralize(num: number, word: string): string {
-  return `${[1, -1].includes(num) ? word : word + "s"}`
+  return `${[1, -1].includes(num) ? word : word + "s"}`;
 }

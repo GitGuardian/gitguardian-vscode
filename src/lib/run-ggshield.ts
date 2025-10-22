@@ -17,7 +17,7 @@ import * as os from "os";
  */
 export function runGGShieldCommand(
   configuration: GGShieldConfiguration,
-  args: string[]
+  args: string[],
 ): SpawnSyncReturns<string> {
   let env: NodeJS.ProcessEnv = {
     ...process.env,

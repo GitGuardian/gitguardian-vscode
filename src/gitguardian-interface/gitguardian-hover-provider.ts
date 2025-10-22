@@ -4,7 +4,7 @@ export class GitGuardianSecretHoverProvider implements vscode.HoverProvider {
   public provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken
+    token: vscode.CancellationToken,
   ): vscode.ProviderResult<vscode.Hover> {
     const diagnostics = vscode.languages.getDiagnostics(document.uri);
 
@@ -20,7 +20,7 @@ export class GitGuardianSecretHoverProvider implements vscode.HoverProvider {
         const encodedDiagnosticData = encodeURIComponent(diagnosticData);
 
         hoverMessage.appendMarkdown(
-          `[GitGuardian: Ignore Secret (update .gitguardian.yaml)](command:gitguardian.ignoreSecret?${encodedDiagnosticData} "Click to ignore this incident")`
+          `[GitGuardian: Ignore Secret (update .gitguardian.yaml)](command:gitguardian.ignoreSecret?${encodedDiagnosticData} "Click to ignore this incident")`,
         );
         return new vscode.Hover(hoverMessage, diagnostic.range);
       }
@@ -65,9 +65,9 @@ function extractInfosFromMessage(message: string): {
 
 export function generateSecretName(
   currentFile: string,
-  uriDiagnostic: any
+  uriDiagnostic: any,
 ): string {
   return `${uriDiagnostic.detector} - ${vscode.workspace.asRelativePath(
-    currentFile
+    currentFile,
   )}:l.${uriDiagnostic.startLine}`;
 }

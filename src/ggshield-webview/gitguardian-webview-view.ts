@@ -3,16 +3,16 @@ import { AuthenticationStatus, ConfigSource } from "../lib/authentication";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
 
 const projectDiscussionUri = vscode.Uri.parse(
-  "https://github.com/GitGuardian/gitguardian-vscode/discussions"
+  "https://github.com/GitGuardian/gitguardian-vscode/discussions",
 );
 const projectIssuesUri = vscode.Uri.parse(
-  "https://github.com/GitGuardian/gitguardian-vscode/issues"
+  "https://github.com/GitGuardian/gitguardian-vscode/issues",
 );
 const feedbackFormUri = vscode.Uri.parse(
-  "https://docs.google.com/forms/d/e/1FAIpQLSc_BemGrdQfxp6lg7KgeDoB32XZg8yMfapk2gbemu0mVfskDQ/viewform"
+  "https://docs.google.com/forms/d/e/1FAIpQLSc_BemGrdQfxp6lg7KgeDoB32XZg8yMfapk2gbemu0mVfskDQ/viewform",
 );
 const documentationUri = vscode.Uri.parse(
-  "https://docs.gitguardian.com/ggshield-docs/configuration"
+  "https://docs.gitguardian.com/ggshield-docs/configuration",
 );
 
 export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
@@ -22,13 +22,13 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
     private readonly _extensionUri: vscode.Uri,
-    private context: vscode.ExtensionContext
+    private context: vscode.ExtensionContext,
   ) {}
 
   public resolveWebviewView(
     webviewView: vscode.WebviewView,
     context: vscode.WebviewViewResolveContext,
-    _token: vscode.CancellationToken
+    _token: vscode.CancellationToken,
   ) {
     this._view = webviewView;
 
@@ -61,14 +61,14 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
     const webview = this._view.webview;
 
     const styleUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, "media", "main.css")
+      vscode.Uri.joinPath(this._extensionUri, "media", "main.css"),
     );
     const logoUri = webview.asWebviewUri(
       vscode.Uri.joinPath(
         this._extensionUri,
         "images",
-        "gitguardian-icon-primary700-background.svg"
-      )
+        "gitguardian-icon-primary700-background.svg",
+      ),
     );
 
     console.log(authenticationStatus);
