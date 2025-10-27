@@ -52,6 +52,6 @@ suite("getConfiguration", () => {
 
     // Assert that the configuration has the expected values
     assert.strictEqual(configuration.apiUrl, "https://custom-url.com");
-    assert.strictEqual(configuration.allowSelfSigned, true);
+    assert.strictEqual(configuration.insecure, true);
   });
 });

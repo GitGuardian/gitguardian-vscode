@@ -1,15 +1,15 @@
 export class GGShieldConfiguration {
   ggshieldPath: string;
   apiUrl: string;
-  allowSelfSigned: boolean;
+  insecure: boolean;
 
   constructor(
     ggshieldPath: string = "",
     apiUrl: string = "",
-    allowSelfSigned: boolean = false,
+    insecure: boolean = false,
   ) {
     this.ggshieldPath = ggshieldPath;
     this.apiUrl = apiUrl;
-    this.allowSelfSigned = allowSelfSigned;
+    this.insecure = insecure;
   }
 }

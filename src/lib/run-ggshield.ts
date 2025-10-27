@@ -37,8 +37,8 @@ export function runGGShieldCommand(
   if (workspace.workspaceFolders?.length || 0 > 0) {
     options["cwd"] = workspace.workspaceFolders![0].uri.fsPath;
   }
-  // if allowSelfSigned is enabled, add the --allow-self-signed flag
-  if (configuration.allowSelfSigned) {
+  // if insecure is enabled, add the --allow-self-signed flag
+  if (configuration.insecure) {
     args = ["--allow-self-signed"].concat(args);
   }
 
