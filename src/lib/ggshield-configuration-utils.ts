@@ -13,7 +13,6 @@ export async function getConfiguration(
 ): Promise<GGShieldConfiguration> {
   const config = workspace.getConfiguration("gitguardian");
 
-  const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
   const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
 
