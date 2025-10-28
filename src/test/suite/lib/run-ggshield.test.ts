@@ -40,12 +40,12 @@ suite("runGGShieldCommand", () => {
     {
       insecure: true,
       description:
-        "GGshield is called with flag --allow-self-signed when insecure is true",
+        "GGshield is called with flag --insecure when insecure is true",
     },
     {
       insecure: false,
       description:
-        "GGshield is not called with flag --allow-self-signed when insecure is false",
+        "GGshield is not called with flag --insecure when insecure is false",
     },
   ];
 
@@ -67,7 +67,7 @@ suite("runGGShieldCommand", () => {
       const spawnSyncArgs = spawnSyncMock.lastCall.args;
       const args = spawnSyncArgs[1];
 
-      assert.strictEqual(args[0] === "--allow-self-signed", insecure);
+      assert.strictEqual(args[0] === "--insecure", insecure);
     });
   });
 
