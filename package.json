@@ -34,12 +34,21 @@
         "gitguardian.apiUrl": {
           "type": "string",
           "default": "",
-          "markdownDescription": "You can override the value here for On Premise installations"
+          "markdownDescription": "You can override the value here for On Premise installations",
+          "order": 1
+        },
+        "gitguardian.insecure": {
+          "type": "boolean",
+          "default": false,
+          "markdownDescription": "Skip all certificate verification checks.\n\nWARNING: this option makes the transfer insecure.",
+          "order": 2
         },
         "gitguardian.allowSelfSigned": {
           "type": "boolean",
           "default": false,
-          "markdownDescription": "Allow Self Signed Certificates"
+          "markdownDescription": "Allow Self Signed Certificates",
+          "markdownDeprecationMessage": "Deprecated: Please use `#gitguardian.insecure#` instead.",
+          "order": 100
         }
       }
     },

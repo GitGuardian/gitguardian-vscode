@@ -13,21 +13,20 @@ export async function getConfiguration(
 ): Promise<GGShieldConfiguration> {
   const config = workspace.getConfiguration("gitguardian");
 
-  const ggshieldPath: string | undefined = config.get("GGShieldPath");
   const apiUrl: string | undefined = config.get("apiUrl");
-  const allowSelfSigned: boolean = config.get("allowSelfSigned", false);
+  const insecure: boolean = config.get(
+    "insecure",
+    // Read allowSelfSigned for backward compatibility
+    config.get("allowSelfSigned", false),
+  );
 
   const pathToGGShield: string = await getGGShield(
     os.platform(),
     os.arch(),
     context,
     outputChannel,
-    allowSelfSigned,
+    insecure,
   );
 
-  return new GGShieldConfiguration(
-    pathToGGShield,
-    apiUrl,
-    allowSelfSigned || false,
-  );
+  return new GGShieldConfiguration(pathToGGShield, apiUrl, insecure || false);
 }

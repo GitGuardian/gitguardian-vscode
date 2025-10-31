@@ -1,5 +1,19 @@
 # GitGuardian Secret Security Changelog
 
+## [0.16.0]
+
+### Added
+
+- Added `gitguardian.insecure` option to replace the ambiguous `gitguardian.allowSelfSigned` one.
+
+### Changed
+
+- Updated to [ggshield 1.44.1](https://github.com/GitGuardian/ggshield/releases/v1.44.1).
+
+### Deprecated
+
+- Marked `gitguardian.allowSelfSigned` as deprecated.
+
 ## [0.15.0]
 
 ### Changed

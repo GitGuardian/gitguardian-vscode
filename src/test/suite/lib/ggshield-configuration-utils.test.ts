@@ -27,21 +27,35 @@ suite("getConfiguration", () => {
     simple.restore();
   });
 
+  /**
+   * Helper class to fake different configurations of the extension
+   */
+  class FakeConfiguration {
+    records: Record<string, any>;
+
+    constructor(records: Record<string, any>) {
+      this.records = records;
+    }
+
+    public get(section: string, defaultValue: any): any {
+      if (this.records.hasOwnProperty(section)) {
+        return this.records[section];
+      }
+      return defaultValue;
+    }
+  }
+
   test("Vscode settings are correctly read", async () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
     simple.mock(context, "asAbsolutePath").returnWith("");
 
-    getConfigurationMock.returnWith({
-      get: (key: string) => {
-        if (key === "apiUrl") {
-          return "https://custom-url.com";
-        }
-        if (key === "allowSelfSigned") {
-          return true;
-        }
-      },
-    });
+    getConfigurationMock.returnWith(
+      new FakeConfiguration({
+        apiUrl: "https://custom-url.com",
+        insecure: true,
+      } as Record<string, any>),
+    );
     const configuration = await getConfiguration(context, outputChannel);
 
     // Assert both workspace.getConfiguration and GGShieldConfiguration constructor were called
@@ -52,6 +66,21 @@ suite("getConfiguration", () => {
 
     // Assert that the configuration has the expected values
     assert.strictEqual(configuration.apiUrl, "https://custom-url.com");
-    assert.strictEqual(configuration.allowSelfSigned, true);
+    assert.strictEqual(configuration.insecure, true);
+  });
+  test("insecure falls back on allowSelfSigned", async () => {
+    const context = {} as ExtensionContext;
+    const outputChannel = window.createOutputChannel("GitGuardian");
+    simple.mock(context, "asAbsolutePath").returnWith("");
+
+    getConfigurationMock.returnWith(
+      new FakeConfiguration({
+        allowSelfSigned: true,
+      } as Record<string, any>),
+    );
+    const configuration = await getConfiguration(context, outputChannel);
+
+    // Assert that the configuration has the expected values
+    assert.strictEqual(configuration.insecure, true);
   });
 });

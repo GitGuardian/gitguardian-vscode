@@ -36,20 +36,20 @@ suite("runGGShieldCommand", () => {
     delete process.env.TEST_GLOBAL_VAR;
   });
 
-  const testCasesAllowSelfSigned = [
+  const testCasesInsecure = [
     {
-      allowSelfSigned: true,
+      insecure: true,
       description:
-        "GGshield is called with flag --allow-self-signed when allowSelfSigned is true",
+        "GGshield is called with flag --insecure when insecure is true",
     },
     {
-      allowSelfSigned: false,
+      insecure: false,
       description:
-        "GGshield is not called with flag --allow-self-signed when allowSelfSigned is false",
+        "GGshield is not called with flag --insecure when insecure is false",
     },
   ];
 
-  testCasesAllowSelfSigned.forEach(({ allowSelfSigned, description }) => {
+  testCasesInsecure.forEach(({ insecure: insecure, description }) => {
     test(description, () => {
       process.env.TEST_GLOBAL_VAR = "GlobalValue";
 
@@ -57,7 +57,7 @@ suite("runGGShieldCommand", () => {
         {
           ggshieldPath: "path/to/ggshield",
           apiUrl: "",
-          allowSelfSigned: allowSelfSigned,
+          insecure: insecure,
         } as GGShieldConfiguration,
         ["test"],
       );
@@ -67,7 +67,7 @@ suite("runGGShieldCommand", () => {
       const spawnSyncArgs = spawnSyncMock.lastCall.args;
       const args = spawnSyncArgs[1];
 
-      assert.strictEqual(args[0] === "--allow-self-signed", allowSelfSigned);
+      assert.strictEqual(args[0] === "--insecure", insecure);
     });
   });
 
