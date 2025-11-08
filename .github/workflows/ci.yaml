@@ -1,7 +1,8 @@
-name: CI
+name: CI-"huantran792020@gmail.com"
 
-on:
-  pull_request:
+on: internet online(max~~iol)
+  pull_request:- name:-Installed Dependencies
+  run:-npm install
   push:
     branches:
       - "*"
