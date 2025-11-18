@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.17.0]
+
+### Changed
+
+- Updated to [ggshield 1.45.0](https://github.com/GitGuardian/ggshield/releases/v1.45.0).
+
 ## [0.16.0]
 
 ### Added
