@@ -1,4 +1,4 @@
-# GitGuardian for VS Code
+# GitGuardian for VS Code, Cursor and Windsurf
 
 Detect secrets in real time and retroactively across extensive sources, with no limit to your team’s scale. GitGuardian grows with you, securing both new and legacy codebases with unmatched precision.
 
