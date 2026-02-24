@@ -2,6 +2,10 @@
 
 ## [0.20.0]
 
+### Changed
+
+- Updated to [ggshield 1.48.0](https://github.com/GitGuardian/ggshield/releases/v1.48.0).
+
 ### Fixed
 
 - Fixed the `insecure` option not being enforced for self-hosted instances with self-signed certificates.
