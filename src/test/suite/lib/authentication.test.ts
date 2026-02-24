@@ -1,13 +1,16 @@
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 import * as simple from "simple-mock";
 import * as runGGShield from "../../../lib/run-ggshield";
+import * as childProcess from "child_process";
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
 import * as assert from "assert";
+import { EventEmitter } from "events";
 import { commands, ExtensionContext, Memento } from "vscode";
 import {
   AuthenticationStatus,
   ConfigSource,
   GGShieldConfigSource,
+  loginGGShield,
   updateAuthenticationStatus,
 } from "../../../lib/authentication";
 
@@ -154,5 +157,54 @@ suite("updateAuthenticationStatus", () => {
       "isAuthenticated",
       false,
     ]);
+  });
+});
+
+suite("loginGGShield", () => {
+  let spawnMock: simple.Stub<any>;
+  let fakeProc: EventEmitter & { stdout: EventEmitter; stderr: EventEmitter };
+
+  setup(function () {
+    fakeProc = Object.assign(new EventEmitter(), {
+      stdout: new EventEmitter(),
+      stderr: new EventEmitter(),
+    });
+    spawnMock = simple.mock(childProcess, "spawn").returnWith(fakeProc);
+  });
+
+  teardown(function () {
+    simple.restore();
+  });
+
+  const testCasesInsecure = [
+    {
+      insecure: true,
+      description: "loginGGShield passes --insecure flag when insecure is true",
+    },
+    {
+      insecure: false,
+      description:
+        "loginGGShield does not pass --insecure flag when insecure is false",
+    },
+  ];
+
+  testCasesInsecure.forEach(({ insecure, description }) => {
+    test(description, () => {
+      loginGGShield(
+        {
+          ggshieldPath: "path/to/ggshield",
+          apiUrl: "",
+          insecure: insecure,
+        } as GGShieldConfiguration,
+        { appendLine: () => {} } as any,
+        { webview: { postMessage: () => {} } } as any,
+        {} as ExtensionContext,
+      );
+
+      assert(spawnMock.called, "spawn should be called once");
+
+      const args = spawnMock.lastCall.args[1];
+      assert.strictEqual(args[0] === "--insecure", insecure);
+    });
   });
 });
