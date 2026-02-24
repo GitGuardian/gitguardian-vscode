@@ -120,6 +120,9 @@ export async function loginGGShield(
   };
 
   let args = ["auth", "login", "--method=web", "--debug"];
+  if (configuration.insecure) {
+    args.unshift("--insecure");
+  }
   if (configuration.apiUrl) {
     args.push("--instance", configuration.apiUrl);
   }

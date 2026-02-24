@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.20.0]
+
+### Fixed
+
+- Fixed the `insecure` option not being enforced for self-hosted instances with self-signed certificates.
+
 ## [0.19.0]
 
 ### Changed
