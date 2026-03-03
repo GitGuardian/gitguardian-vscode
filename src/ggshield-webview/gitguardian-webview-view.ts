@@ -183,7 +183,7 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
 
           </div>
           <p>Invalid API key for instance "${sanitizeInstanceUrl(
-            authenticationStatus.instance
+            authenticationStatus.instance,
           )}".</p>
           <p>Instance source: ${authenticationStatus.instanceSource}.</p>
           <p>API key source: ${authenticationStatus.keySource}.</p>
