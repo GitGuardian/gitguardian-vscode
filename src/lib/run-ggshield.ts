@@ -45,6 +45,12 @@ export function runGGShieldCommand(
     args.push("--instance", configuration.apiUrl);
   }
 
+  if (!workspace.isTrusted) {
+    throw new Error(
+      "GitGuardian: cannot run ggshield in an untrusted workspace.",
+    );
+  }
+
   let proc = spawnSync(configuration.ggshieldPath, args, options);
 
   return proc;

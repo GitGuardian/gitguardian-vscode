@@ -23,6 +23,12 @@
     "scan",
     "devsecops"
   ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "support": false,
+      "description": "GitGuardian runs ggshield in the workspace directory, which loads configuration files (.gitguardian.yaml, .env) from the repository. Running in an untrusted workspace could allow a malicious repository to influence ggshield's behavior."
+    }
+  },
   "activationEvents": [
     "onStartupFinished"
   ],
