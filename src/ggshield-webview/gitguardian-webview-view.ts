@@ -15,6 +15,27 @@ const documentationUri = vscode.Uri.parse(
   "https://docs.gitguardian.com/ggshield-docs/configuration",
 );
 
+function escapeHtml(value: string): string {
+  return value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+}
+
+function sanitizeInstanceUrl(instance: string): string {
+  try {
+    const url = new URL(instance);
+    if (url.protocol !== "https:" && url.protocol !== "http:") {
+      return "";
+    }
+    return escapeHtml(url.origin);
+  } catch {
+    return "";
+  }
+}
+
 export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "gitguardian.gitguardianView";
   private _view?: vscode.WebviewView;
@@ -161,9 +182,9 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
             <img src="${logoUri}" alt="GitGuardian Logo" height="100px"; />
 
           </div>
-          <p>Invalid API key for instance "${
-            authenticationStatus.instance
-          }".</p>
+          <p>Invalid API key for instance "${sanitizeInstanceUrl(
+            authenticationStatus.instance,
+          )}".</p>
           <p>Instance source: ${authenticationStatus.instanceSource}.</p>
           <p>API key source: ${authenticationStatus.keySource}.</p>
           ${
