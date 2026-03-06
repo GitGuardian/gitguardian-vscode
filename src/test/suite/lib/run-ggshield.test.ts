@@ -1,5 +1,6 @@
 import * as simple from "simple-mock";
 import * as childProcess from "child_process";
+import * as vscode from "vscode";
 import * as runGGShield from "../../../lib/run-ggshield";
 import assert = require("assert");
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
@@ -101,5 +102,46 @@ suite("runGGShieldCommand", () => {
     assert(spawnSyncMock.called, "spawnSync should be called once");
 
     assert.deepStrictEqual(spawnSyncMock.lastCall.args[1], ["--version"]);
+  });
+
+  test("returns a failed result without spawning ggshield in an untrusted workspace", () => {
+    const originalDescriptor = Object.getOwnPropertyDescriptor(
+      vscode.workspace,
+      "isTrusted",
+    );
+    Object.defineProperty(vscode.workspace, "isTrusted", {
+      get: () => false,
+      configurable: true,
+    });
+
+    try {
+      const result = runGGShield.runGGShieldCommand(
+        {
+          ggshieldPath: "path/to/ggshield",
+          apiUrl: "",
+        } as GGShieldConfiguration,
+        ["secret", "scan", "--json", "test.py"],
+      );
+
+      assert(!spawnSyncMock.called, "spawnSync should not be called");
+      assert.strictEqual(result.status, 3);
+      assert.strictEqual(result.pid, -1);
+      assert.ok(
+        result.stderr.includes("untrusted workspace"),
+        "stderr should mention untrusted workspace",
+      );
+      assert.ok(
+        result.error instanceof Error,
+        "error should be an Error instance",
+      );
+    } finally {
+      if (originalDescriptor) {
+        Object.defineProperty(
+          vscode.workspace,
+          "isTrusted",
+          originalDescriptor,
+        );
+      }
+    }
   });
 });
