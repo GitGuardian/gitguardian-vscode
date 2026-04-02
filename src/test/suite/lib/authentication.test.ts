@@ -1,7 +1,10 @@
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
-import * as simple from "simple-mock";
+import * as sinon from "sinon";
 import * as runGGShield from "../../../lib/run-ggshield";
-import * as childProcess from "child_process";
+import {
+  childProcess,
+  type ChildProcessWithoutNullStreams,
+} from "../../../lib/child-process";
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
 import * as assert from "assert";
 import { EventEmitter } from "events";
@@ -20,13 +23,13 @@ suite("updateAuthenticationStatus", () => {
     setKeysForSync(keys: readonly string[]): void;
   };
   let mockContext: Partial<ExtensionContext>;
-  let runGGShieldMock: simple.Stub<Function>;
-  let updateStatusBarItemMock: simple.Stub<Function>;
-  let executeCommandMock: simple.Stub<Function>;
+  let runGGShieldMock: sinon.SinonStub;
+  let updateStatusBarItemMock: sinon.SinonStub;
+  let executeCommandMock: sinon.SinonStub;
 
   setup(function () {
-    updateStatusBarItemMock = simple.mock(statusBar, "updateStatusBarItem");
-    executeCommandMock = simple.mock(commands, "executeCommand");
+    updateStatusBarItemMock = sinon.stub(statusBar, "updateStatusBarItem");
+    executeCommandMock = sinon.stub(commands, "executeCommand");
     mockWorkspaceState = {
       get: (key: string) =>
         key === "authenticationStatus" ? authenticationStatus : undefined,
@@ -43,22 +46,20 @@ suite("updateAuthenticationStatus", () => {
     mockContext = {
       workspaceState: mockWorkspaceState,
     };
-    runGGShieldMock = simple.mock(runGGShield, "runGGShieldCommand");
+    runGGShieldMock = sinon.stub(runGGShield, "runGGShieldCommand");
   });
 
   teardown(function () {
-    simple.restore();
+    sinon.restore();
   });
 
   test("returns noKeyFound status when no key is configured", async () => {
-    runGGShieldMock.returnWith(
-      Promise.resolve({
-        status: 3,
-        stdout: "",
-        stderr:
-          "Error: No token is saved for this instance: 'https://dashboard.gitguardian.com'",
-      }),
-    );
+    runGGShieldMock.resolves({
+      status: 3,
+      stdout: "",
+      stderr:
+        "Error: No token is saved for this instance: 'https://dashboard.gitguardian.com'",
+    });
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
@@ -86,18 +87,16 @@ suite("updateAuthenticationStatus", () => {
   });
 
   test("returns true when valid credentials are configured", async () => {
-    runGGShieldMock.returnWith(
-      Promise.resolve({
-        status: 0,
-        stdout: `{
+    runGGShieldMock.resolves({
+      status: 0,
+      stdout: `{
           "status_code": 200,
           "instance": "https://dashboard.gitguardian.com",
           "api_key_source": "${GGShieldConfigSource.userConfig}",
           "instance_source": "${GGShieldConfigSource.userConfig}"
         }`,
-        stderr: "",
-      }),
-    );
+      stderr: "",
+    });
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
@@ -126,18 +125,16 @@ suite("updateAuthenticationStatus", () => {
   });
 
   test("returns false with correct sources and instance when API key is invalid", async () => {
-    runGGShieldMock.returnWith(
-      Promise.resolve({
-        status: 0,
-        stdout: `{
+    runGGShieldMock.resolves({
+      status: 0,
+      stdout: `{
         "status_code": 401,
         "instance": "https://dashboard.gitguardian.com",
         "api_key_source": "${GGShieldConfigSource.dotEnv}",
         "instance_source": "${GGShieldConfigSource.cmdOption}"
       }`,
-        stderr: "",
-      }),
-    );
+      stderr: "",
+    });
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
@@ -167,7 +164,7 @@ suite("updateAuthenticationStatus", () => {
 });
 
 suite("loginGGShield", () => {
-  let spawnMock: simple.Stub<any>;
+  let spawnMock: sinon.SinonStub;
   let fakeProc: EventEmitter & { stdout: EventEmitter; stderr: EventEmitter };
 
   setup(function () {
@@ -175,11 +172,11 @@ suite("loginGGShield", () => {
       stdout: new EventEmitter(),
       stderr: new EventEmitter(),
     });
-    spawnMock = simple.mock(childProcess, "spawn").returnWith(fakeProc);
+    spawnMock = sinon.stub(childProcess, "spawn").returns(fakeProc as any);
   });
 
   teardown(function () {
-    simple.restore();
+    sinon.restore();
   });
 
   const testCasesInsecure = [
