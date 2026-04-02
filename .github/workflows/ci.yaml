@@ -40,35 +40,18 @@ jobs:
       - name: 👩‍💻 Checkout code
         uses: actions/checkout@v4
 
-      - name: ⚙️ Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
+      - name: ⚙️ Set up Node.js and tools
+        uses: jdx/mise-action@v2
 
       - name: ⚙️ Install dependencies
-        run: yarn install
+        run: npm ci
 
       - name: Download ggshield binary
         shell: bash
         run: scripts/download-ggshield.sh --target ${{ matrix.vscode_target }}
 
-        # We use xvfb-run on Linux to run tests because we need a display.
-        # xvfb-run is not available on macOS, so we use XQuartz instead.
-        # The default GitHub Actions runner for Windows (windows-latest) has a GUI session
-      - name: ⚙️ Install XQuartz on macOS
-        if: runner.os == 'macOS'
-        run: brew install xquartz xorg-server
-
       - name: 🧪 Run tests
-        shell: bash # Ensure bash is used for Linux/macOS
-        run: |
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            xvfb-run --auto-servernum yarn test
-          elif [ "$RUNNER_OS" = "macOS" ]; then
-            bash ./scripts/xvfb-run-macos.sh yarn test
-          else
-            bash -c "yarn test"
-          fi
+        run: npm test
 
   scanning:
     name: GitGuardian scan
