@@ -158,17 +158,17 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "bash scripts/download-ggshield.sh && yarn run compile",
+    "vscode:prepublish": "bash scripts/download-ggshield.sh && npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "yarn run compile && yarn run lint",
+    "pretest": "npm run compile && npm run lint",
     "lint": "eslint src --ext ts",
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
     "@types/mocha": "^10.0.1",
-    "@types/node": "20.2.5",
+    "@types/node": "^22",
     "@types/simple-mock": "^0.8.6",
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
