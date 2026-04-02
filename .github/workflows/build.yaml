@@ -12,8 +12,17 @@ permissions:
   contents: read
 
 jobs:
-  build_vsix_file:
+  build_vsix:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: darwin-x64
+          - target: darwin-arm64
+          - target: linux-x64
+          - target: win32-x64
+          - target: win32-arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -29,12 +38,16 @@ jobs:
       - name: Install dependencies
         run: yarn install
 
-      - name: Build extension
+      - name: Build platform-specific VSIX
         run: |
-          vsce package --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ --allow-missing-repository
+          vsce package --target ${{ matrix.target }} \
+            --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ \
+            --allow-missing-repository
+        env:
+          GGSHIELD_TARGET: ${{ matrix.target }}
 
       - name: Upload extension package
         uses: actions/upload-artifact@v4
         with:
-          name: gitguardian.vsix
+          name: gitguardian-${{ matrix.target }}.vsix
           path: gitguardian-*.vsix

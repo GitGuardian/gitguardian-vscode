@@ -1,5 +1,13 @@
 # GitGuardian Secret Security Changelog
 
+## [0.22.0]
+
+### Changed
+
+- `ggshield` binaries are again bundled in the extension.
+- Distribute platform-specific extensions to limit the extension size with bundled `ggshield`.
+- Introduce `gitguardian.ggshieldPath` configuration variable to allow users to override the default `ggshield` that comes bundled with the extension.
+
 ## [0.21.0]
 
 ### Changed
