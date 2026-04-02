@@ -18,16 +18,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
+      - name: Setup Node.js and tools
+        uses: jdx/mise-action@v2
 
       - name: Setup VSCE
-        run: sudo yarn global add vsce@latest
+        run: npm install -g @vscode/vsce
 
       - name: Install dependencies
-        run: yarn install
+        run: npm ci
 
       - name: Build extension
         run: |
