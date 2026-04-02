@@ -28,7 +28,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            vscode_target: linux-x64
+          - os: macos-latest
+            vscode_target: darwin-arm64
+          - os: windows-latest
+            vscode_target: win32-x64
 
     steps:
       - name: 👩‍💻 Checkout code
@@ -41,6 +47,10 @@ jobs:
 
       - name: ⚙️ Install dependencies
         run: yarn install
+
+      - name: Download ggshield binary
+        shell: bash
+        run: bash scripts/download-ggshield.sh --target ${{ matrix.vscode_target }}
 
         # We use xvfb-run on Linux to run tests because we need a display.
         # xvfb-run is not available on macOS, so we use XQuartz instead.
