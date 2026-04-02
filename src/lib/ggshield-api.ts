@@ -19,7 +19,8 @@ import { parseGGShieldResults } from "./ggshield-results-parser";
 /**
  * Extension diagnostic collection
  */
-export let diagnosticCollection: DiagnosticCollection;
+export const diagnosticCollection: DiagnosticCollection =
+  languages.createDiagnosticCollection("ggshield");
 
 // Tracks the in-flight scan per URI so a later save can abort an earlier one
 // and we can drop stale results that return after being superseded.
@@ -120,7 +121,6 @@ export async function ignoreSecret(
 }
 
 export function createDiagnosticCollection(context: ExtensionContext): void {
-  diagnosticCollection = languages.createDiagnosticCollection("ggshield");
   context.subscriptions.push(diagnosticCollection);
 }
 
