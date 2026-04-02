@@ -1,30 +1,22 @@
-import * as simple from "simple-mock";
+import * as sinon from "sinon";
 import assert = require("assert");
 import { ExtensionContext, workspace, window } from "vscode";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
 import * as ggshieldResolverUtils from "../../../lib/ggshield-resolver-utils";
 
 suite("getConfiguration", () => {
-  let getConfigurationMock: simple.Stub<Function>;
-  let getGGShieldMock: simple.Stub<
-    (
-      platform: NodeJS.Platform,
-      arch: string,
-      context: ExtensionContext,
-    ) => string
-  >;
-
+  let getConfigurationMock: sinon.SinonStub;
   setup(() => {
     // Mock workspace.getConfiguration
-    getConfigurationMock = simple.mock(workspace, "getConfiguration");
+    getConfigurationMock = sinon.stub(workspace, "getConfiguration");
     // Mock getGGShield
-    getGGShieldMock = simple
-      .mock(ggshieldResolverUtils, "getGGShield")
-      .returnWith(() => "/mock/path/to/ggshield");
+    sinon
+      .stub(ggshieldResolverUtils, "getGGShield")
+      .resolves("/mock/path/to/ggshield");
   });
 
   teardown(() => {
-    simple.restore();
+    sinon.restore();
   });
 
   /**
@@ -48,9 +40,9 @@ suite("getConfiguration", () => {
   test("Vscode settings are correctly read", async () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
-    simple.mock(context, "asAbsolutePath").returnWith("");
+    context.asAbsolutePath = sinon.stub().returns("") as any;
 
-    getConfigurationMock.returnWith(
+    getConfigurationMock.returns(
       new FakeConfiguration({
         apiUrl: "https://custom-url.com",
         insecure: true,
@@ -71,9 +63,9 @@ suite("getConfiguration", () => {
   test("insecure falls back on allowSelfSigned", async () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
-    simple.mock(context, "asAbsolutePath").returnWith("");
+    context.asAbsolutePath = sinon.stub().returns("") as any;
 
-    getConfigurationMock.returnWith(
+    getConfigurationMock.returns(
       new FakeConfiguration({
         allowSelfSigned: true,
       } as Record<string, any>),
