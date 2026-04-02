@@ -7,7 +7,8 @@
   "version": "0.21.0",
   "publisher": "gitguardian-secret-security",
   "engines": {
-    "vscode": "^1.81.0"
+    "vscode": "^1.81.0",
+    "node": ">=20"
   },
   "galleryBanner": {
     "color": "#081736",
