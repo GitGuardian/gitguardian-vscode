@@ -23,7 +23,8 @@ import { parseGGShieldResults } from "./ggshield-results-parser";
 /**
  * Extension diagnostic collection
  */
-export let diagnosticCollection: DiagnosticCollection;
+export const diagnosticCollection: DiagnosticCollection =
+  languages.createDiagnosticCollection("ggshield");
 
 // Per-URI delete watchers, registered only for files we currently track
 // diagnostics for.
@@ -178,7 +179,6 @@ export async function ignoreSecret(
 }
 
 export function createDiagnosticCollection(context: ExtensionContext): void {
-  diagnosticCollection = languages.createDiagnosticCollection("ggshield");
   context.subscriptions.push(diagnosticCollection);
 }
 

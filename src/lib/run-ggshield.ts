@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { spawn, SpawnOptionsWithoutStdio } from "child_process";
+import { childProcess, SpawnOptionsWithoutStdio } from "./child-process";
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { workspace } from "vscode";
 
@@ -73,7 +72,7 @@ export function runGGShieldCommand(
   return new Promise<GGShieldCommandResult>((resolve) => {
     let proc;
     try {
-      proc = spawn(configuration.ggshieldPath, finalArgs, options);
+      proc = childProcess.spawn(configuration.ggshieldPath, finalArgs, options);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));
       resolve({
