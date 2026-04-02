@@ -160,10 +160,12 @@
   "scripts": {
     "vscode:prepublish": "bash scripts/download-ggshield.sh && npm run compile",
     "compile": "tsc -p ./",
+    "compile-tests": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "check": "tsc --noEmit",
+    "pretest": "npm run check && npm run compile-tests && npm run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "vscode-test"
   },
   "devDependencies": {
     "@types/glob": "^8.1.0",
@@ -173,9 +175,9 @@
     "@types/vscode": "^1.81.0",
     "@typescript-eslint/eslint-plugin": "^5.59.8",
     "@typescript-eslint/parser": "^5.59.8",
+    "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.3.2",
     "eslint": "^8.41.0",
-    "glob": "^8.1.0",
     "mocha": "^10.2.0",
     "simple-mock": "^0.8.0",
     "typescript": "^5.1.3"
