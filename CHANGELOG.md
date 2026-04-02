@@ -1,5 +1,12 @@
 # GitGuardian Secret Security Changelog
 
+## [0.22.0]
+
+### Changed
+
+- `ggshield` binaries are again bundled in the extension.
+- Distribute platform-specific extensions to limit the extension size with bundled `ggshield`.
+
 ## [0.21.0]
 
 ### Changed
