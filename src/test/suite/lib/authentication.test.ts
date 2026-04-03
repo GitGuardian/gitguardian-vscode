@@ -1,8 +1,10 @@
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 import * as sinon from "sinon";
 import * as runGGShield from "../../../lib/run-ggshield";
-import * as childProcess from "child_process";
-import { ChildProcessWithoutNullStreams } from "child_process";
+import {
+  childProcess,
+  type ChildProcessWithoutNullStreams,
+} from "../../../lib/child-process";
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
 import assert from "assert";
 import { EventEmitter } from "events";

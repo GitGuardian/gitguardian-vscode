@@ -1,8 +1,8 @@
 import {
-  spawnSync,
-  SpawnSyncOptionsWithStringEncoding,
-  SpawnSyncReturns,
-} from "child_process";
+  type SpawnSyncOptionsWithStringEncoding,
+  type SpawnSyncReturns,
+  childProcess,
+} from "./child-process";
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { workspace } from "vscode";
 
@@ -58,7 +58,11 @@ export function runGGShieldCommand(
     };
   }
 
-  const proc = spawnSync(configuration.ggshieldPath, args, options);
+  const proc = childProcess.spawnSync(
+    configuration.ggshieldPath,
+    args,
+    options,
+  );
 
   return proc;
 }
