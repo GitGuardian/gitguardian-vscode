@@ -6,9 +6,15 @@ import {
   type ChildProcessWithoutNullStreams,
 } from "../../../lib/child-process";
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
-import * as assert from "assert";
+import assert from "assert";
 import { EventEmitter } from "events";
-import { commands, ExtensionContext, Memento } from "vscode";
+import {
+  commands,
+  ExtensionContext,
+  Memento,
+  OutputChannel,
+  WebviewView,
+} from "vscode";
 import {
   AuthenticationStatus,
   ConfigSource,
@@ -33,14 +39,14 @@ suite("updateAuthenticationStatus", () => {
     mockWorkspaceState = {
       get: (key: string) =>
         key === "authenticationStatus" ? authenticationStatus : undefined,
-      update: (key: string, value: any) => {
+      update: (key: string, value: unknown) => {
         if (key === "authenticationStatus") {
-          authenticationStatus = value;
+          authenticationStatus = value as AuthenticationStatus | undefined;
         }
         return Promise.resolve();
       },
       keys: () => [],
-      setKeysForSync: (keys: readonly string[]) => {},
+      setKeysForSync: (_keys: readonly string[]) => {},
     };
 
     mockContext = {
@@ -172,7 +178,9 @@ suite("loginGGShield", () => {
       stdout: new EventEmitter(),
       stderr: new EventEmitter(),
     });
-    spawnMock = sinon.stub(childProcess, "spawn").returns(fakeProc as any);
+    spawnMock = sinon
+      .stub(childProcess, "spawn")
+      .returns(fakeProc as unknown as ChildProcessWithoutNullStreams);
   });
 
   teardown(function () {
@@ -193,14 +201,14 @@ suite("loginGGShield", () => {
 
   testCasesInsecure.forEach(({ insecure, description }) => {
     test(description, () => {
-      loginGGShield(
+      void loginGGShield(
         {
           ggshieldPath: "path/to/ggshield",
           apiUrl: "",
           insecure: insecure,
         } as GGShieldConfiguration,
-        { appendLine: () => {} } as any,
-        { webview: { postMessage: () => {} } } as any,
+        { appendLine: () => {} } as unknown as OutputChannel,
+        { webview: { postMessage: () => {} } } as unknown as WebviewView,
         {} as ExtensionContext,
       );
 

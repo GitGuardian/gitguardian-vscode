@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 export interface Occurrence {
   type: string;
   line_start: number;

@@ -2,7 +2,7 @@ import * as sinon from "sinon";
 import { childProcess } from "../../../lib/child-process";
 import * as vscode from "vscode";
 import * as runGGShield from "../../../lib/run-ggshield";
-import assert = require("assert");
+import assert from "assert";
 import { EventEmitter } from "events";
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 

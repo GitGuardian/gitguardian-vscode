@@ -1,5 +1,5 @@
 import * as sinon from "sinon";
-import assert = require("assert");
+import assert from "assert";
 import { ExtensionContext, workspace, window } from "vscode";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
 
@@ -18,13 +18,13 @@ suite("getConfiguration", () => {
    * Helper class to fake different configurations of the extension
    */
   class FakeConfiguration {
-    records: Record<string, any>;
+    records: Record<string, unknown>;
 
-    constructor(records: Record<string, any>) {
+    constructor(records: Record<string, unknown>) {
       this.records = records;
     }
 
-    public get(section: string, defaultValue: any): any {
+    public get(section: string, defaultValue: unknown): unknown {
       if (this.records.hasOwnProperty(section)) {
         return this.records[section];
       }
@@ -35,13 +35,13 @@ suite("getConfiguration", () => {
   test("Vscode settings are correctly read", () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
-    context.asAbsolutePath = sinon.stub().returns("") as any;
+    context.asAbsolutePath = sinon.stub<[string], string>().returns("");
 
     getConfigurationMock.returns(
       new FakeConfiguration({
         apiUrl: "https://custom-url.com",
         insecure: true,
-      } as Record<string, any>),
+      } as Record<string, unknown>),
     );
     const configuration = getConfiguration(context, outputChannel);
 
@@ -59,12 +59,12 @@ suite("getConfiguration", () => {
   test("insecure falls back on allowSelfSigned", () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
-    context.asAbsolutePath = sinon.stub().returns("") as any;
+    context.asAbsolutePath = sinon.stub<[string], string>().returns("");
 
     getConfigurationMock.returns(
       new FakeConfiguration({
         allowSelfSigned: true,
-      } as Record<string, any>),
+      } as Record<string, unknown>),
     );
     const configuration = getConfiguration(context, outputChannel);
 
