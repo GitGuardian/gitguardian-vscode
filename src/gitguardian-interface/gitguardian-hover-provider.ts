@@ -65,7 +65,7 @@ function extractInfosFromMessage(message: string): {
 
 export function generateSecretName(
   currentFile: string,
-  uriDiagnostic: any,
+  uriDiagnostic: { detector: string; startLine: number },
 ): string {
   return `${uriDiagnostic.detector} - ${vscode.workspace.asRelativePath(
     currentFile,

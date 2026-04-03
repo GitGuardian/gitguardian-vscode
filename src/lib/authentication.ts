@@ -1,6 +1,12 @@
 import { runGGShieldCommand } from "./run-ggshield";
 import { GGShieldConfiguration } from "./ggshield-configuration";
-import { commands, ExtensionContext, WebviewView, workspace } from "vscode";
+import {
+  commands,
+  ExtensionContext,
+  OutputChannel,
+  WebviewView,
+  workspace,
+} from "vscode";
 import { spawn, SpawnOptionsWithoutStdio } from "child_process";
 import * as os from "os";
 import {
@@ -108,7 +114,7 @@ export async function updateAuthenticationStatus(
 
 export async function loginGGShield(
   configuration: GGShieldConfiguration,
-  outputChannel: any,
+  outputChannel: OutputChannel,
   webviewView: WebviewView,
   context: ExtensionContext,
 ): Promise<void> {
