@@ -50,7 +50,15 @@ jobs:
         run: scripts/download-ggshield.sh --target ${{ matrix.vscode_target }}
 
       - name: 🧪 Run tests
-        run: npm test
+        shell: bash # Ensure bash is used for Linux/macOS
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run --auto-servernum npm test
+          elif [ "$RUNNER_OS" = "macOS" ]; then
+            npm test
+          else
+            bash -c "npm test"
+          fi
 
   scanning:
     name: GitGuardian scan
