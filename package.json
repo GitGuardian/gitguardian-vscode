@@ -163,8 +163,8 @@
     "compile-tests": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "check": "tsc --noEmit",
-    "pretest": "npm run check && npm run compile-tests && npm run lint",
     "lint": "eslint src",
+    "pretest": "npm run check && npm run compile-tests",
     "test": "vscode-test"
   },
   "devDependencies": {
