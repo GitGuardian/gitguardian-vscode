@@ -71,7 +71,7 @@ function registerOpenViewsCommands(
 
 export async function activate(context: ExtensionContext) {
   const outputChannel = window.createOutputChannel("GitGuardian");
-  let configuration = await getConfiguration(context, outputChannel);
+  const configuration = await getConfiguration(context, outputChannel);
 
   const ggshieldResolver = new GGShieldResolver(
     outputChannel,
@@ -130,7 +130,7 @@ export async function activate(context: ExtensionContext) {
   ggshieldResolver.checkGGShieldConfiguration();
 
   // update authentication status
-  updateAuthenticationStatus(context, configuration).then(() => {
+  void updateAuthenticationStatus(context, configuration).then(() => {
     ggshieldViewProvider.refresh();
     ggshieldRemediationMessageViewProvider.refresh();
     ggshieldQuotaViewProvider.refresh();
@@ -167,8 +167,8 @@ export async function activate(context: ExtensionContext) {
     }),
     commands.registerCommand("gitguardian.ignoreSecret", (diagnosticData) => {
       window.showInformationMessage("Secret ignored.");
-      let currentFile = getCurrentFile();
-      let secretName = generateSecretName(currentFile, diagnosticData);
+      const currentFile = getCurrentFile();
+      const secretName = generateSecretName(currentFile, diagnosticData);
 
       ignoreSecret(
         ggshieldResolver.configuration,

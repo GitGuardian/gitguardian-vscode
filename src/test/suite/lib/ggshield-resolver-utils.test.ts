@@ -1,17 +1,18 @@
-import * as assert from "assert";
+import assert from "assert";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
 import * as tar from "tar";
-const AdmZip = require("adm-zip");
+import AdmZip from "adm-zip";
 import * as getGGShieldUtils from "../../../lib/ggshield-resolver-utils";
 import { ExtensionContext, window, OutputChannel } from "vscode";
 
-suite("getGGShield integration tests", async () => {
+suite("getGGShield integration tests", () => {
   let tempDir: string;
   let mockContext: ExtensionContext;
   let version: string;
-  let outputChannel: OutputChannel = window.createOutputChannel("GitGuardian");
+  const outputChannel: OutputChannel =
+    window.createOutputChannel("GitGuardian");
   const platform = process.platform;
   const arch = process.arch;
   let originalLog: (message?: any, ...optionalParams: any[]) => void;

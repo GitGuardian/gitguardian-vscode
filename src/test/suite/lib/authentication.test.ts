@@ -3,7 +3,7 @@ import * as sinon from "sinon";
 import * as runGGShield from "../../../lib/run-ggshield";
 import * as childProcess from "child_process";
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
-import * as assert from "assert";
+import assert from "assert";
 import { EventEmitter } from "events";
 import { commands, ExtensionContext, Memento } from "vscode";
 import {
@@ -37,7 +37,7 @@ suite("updateAuthenticationStatus", () => {
         return Promise.resolve();
       },
       keys: () => [],
-      setKeysForSync: (keys: readonly string[]) => {},
+      setKeysForSync: (_keys: readonly string[]) => {},
     };
 
     mockContext = {
@@ -190,7 +190,7 @@ suite("loginGGShield", () => {
 
   testCasesInsecure.forEach(({ insecure, description }) => {
     test(description, () => {
-      loginGGShield(
+      void loginGGShield(
         {
           ggshieldPath: "path/to/ggshield",
           apiUrl: "",
