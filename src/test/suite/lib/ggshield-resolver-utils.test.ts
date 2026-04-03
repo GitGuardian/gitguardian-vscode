@@ -1,6 +1,7 @@
-import * as assert from "assert";
+import assert from "assert";
 import * as path from "path";
 import * as fs from "fs";
+
 import * as getGGShieldUtils from "../../../lib/ggshield-resolver-utils";
 import { ExtensionContext, window, OutputChannel } from "vscode";
 

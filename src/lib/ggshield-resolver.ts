@@ -47,7 +47,7 @@ export class GGShieldResolver {
    */
   async testConfiguration(configuration: GGShieldConfiguration): Promise<void> {
     // Check if the ggshield path is valid
-    let proc = await runGGShieldCommand(configuration, ["--version"]);
+    const proc = await runGGShieldCommand(configuration, ["--version"]);
     if (proc.status !== 0) {
       window.showErrorMessage(
         `GitGuardian: Invalid ggshield path. ${proc.stderr}`,

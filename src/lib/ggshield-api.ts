@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import * as path from "path";
 import {
   window,
@@ -120,7 +119,7 @@ export async function getAPIquota(
   try {
     const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
     return JSON.parse(proc.stdout).remaining;
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
@@ -270,6 +269,6 @@ export async function scanFile(
     updateStatusBarItem(StatusBarStatus.secretFound);
   }
   const results = JSON.parse(proc.stdout);
-  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
+  const incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   setDiagnostics(fileUri, incidentsDiagnostics);
 }
