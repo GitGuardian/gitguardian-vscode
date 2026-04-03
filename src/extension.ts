@@ -10,6 +10,7 @@ import {
 import { getConfiguration } from "./lib/ggshield-configuration-utils";
 import {
   ExtensionContext,
+  OutputChannel,
   Uri,
   commands,
   languages,
@@ -41,7 +42,7 @@ import {
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
-  outputChannel: any,
+  outputChannel: OutputChannel,
 ) {
   const showOutputCommand = commands.registerCommand(
     "gitguardian.showOutput",
@@ -149,7 +150,7 @@ export async function activate(context: ExtensionContext) {
       await updateAuthenticationStatus(context, configuration);
       ggshieldViewProvider.refresh();
       ggshieldRemediationMessageViewProvider.refresh();
-      ggshieldQuotaViewProvider.refresh();
+      await ggshieldQuotaViewProvider.refresh();
     }),
   );
 
@@ -165,16 +166,16 @@ export async function activate(context: ExtensionContext) {
   ggshieldResolver.checkGGShieldConfiguration().catch((err) => {
     outputChannel.appendLine(
       `ggshield configuration check failed: ${
-        err instanceof Error ? err.stack ?? err.message : String(err)
+        err instanceof Error ? (err.stack ?? err.message) : String(err)
       }`,
     );
   });
 
   // update authentication status
-  updateAuthenticationStatus(context, configuration).then(() => {
+  void updateAuthenticationStatus(context, configuration).then(() => {
     ggshieldViewProvider.refresh();
     ggshieldRemediationMessageViewProvider.refresh();
-    ggshieldQuotaViewProvider.refresh();
+    void ggshieldQuotaViewProvider.refresh();
   });
 
   // Start scanning documents on activation events
@@ -206,7 +207,7 @@ export async function activate(context: ExtensionContext) {
         ).catch((err) => {
           outputChannel.appendLine(
             `scanFile failed: ${
-              err instanceof Error ? err.stack ?? err.message : String(err)
+              err instanceof Error ? (err.stack ?? err.message) : String(err)
             }`,
           );
         });
@@ -218,7 +219,7 @@ export async function activate(context: ExtensionContext) {
       } catch (err) {
         outputChannel.appendLine(
           `showAPIQuota failed: ${
-            err instanceof Error ? err.stack ?? err.message : String(err)
+            err instanceof Error ? (err.stack ?? err.message) : String(err)
           }`,
         );
       }
@@ -233,8 +234,8 @@ export async function activate(context: ExtensionContext) {
       "gitguardian.ignoreSecret",
       async (diagnosticData) => {
         window.showInformationMessage("Secret ignored.");
-        let currentFile = getCurrentFile();
-        let secretName = generateSecretName(currentFile, diagnosticData);
+        const currentFile = getCurrentFile();
+        const secretName = generateSecretName(currentFile, diagnosticData);
 
         await ignoreSecret(
           ggshieldResolver.configuration,
@@ -260,7 +261,7 @@ export async function activate(context: ExtensionContext) {
           await updateAuthenticationStatus(context, configuration);
           ggshieldViewProvider.refresh();
           ggshieldRemediationMessageViewProvider.refresh();
-          ggshieldQuotaViewProvider.refresh();
+          await ggshieldQuotaViewProvider.refresh();
         })
         .catch((err) => {
           outputChannel.appendLine(`Authentication failed: ${err.message}`);
@@ -270,7 +271,7 @@ export async function activate(context: ExtensionContext) {
       await logoutGGShield(ggshieldResolver.configuration, context);
       ggshieldViewProvider.refresh();
       ggshieldRemediationMessageViewProvider.refresh();
-      ggshieldQuotaViewProvider.refresh();
+      await ggshieldQuotaViewProvider.refresh();
     }),
     commands.registerCommand(
       "gitguardian.updateAuthenticationStatus",
@@ -278,7 +279,7 @@ export async function activate(context: ExtensionContext) {
         await updateAuthenticationStatus(context, configuration);
         ggshieldViewProvider.refresh();
         ggshieldRemediationMessageViewProvider.refresh();
-        ggshieldQuotaViewProvider.refresh();
+        await ggshieldQuotaViewProvider.refresh();
       },
     ),
   );

@@ -17,10 +17,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: ⚙️ Install dependencies
+        run: npm ci
+
       - name: Run pre-commit
         run: pipx run pre-commit run --all-files --show-diff-on-failure
         env:
-          SKIP: ggshield # already done by the "scanning" job
+          SKIP: ggshield # covered by the scanning job
 
   build-and-test:
     runs-on: ${{ matrix.os }}
