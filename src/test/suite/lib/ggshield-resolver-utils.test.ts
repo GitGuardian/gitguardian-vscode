@@ -8,7 +8,8 @@ import { ExtensionContext, window, OutputChannel } from "vscode";
 suite("getGGShield", () => {
   let tempDir: string;
   let mockContext: ExtensionContext;
-  const outputChannel: OutputChannel = window.createOutputChannel("GitGuardian");
+  const outputChannel: OutputChannel =
+    window.createOutputChannel("GitGuardian");
   const platform = process.platform;
 
   setup(() => {

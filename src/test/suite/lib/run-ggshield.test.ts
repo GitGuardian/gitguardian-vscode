@@ -1,5 +1,5 @@
 import * as sinon from "sinon";
-import * as childProcess from "child_process";
+import { childProcess } from "../../../lib/child-process";
 import * as vscode from "vscode";
 import * as runGGShield from "../../../lib/run-ggshield";
 import assert from "assert";

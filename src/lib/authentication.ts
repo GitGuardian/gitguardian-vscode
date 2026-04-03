@@ -7,7 +7,8 @@ import {
   WebviewView,
   workspace,
 } from "vscode";
-import { spawn, SpawnOptionsWithoutStdio } from "child_process";
+import { SpawnOptionsWithoutStdio } from "child_process";
+import { childProcess } from "./child-process";
 import * as os from "os";
 import {
   StatusBarStatus,
@@ -141,7 +142,7 @@ export async function loginGGShield(
   }
 
   return new Promise<void>((resolve, reject) => {
-    const proc = spawn(ggshieldPath, args, options);
+    const proc = childProcess.spawn(ggshieldPath, args, options);
 
     proc.stdout.on("data", (data) => {
       const urlLine = data.toString().match(/https:\/\/[^\s]+/);

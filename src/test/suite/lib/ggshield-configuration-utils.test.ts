@@ -2,20 +2,12 @@ import * as sinon from "sinon";
 import assert from "assert";
 import { ExtensionContext, workspace, window } from "vscode";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
-import * as ggshieldResolverUtils from "../../../lib/ggshield-resolver-utils";
 
 suite("getConfiguration", () => {
   let getConfigurationMock: sinon.SinonStub;
-  let getGGShieldMock: any;
 
   setup(() => {
-    // Mock workspace.getConfiguration
     getConfigurationMock = sinon.stub(workspace, "getConfiguration");
-    // Mock getGGShield
-
-    getGGShieldMock= sinon
-      .stub(ggshieldResolverUtils, "getGGShield")
-      .resolves("/mock/path/to/ggshield");
   });
 
   teardown(() => {
