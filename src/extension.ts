@@ -72,7 +72,7 @@ function registerOpenViewsCommands(
   );
 }
 
-export async function activate(context: ExtensionContext) {
+export function activate(context: ExtensionContext) {
   const outputChannel = window.createOutputChannel("GitGuardian");
   let configuration = getConfiguration(context, outputChannel);
 
