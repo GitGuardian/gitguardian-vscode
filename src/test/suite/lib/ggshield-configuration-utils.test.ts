@@ -1,5 +1,5 @@
 import * as sinon from "sinon";
-import assert = require("assert");
+import assert from "assert";
 import { ExtensionContext, workspace, window } from "vscode";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
 import * as ggshieldResolverUtils from "../../../lib/ggshield-resolver-utils";

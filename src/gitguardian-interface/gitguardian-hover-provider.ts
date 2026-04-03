@@ -4,7 +4,7 @@ export class GitGuardianSecretHoverProvider implements vscode.HoverProvider {
   public provideHover(
     document: vscode.TextDocument,
     position: vscode.Position,
-    token: vscode.CancellationToken,
+    _token: vscode.CancellationToken,
   ): vscode.ProviderResult<vscode.Hover> {
     const diagnostics = vscode.languages.getDiagnostics(document.uri);
 

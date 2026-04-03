@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {
   window,
   DiagnosticCollection,
@@ -46,7 +45,7 @@ export function getAPIquota(configuration: GGShieldConfiguration): number {
   try {
     const proc = runGGShieldCommand(configuration, ["quota", "--json"]);
     return JSON.parse(proc.stdout).remaining;
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
@@ -178,6 +177,6 @@ export function scanFile(
     updateStatusBarItem(StatusBarStatus.secretFound);
   }
   const results = JSON.parse(proc.stdout);
-  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
+  const incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }

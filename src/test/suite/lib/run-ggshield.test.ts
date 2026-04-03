@@ -2,7 +2,7 @@ import * as sinon from "sinon";
 import * as childProcess from "child_process";
 import * as vscode from "vscode";
 import * as runGGShield from "../../../lib/run-ggshield";
-import assert = require("assert");
+import assert from "assert";
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 
 suite("runGGShieldCommand", () => {
