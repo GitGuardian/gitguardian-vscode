@@ -4,7 +4,7 @@ import * as tar from "tar";
 import axios, { AxiosRequestConfig } from "axios";
 import { Agent } from "https";
 
-const AdmZip = require("adm-zip");
+import AdmZip from "adm-zip";
 import { ExtensionContext, OutputChannel } from "vscode";
 
 const defaultRequestConfig = {

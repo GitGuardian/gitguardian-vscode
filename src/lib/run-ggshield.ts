@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {
-  spawnSync,
-  SpawnSyncOptionsWithStringEncoding,
-  SpawnSyncReturns,
-} from "child_process";
+  type SpawnSyncOptionsWithStringEncoding,
+  type SpawnSyncReturns,
+  childProcess,
+} from "./child-process";
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { workspace } from "vscode";
 
@@ -19,12 +18,12 @@ export function runGGShieldCommand(
   configuration: GGShieldConfiguration,
   args: string[],
 ): SpawnSyncReturns<string> {
-  let env: NodeJS.ProcessEnv = {
+  const env: NodeJS.ProcessEnv = {
     ...process.env,
     GG_USER_AGENT: "gitguardian-vscode",
   };
 
-  let options: SpawnSyncOptionsWithStringEncoding = {
+  const options: SpawnSyncOptionsWithStringEncoding = {
     cwd: workspace.workspaceFolders
       ? workspace.workspaceFolders[0].uri.fsPath
       : os.tmpdir(),
@@ -59,7 +58,11 @@ export function runGGShieldCommand(
     };
   }
 
-  let proc = spawnSync(configuration.ggshieldPath, args, options);
+  const proc = childProcess.spawnSync(
+    configuration.ggshieldPath,
+    args,
+    options,
+  );
 
   return proc;
 }
