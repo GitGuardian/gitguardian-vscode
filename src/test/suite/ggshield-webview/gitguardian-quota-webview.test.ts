@@ -20,7 +20,7 @@ suite("GitGuardianQuotaWebviewProvider", () => {
   setup(() => {
     mockWorkspaceState = {
       get: (_key: string) => undefined,
-      update: (_key: string, _value: any) => Promise.resolve(),
+      update: (_key: string, _value: unknown) => Promise.resolve(),
       keys: () => [],
       setKeysForSync: (_keys: readonly string[]) => {},
     };
@@ -41,7 +41,7 @@ suite("GitGuardianQuotaWebviewProvider", () => {
         onDidReceiveMessage: () => ({ dispose: () => {} }),
         cspSource: "",
         options: {} as WebviewOptions,
-        postMessage: (_message: any) => Promise.resolve(true),
+        postMessage: (_message: unknown) => Promise.resolve(true),
         asWebviewUri: (uri: Uri) => uri,
       },
       onDidChangeVisibility: () => ({ dispose: () => {} }),

@@ -9,6 +9,7 @@ import {
 import { getConfiguration } from "./lib/ggshield-configuration-utils";
 import {
   ExtensionContext,
+  OutputChannel,
   Uri,
   commands,
   languages,
@@ -39,7 +40,7 @@ import {
 
 function registerOpenViewsCommands(
   context: ExtensionContext,
-  outputChannel: any,
+  outputChannel: OutputChannel,
 ) {
   const showOutputCommand = commands.registerCommand(
     "gitguardian.showOutput",

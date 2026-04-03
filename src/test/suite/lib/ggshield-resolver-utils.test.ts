@@ -15,7 +15,7 @@ suite("getGGShield integration tests", () => {
     window.createOutputChannel("GitGuardian");
   const platform = process.platform;
   const arch = process.arch;
-  let originalLog: (message?: any, ...optionalParams: any[]) => void;
+  let originalLog: typeof console.log;
   let output: string;
 
   setup(() => {
