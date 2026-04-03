@@ -48,3 +48,6 @@ out/
 
 # ggshield internal
 ggshield-internal/
+
+# Worktrees
+.worktrees
