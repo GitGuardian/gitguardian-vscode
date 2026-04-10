@@ -188,7 +188,8 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
           <p>Instance source: ${authenticationStatus.instanceSource}.</p>
           <p>API key source: ${authenticationStatus.keySource}.</p>
           ${
-            authenticationStatus.keySource === ConfigSource.keyGGShieldConfig
+            authenticationStatus.keySource === ConfigSource.keyGGShieldConfig ||
+            authenticationStatus.keySource === ConfigSource.keyring
               ? `
             <p>To generate a valid key, please <a id="logout" href="">log out</a> and log back in.</p>
             <script>

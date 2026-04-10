@@ -20,6 +20,7 @@ export enum GGShieldConfigSource {
   dotEnv = "DOTENV",
   envVar = "ENV_VAR",
   userConfig = "USER_CONFIG",
+  keyring = "KEYRING",
   default = "DEFAULT",
 }
 
@@ -29,6 +30,7 @@ export enum ConfigSource {
   envVar = "Environment variable",
   instanceGGShieldConfig = "ggshield settings or .gitguardian.yaml file",
   keyGGShieldConfig = "ggshield settings",
+  keyring = "System credential store",
   default = "Default instance",
   noKeyFound = "No key found",
 }
@@ -47,6 +49,8 @@ function getSource(sourceString: string, isInstance: boolean): ConfigSource {
       } else {
         return ConfigSource.keyGGShieldConfig;
       }
+    case GGShieldConfigSource.keyring:
+      return ConfigSource.keyring;
     case GGShieldConfigSource.default:
       return ConfigSource.default;
   }
@@ -172,7 +176,8 @@ export async function logoutGGShield(
     context.workspaceState.get("authenticationStatus");
   if (
     authStatus?.success === false &&
-    authStatus.keySource === ConfigSource.keyGGShieldConfig
+    (authStatus.keySource === ConfigSource.keyGGShieldConfig ||
+      authStatus.keySource === ConfigSource.keyring)
   ) {
     cmd.push("--no-revoke");
   }
