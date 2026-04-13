@@ -7,10 +7,10 @@ import { getGGShield } from "./ggshield-resolver-utils";
  * Retrieve configuration from settings
  * @returns {GGShieldConfiguration} from the extension settings
  */
-export async function getConfiguration(
+export function getConfiguration(
   context: ExtensionContext,
   outputChannel: OutputChannel,
-): Promise<GGShieldConfiguration> {
+): GGShieldConfiguration {
   const config = workspace.getConfiguration("gitguardian");
 
   const apiUrl: string | undefined = config.get("apiUrl");
@@ -20,13 +20,7 @@ export async function getConfiguration(
     config.get("allowSelfSigned", false),
   );
 
-  const pathToGGShield: string = await getGGShield(
-    os.platform(),
-    os.arch(),
-    context,
-    outputChannel,
-    insecure,
-  );
+  const pathToGGShield = getGGShield(os.platform(), context, outputChannel);
 
   return new GGShieldConfiguration(pathToGGShield, apiUrl, insecure || false);
 }

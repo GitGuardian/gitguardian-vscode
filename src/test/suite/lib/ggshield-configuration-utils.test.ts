@@ -6,13 +6,8 @@ import * as ggshieldResolverUtils from "../../../lib/ggshield-resolver-utils";
 
 suite("getConfiguration", () => {
   let getConfigurationMock: simple.Stub<Function>;
-  let getGGShieldMock: simple.Stub<
-    (
-      platform: NodeJS.Platform,
-      arch: string,
-      context: ExtensionContext,
-    ) => string
-  >;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let getGGShieldMock: any;
 
   setup(() => {
     // Mock workspace.getConfiguration
@@ -20,7 +15,7 @@ suite("getConfiguration", () => {
     // Mock getGGShield
     getGGShieldMock = simple
       .mock(ggshieldResolverUtils, "getGGShield")
-      .returnWith(() => "/mock/path/to/ggshield");
+      .returnWith("/mock/path/to/ggshield");
   });
 
   teardown(() => {
@@ -45,7 +40,7 @@ suite("getConfiguration", () => {
     }
   }
 
-  test("Vscode settings are correctly read", async () => {
+  test("Vscode settings are correctly read", () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
     simple.mock(context, "asAbsolutePath").returnWith("");
@@ -56,7 +51,7 @@ suite("getConfiguration", () => {
         insecure: true,
       } as Record<string, any>),
     );
-    const configuration = await getConfiguration(context, outputChannel);
+    const configuration = getConfiguration(context, outputChannel);
 
     // Assert both workspace.getConfiguration and GGShieldConfiguration constructor were called
     assert(
@@ -68,7 +63,8 @@ suite("getConfiguration", () => {
     assert.strictEqual(configuration.apiUrl, "https://custom-url.com");
     assert.strictEqual(configuration.insecure, true);
   });
-  test("insecure falls back on allowSelfSigned", async () => {
+
+  test("insecure falls back on allowSelfSigned", () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
     simple.mock(context, "asAbsolutePath").returnWith("");
@@ -78,7 +74,7 @@ suite("getConfiguration", () => {
         allowSelfSigned: true,
       } as Record<string, any>),
     );
-    const configuration = await getConfiguration(context, outputChannel);
+    const configuration = getConfiguration(context, outputChannel);
 
     // Assert that the configuration has the expected values
     assert.strictEqual(configuration.insecure, true);
