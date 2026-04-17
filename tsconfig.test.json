@@ -1,6 +1,7 @@
 {
   "extends": "./tsconfig.src.json",
   "compilerOptions": {
+    "outDir": "out",
     "types": ["node", "mocha"]
   },
   "include": ["src/**/*.ts"],
