@@ -1,19 +1,19 @@
-import * as simple from "simple-mock";
-import * as childProcess from "child_process";
+import * as sinon from "sinon";
+import { childProcess } from "../../../lib/child-process";
 import * as vscode from "vscode";
 import * as runGGShield from "../../../lib/run-ggshield";
-import assert = require("assert");
+import assert from "assert";
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 
 suite("runGGShieldCommand", () => {
-  let spawnSyncMock: simple.Stub<Function>;
+  let spawnSyncMock: sinon.SinonStub;
 
   setup(() => {
-    spawnSyncMock = simple.mock(childProcess, "spawnSync"); // Mock spawnSync
+    spawnSyncMock = sinon.stub(childProcess, "spawnSync"); // Mock spawnSync
   });
 
   teardown(() => {
-    simple.restore();
+    sinon.restore();
   });
 
   test("Global env variables are set correctly", () => {

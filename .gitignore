@@ -49,3 +49,6 @@ out/
 # ggshield internal
 ggshield-internal/
 ggshield-bundled/
+
+# Worktrees
+.worktrees

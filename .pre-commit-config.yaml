@@ -27,10 +27,10 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-        exclude: ^(ggshield-internal)
+        exclude: ^(ggshield-internal|package-lock\.json)
 
   - repo: https://github.com/gitguardian/ggshield
-    rev: v1.43.0
+    rev: v1.49.0
     hooks:
       - id: ggshield
         language_version: python3

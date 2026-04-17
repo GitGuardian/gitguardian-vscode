@@ -15,13 +15,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Run pre-commit
         run: pipx run pre-commit run --all-files --show-diff-on-failure
         env:
-          # SKIP ggshield check: it's done by the "scanning" job
-          SKIP: ggshield
+          SKIP: ggshield # already done by the "scanning" job
 
   build-and-test:
     runs-on: ${{ matrix.os }}
@@ -38,36 +37,27 @@ jobs:
 
     steps:
       - name: 👩‍💻 Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: ⚙️ Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: "18"
+      - name: ⚙️ Set up Node.js and tools
+        uses: jdx/mise-action@v4
 
       - name: ⚙️ Install dependencies
-        run: yarn install
+        run: npm ci
 
       - name: Download ggshield binary
         shell: bash
         run: scripts/download-ggshield.sh --target ${{ matrix.vscode_target }}
 
-        # We use xvfb-run on Linux to run tests because we need a display.
-        # xvfb-run is not available on macOS, so we use XQuartz instead.
-        # The default GitHub Actions runner for Windows (windows-latest) has a GUI session
-      - name: ⚙️ Install XQuartz on macOS
-        if: runner.os == 'macOS'
-        run: brew install xquartz xorg-server
-
       - name: 🧪 Run tests
         shell: bash # Ensure bash is used for Linux/macOS
         run: |
           if [ "$RUNNER_OS" = "Linux" ]; then
-            xvfb-run --auto-servernum yarn test
+            xvfb-run --auto-servernum npm test
           elif [ "$RUNNER_OS" = "macOS" ]; then
-            bash ./scripts/xvfb-run-macos.sh yarn test
+            npm test
           else
-            bash -c "yarn test"
+            bash -c "npm test"
           fi
 
   scanning:
@@ -75,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # fetch all history so multiple commits can be scanned
       - name: GitGuardian scan
