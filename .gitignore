@@ -34,15 +34,15 @@ yarn-error.log*
 !.vscode/*.code-snippets
 
 # TypeScript cache
-tsconfig.base.tsbuildinfo%
+*.tsbuildinfo
 
-# ouput dir
-out/
+# output dir
+dist/
 
 # build files
 **/*.vsix
 
-# cache dir
+# cache
 .cache_ggshield
 .vscode-test/
 
