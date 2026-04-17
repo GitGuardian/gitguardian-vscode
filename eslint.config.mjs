@@ -9,7 +9,7 @@ export default defineConfig([
     extends: [...tseslint.configs.recommendedTypeChecked, prettierPlugin],
     languageOptions: {
       parserOptions: {
-        project: true,
+        project: ["./tsconfig.src.json", "./tsconfig.test.json"],
         tsconfigRootDir: import.meta.dirname,
       },
     },
