@@ -159,10 +159,10 @@
   },
   "scripts": {
     "vscode:prepublish": "bash scripts/download-ggshield.sh && npm run compile",
-    "compile": "tsc -p ./",
-    "compile-tests": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
-    "check": "tsc --noEmit",
+    "compile": "tsc -p ./tsconfig.src.json",
+    "compile-tests": "tsc -p ./tsconfig.test.json",
+    "watch": "tsc -watch -p ./tsconfig.src.json",
+    "check": "tsc --noEmit -p ./tsconfig.src.json && tsc --noEmit -p ./tsconfig.test.json",
     "lint": "eslint src",
     "pretest": "npm run check && npm run compile-tests",
     "test": "vscode-test"
