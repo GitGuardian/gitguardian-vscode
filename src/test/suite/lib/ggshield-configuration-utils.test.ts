@@ -2,12 +2,14 @@ import * as sinon from "sinon";
 import assert from "assert";
 import { ExtensionContext, workspace, window } from "vscode";
 import { getConfiguration } from "../../../lib/ggshield-configuration-utils";
+import * as resolverUtils from "../../../lib/ggshield-resolver-utils";
 
 suite("getConfiguration", () => {
   let getConfigurationMock: sinon.SinonStub;
 
   setup(() => {
     getConfigurationMock = sinon.stub(workspace, "getConfiguration");
+    sinon.stub(resolverUtils, "getGGShield").returns("/fake/ggshield");
   });
 
   teardown(() => {
@@ -35,7 +37,6 @@ suite("getConfiguration", () => {
   test("Vscode settings are correctly read", () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
-    context.asAbsolutePath = sinon.stub<[string], string>().returns("");
 
     getConfigurationMock.returns(
       new FakeConfiguration({
@@ -59,7 +60,6 @@ suite("getConfiguration", () => {
   test("insecure falls back on allowSelfSigned", () => {
     const context = {} as ExtensionContext;
     const outputChannel = window.createOutputChannel("GitGuardian");
-    context.asAbsolutePath = sinon.stub<[string], string>().returns("");
 
     getConfigurationMock.returns(
       new FakeConfiguration({
