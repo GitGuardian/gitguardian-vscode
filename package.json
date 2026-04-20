@@ -33,7 +33,7 @@
   "activationEvents": [
     "onStartupFinished"
   ],
-  "main": "./dist/extension.js",
+  "main": "./out/extension.js",
   "contributes": {
     "configuration": {
       "title": "GitGuardian",
@@ -158,13 +158,12 @@
     }
   },
   "scripts": {
-    "vscode:prepublish": "bash scripts/download-ggshield.sh && node build.mjs --production",
+    "vscode:prepublish": "bash scripts/download-ggshield.sh && node build.mjs",
     "compile": "node build.mjs",
-    "compile-tests": "tsc -p ./tsconfig.test.json",
     "watch": "node build.mjs --watch",
     "check": "tsc --noEmit -p ./tsconfig.src.json && tsc --noEmit -p ./tsconfig.test.json",
     "lint": "eslint src",
-    "pretest": "npm run check && npm run compile-tests",
+    "pretest": "npm run check && tsc -p tsconfig.test.json",
     "test": "vscode-test"
   },
   "devDependencies": {

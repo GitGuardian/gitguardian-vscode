@@ -1,8 +1,8 @@
 {
   "extends": "./tsconfig.src.json",
   "compilerOptions": {
-    "outDir": "out",
-    "types": ["node", "mocha"]
+    "types": ["node", "mocha"],
+    "outDir": "out"
   },
   "include": ["src/**/*.ts"],
   "exclude": []

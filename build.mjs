@@ -1,17 +1,28 @@
 import { build, context } from "esbuild";
+import { readdirSync, statSync } from "node:fs";
+import { join } from "node:path";
 
-const production = process.argv.includes("--production");
 const watchMode = process.argv.includes("--watch");
 
+function findTs(dir) {
+  return readdirSync(dir).flatMap((name) => {
+    const full = join(dir, name);
+    return statSync(full).isDirectory()
+      ? findTs(full)
+      : full.endsWith(".ts")
+        ? [full]
+        : [];
+  });
+}
+
 const options = {
-  entryPoints: ["src/extension.ts"],
-  bundle: true,
+  entryPoints: findTs("src"),
+  bundle: false,
   format: "cjs",
-  minify: production,
-  sourcemap: !production,
-  outfile: "dist/extension.js",
-  external: ["vscode"],
   platform: "node",
+  sourcemap: true,
+  outdir: "out",
+  outbase: "src",
 };
 
 if (watchMode) {

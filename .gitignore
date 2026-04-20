@@ -36,8 +36,9 @@ yarn-error.log*
 # TypeScript cache
 tsconfig.base.tsbuildinfo%
 
-# ouput dir
+# output dir
 out/
+dist/
 
 # build files
 **/*.vsix
