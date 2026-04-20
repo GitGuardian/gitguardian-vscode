@@ -14,6 +14,12 @@ const feedbackFormUri = vscode.Uri.parse(
 const documentationUri = vscode.Uri.parse(
   "https://docs.gitguardian.com/ggshield-docs/configuration",
 );
+const engineFaqUri = vscode.Uri.parse(
+  "https://docs.gitguardian.com/secrets-detection/secrets-detection-engine/frequently_asked_questions",
+);
+const enginePrecisionIntro = vscode.Uri.parse(
+  "https://blog.gitguardian.com/secrets-detection-accuracy-precision-recall-explained",
+);
 
 function escapeHtml(value: string): string {
   return value
@@ -116,6 +122,8 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
           <p><a href="${projectDiscussionUri}" target="_blank">👉 Join the discussion: share feedback, ideas, and vote</a></p>
           <p><a href="${projectIssuesUri}" target="_blank">👉 Report any issues you encounter</a></p>
           <p><a href="${feedbackFormUri}" target="_blank">👉 Provide anonymous feedback</a></p>
+          <p><a href="${engineFaqUri}" target="_blank">👉 Read about our detection engine</a></p>
+          <p><a href="${enginePrecisionIntro}" target="_blank">👉 Find out how we choose what to report</a></p>
         </body>
         </html>`;
     } else if (
