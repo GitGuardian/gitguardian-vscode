@@ -2,8 +2,7 @@
 .vscode-test/**
 node_modules/
 src/
-dist/
-out/test/
+out/
 scripts/**
 .gitignore
 .npmrc
