@@ -13,8 +13,7 @@ node_modules/
 # TypeScript cache
 *.tsbuildinfo
 
-# output dirs
-out/
+# output dir
 dist/
 
 # build files
