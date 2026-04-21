@@ -1,6 +1,7 @@
 import * as vscode from "vscode";
 import { AuthenticationStatus, ConfigSource } from "../lib/authentication";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
+import { sanitizeInstanceUrl } from "./webview-utils";
 
 const projectDiscussionUri = vscode.Uri.parse(
   "https://github.com/GitGuardian/gitguardian-vscode/discussions",
@@ -14,27 +15,6 @@ const feedbackFormUri = vscode.Uri.parse(
 const documentationUri = vscode.Uri.parse(
   "https://docs.gitguardian.com/ggshield-docs/configuration",
 );
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function sanitizeInstanceUrl(instance: string): string {
-  try {
-    const url = new URL(instance);
-    if (url.protocol !== "https:" && url.protocol !== "http:") {
-      return "";
-    }
-    return escapeHtml(url.origin);
-  } catch {
-    return "";
-  }
-}
 
 export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "gitguardian.gitguardianView";
