@@ -1,0 +1,19 @@
+{
+  "name": "gitguardian-vscode",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20-bookworm",
+  "runArgs": ["--platform=linux/amd64"],
+  "postCreateCommand": "yarn install --frozen-lockfile && bash scripts/download-ggshield.sh --target linux-x64 --force",
+  "customizations": {
+    "vscode": {
+      "extensions": ["dbaeumer.vscode-eslint"],
+      "settings": {
+        "gitguardian.apiUrl": "",
+        "terminal.integrated.defaultProfile.linux": "bash"
+      }
+    }
+  },
+  "containerEnv": {
+    "HOME": "/home/node"
+  },
+  "remoteUser": "node"
+}
