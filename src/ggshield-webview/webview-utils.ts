@@ -18,3 +18,15 @@ export function sanitizeInstanceUrl(instance: string): string {
     return "";
   }
 }
+
+export function renderSelfHostedHint(): string {
+  return `<p class="self-hosted-hint">Using a self-hosted instance?</p>
+          <button class="button secondary" id="openInstanceSettings">Configure instance URL</button>`;
+}
+
+export function renderCurrentInstanceLine(instance: string): string {
+  const sanitized = sanitizeInstanceUrl(instance);
+  return sanitized
+    ? `<p class="self-hosted-current">Connecting to <code>${sanitized}</code></p>`
+    : "";
+}

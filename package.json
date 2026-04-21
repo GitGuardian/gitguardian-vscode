@@ -106,6 +106,12 @@
           "light": "images/refresh-light.svg",
           "dark": "images/refresh-dark.svg"
         }
+      },
+      {
+        "command": "gitguardian.openInstanceSettings",
+        "title": "Configure instance URL",
+        "category": "GitGuardian",
+        "icon": "$(link)"
       }
     ],
     "viewsContainers": {
@@ -150,7 +156,12 @@
       "view/title": [
         {
           "command": "gitguardian.refreshQuota",
-          "group": "navigation",
+          "group": "navigation@1",
+          "when": "view == gitguardianQuotaView"
+        },
+        {
+          "command": "gitguardian.openInstanceSettings",
+          "group": "navigation@2",
           "when": "view == gitguardianQuotaView"
         }
       ]

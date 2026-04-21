@@ -1,7 +1,11 @@
 import * as vscode from "vscode";
 import { AuthenticationStatus, ConfigSource } from "../lib/authentication";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
-import { sanitizeInstanceUrl } from "./webview-utils";
+import {
+  renderCurrentInstanceLine,
+  renderSelfHostedHint,
+  sanitizeInstanceUrl,
+} from "./webview-utils";
 
 const projectDiscussionUri = vscode.Uri.parse(
   "https://github.com/GitGuardian/gitguardian-vscode/discussions",
@@ -117,18 +121,25 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
             <h1 style="margin-bottom:0px;">Welcome to GitGuardian</h1>
             <p>Protect your code from secrets leakage</p>
             <button class="button large" id="authenticate">Link your IDE to your account</button>
-            
+
             <p id="authMessage" style="display:none;">
               If your browser doesn't open automatically, <a id="authLink" href="#" target="_blank">click here</a>.
             </p>
+            ${renderSelfHostedHint()}
+            ${renderCurrentInstanceLine(authenticationStatus?.instance ?? "")}
           </div>
 
           <script>
             const vscode = acquireVsCodeApi();
-            
+
             // Button click event to trigger authentication
             document.getElementById('authenticate').addEventListener('click', () => {
               vscode.postMessage({ type: 'authenticate' });
+            });
+
+            document.getElementById('openInstanceSettings').addEventListener('click', (e) => {
+              e.preventDefault();
+              vscode.postMessage({ type: 'openInstanceSettings' });
             });
             
             // Listener for authentication link

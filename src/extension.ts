@@ -114,8 +114,31 @@ export async function activate(context: ExtensionContext) {
 
   //generic commands to open correct view on status bar click
   registerOpenViewsCommands(context, outputChannel);
-  commands.registerCommand("gitguardian.refreshQuota", () =>
-    ggshieldQuotaViewProvider.refresh(),
+  context.subscriptions.push(
+    commands.registerCommand("gitguardian.refreshQuota", () =>
+      ggshieldQuotaViewProvider.refresh(),
+    ),
+    commands.registerCommand("gitguardian.openInstanceSettings", () =>
+      commands.executeCommand(
+        "workbench.action.openSettings",
+        "gitguardian.apiUrl",
+      ),
+    ),
+  );
+
+  context.subscriptions.push(
+    workspace.onDidChangeConfiguration(async (event) => {
+      if (!event.affectsConfiguration("gitguardian.apiUrl")) {
+        return;
+      }
+      configuration = getConfiguration(context, outputChannel);
+      ggshieldResolver.configuration = configuration;
+      ggshieldQuotaViewProvider.setConfiguration(configuration);
+      await updateAuthenticationStatus(context, configuration);
+      ggshieldViewProvider.refresh();
+      ggshieldRemediationMessageViewProvider.refresh();
+      ggshieldQuotaViewProvider.refresh();
+    }),
   );
 
   context.subscriptions.push(

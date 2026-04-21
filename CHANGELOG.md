@@ -2,6 +2,10 @@
 
 ## [0.22.0]
 
+### Added
+
+- Quota view now shows the connected GitGuardian instance and exposes a title-bar action to open the instance URL setting. The view refreshes automatically when `gitguardian.apiUrl` changes.
+
 ### Changed
 
 - `ggshield` binaries are again bundled in the extension.
