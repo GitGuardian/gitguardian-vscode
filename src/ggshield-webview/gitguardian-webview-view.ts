@@ -1,6 +1,11 @@
 import * as vscode from "vscode";
 import { AuthenticationStatus, ConfigSource } from "../lib/authentication";
 import { GGShieldConfiguration } from "../lib/ggshield-configuration";
+import {
+  renderCurrentInstanceLine,
+  renderSelfHostedHint,
+  sanitizeInstanceUrl,
+} from "./webview-utils";
 
 const projectDiscussionUri = vscode.Uri.parse(
   "https://github.com/GitGuardian/gitguardian-vscode/discussions",
@@ -20,27 +25,6 @@ const engineFaqUri = vscode.Uri.parse(
 const enginePrecisionIntro = vscode.Uri.parse(
   "https://blog.gitguardian.com/secrets-detection-accuracy-precision-recall-explained",
 );
-
-function escapeHtml(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function sanitizeInstanceUrl(instance: string): string {
-  try {
-    const url = new URL(instance);
-    if (url.protocol !== "https:" && url.protocol !== "http:") {
-      return "";
-    }
-    return escapeHtml(url.origin);
-  } catch {
-    return "";
-  }
-}
 
 export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
   public static readonly viewType = "gitguardian.gitguardianView";
@@ -145,18 +129,25 @@ export class GitGuardianWebviewProvider implements vscode.WebviewViewProvider {
             <h1 style="margin-bottom:0px;">Welcome to GitGuardian</h1>
             <p>Protect your code from secrets leakage</p>
             <button class="button large" id="authenticate">Link your IDE to your account</button>
-            
+
             <p id="authMessage" style="display:none;">
               If your browser doesn't open automatically, <a id="authLink" href="#" target="_blank">click here</a>.
             </p>
+            ${renderSelfHostedHint()}
+            ${renderCurrentInstanceLine(authenticationStatus?.instance ?? "")}
           </div>
 
           <script>
             const vscode = acquireVsCodeApi();
-            
+
             // Button click event to trigger authentication
             document.getElementById('authenticate').addEventListener('click', () => {
               vscode.postMessage({ type: 'authenticate' });
+            });
+
+            document.getElementById('openInstanceSettings').addEventListener('click', (e) => {
+              e.preventDefault();
+              vscode.postMessage({ type: 'openInstanceSettings' });
             });
             
             // Listener for authentication link
