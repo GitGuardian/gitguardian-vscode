@@ -1,13 +1,15 @@
-import * as assert from "assert";
+import assert from "assert";
 import * as path from "path";
 import * as fs from "fs";
+
 import * as getGGShieldUtils from "../../../lib/ggshield-resolver-utils";
 import { ExtensionContext, window, OutputChannel } from "vscode";
 
 suite("getGGShield", () => {
   let tempDir: string;
   let mockContext: ExtensionContext;
-  let outputChannel: OutputChannel = window.createOutputChannel("GitGuardian");
+  const outputChannel: OutputChannel =
+    window.createOutputChannel("GitGuardian");
   const platform = process.platform;
 
   setup(() => {

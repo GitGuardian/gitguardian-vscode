@@ -1,7 +1,14 @@
 import { runGGShieldCommand } from "./run-ggshield";
 import { GGShieldConfiguration } from "./ggshield-configuration";
-import { commands, ExtensionContext, WebviewView, workspace } from "vscode";
-import { spawn, SpawnOptionsWithoutStdio } from "child_process";
+import {
+  commands,
+  ExtensionContext,
+  OutputChannel,
+  WebviewView,
+  workspace,
+} from "vscode";
+import { SpawnOptionsWithoutStdio } from "child_process";
+import { childProcess } from "./child-process";
 import * as os from "os";
 import {
   StatusBarStatus,
@@ -35,7 +42,10 @@ export enum ConfigSource {
   noKeyFound = "No key found",
 }
 
-function getSource(sourceString: string, isInstance: boolean): ConfigSource {
+function getSource(
+  sourceString: GGShieldConfigSource,
+  isInstance: boolean,
+): ConfigSource {
   switch (sourceString) {
     case GGShieldConfigSource.cmdOption:
       return ConfigSource.extensionSettings;
@@ -105,25 +115,25 @@ export async function updateAuthenticationStatus(
 
 export async function loginGGShield(
   configuration: GGShieldConfiguration,
-  outputChannel: any,
+  outputChannel: OutputChannel,
   webviewView: WebviewView,
   context: ExtensionContext,
 ): Promise<void> {
   const { ggshieldPath } = configuration;
 
-  let options: SpawnOptionsWithoutStdio = {
+  const options: SpawnOptionsWithoutStdio = {
     cwd: workspace.workspaceFolders
       ? workspace.workspaceFolders[0].uri.fsPath
       : os.tmpdir(),
     env: {
       ...process.env,
-      // eslint-disable-next-line @typescript-eslint/naming-convention
+
       GG_USER_AGENT: "gitguardian-vscode",
     },
     windowsHide: true,
   };
 
-  let args = ["auth", "login", "--method=web", "--debug"];
+  const args = ["auth", "login", "--method=web", "--debug"];
   if (configuration.insecure) {
     args.unshift("--insecure");
   }
@@ -132,7 +142,7 @@ export async function loginGGShield(
   }
 
   return new Promise<void>((resolve, reject) => {
-    const proc = spawn(ggshieldPath, args, options);
+    const proc = childProcess.spawn(ggshieldPath, args, options);
 
     proc.stdout.on("data", (data) => {
       const urlLine = data.toString().match(/https:\/\/[^\s]+/);
@@ -149,13 +159,13 @@ export async function loginGGShield(
       outputChannel.appendLine(`ggshield stderr: ${data.toString()}`);
     });
 
-    proc.on("close", async (code) => {
+    proc.on("close", (code) => {
       if (code !== 0) {
         outputChannel.appendLine(`ggshield process exited with code ${code}`);
         reject(new Error(`ggshield process exited with code ${code}`));
       } else {
         outputChannel.appendLine("ggshield login completed successfully");
-        updateAuthenticationStatus(context, configuration);
+        void updateAuthenticationStatus(context, configuration);
         resolve();
       }
     });
@@ -171,7 +181,7 @@ export async function logoutGGShield(
   configuration: GGShieldConfiguration,
   context: ExtensionContext,
 ): Promise<void> {
-  let cmd = ["auth", "logout"];
+  const cmd = ["auth", "logout"];
   const authStatus: AuthenticationStatus | undefined =
     context.workspaceState.get("authenticationStatus");
   if (

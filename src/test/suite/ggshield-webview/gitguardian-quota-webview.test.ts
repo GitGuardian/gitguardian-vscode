@@ -1,4 +1,4 @@
-import * as assert from "assert";
+import assert from "assert";
 import { GitGuardianQuotaWebviewProvider } from "../../../ggshield-webview/gitguardian-quota-webview";
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 import {
@@ -11,7 +11,6 @@ import {
 
 suite("GitGuardianQuotaWebviewProvider", () => {
   let provider: GitGuardianQuotaWebviewProvider;
-  let mockGGShieldConfig: Partial<GGShieldConfiguration>;
   let mockWebviewView: Partial<WebviewView>;
   let mockWorkspaceState: Memento & {
     setKeysForSync(keys: readonly string[]): void;
@@ -20,13 +19,10 @@ suite("GitGuardianQuotaWebviewProvider", () => {
 
   setup(() => {
     mockWorkspaceState = {
-      get: (key: string) => undefined,
-      update: (key: string, value: any) => {
-        key = value;
-        return Promise.resolve();
-      },
+      get: (_key: string) => undefined,
+      update: (_key: string, _value: unknown) => Promise.resolve(),
       keys: () => [],
-      setKeysForSync: (keys: readonly string[]) => {},
+      setKeysForSync: (_keys: readonly string[]) => {},
     };
 
     mockContext = {
@@ -45,7 +41,7 @@ suite("GitGuardianQuotaWebviewProvider", () => {
         onDidReceiveMessage: () => ({ dispose: () => {} }),
         cspSource: "",
         options: {} as WebviewOptions,
-        postMessage: (message: any) => Promise.resolve(true),
+        postMessage: (_message: unknown) => Promise.resolve(true),
         asWebviewUri: (uri: Uri) => uri,
       },
       onDidChangeVisibility: () => ({ dispose: () => {} }),

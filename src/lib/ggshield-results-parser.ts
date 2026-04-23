@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {
   Diagnostic,
   Range,
@@ -50,7 +49,7 @@ function filterUriOccurrences(occurrences: Occurrence[]): Occurrence[] {
 export function parseGGShieldResults(
   results: GGShieldScanResults,
 ): Diagnostic[] {
-  let diagnostics: Diagnostic[] = [];
+  const diagnostics: Diagnostic[] = [];
 
   try {
     if (!results.entities_with_incidents) {
@@ -61,7 +60,7 @@ export function parseGGShieldResults(
         entityWithIncidents.incidents.forEach((incident: Incident) => {
           filterUriOccurrences(incident.occurrences).forEach(
             (occurrence: Occurrence) => {
-              let range = new Range(
+              const range = new Range(
                 new Position(occurrence.line_start - 1, occurrence.index_start),
                 new Position(occurrence.line_end - 1, occurrence.index_end),
               );
@@ -83,7 +82,7 @@ export function parseGGShieldResults(
                 vaultInfo += "Secret found in vault: NO";
               }
 
-              let diagnostic = new Diagnostic(
+              const diagnostic = new Diagnostic(
                 range,
                 `ggshield: ${occurrence.type}
 

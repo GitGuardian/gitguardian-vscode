@@ -1,28 +1,5 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
 # dependencies
 node_modules/
-.pnp/
-.pnp.js
-
-# testing
-coverage/
-
-# production
-build/
-
-# misc
-.DS_Store
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
-
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-
-.eslintcache
 
 # IDE
 .idea
@@ -34,18 +11,21 @@ yarn-error.log*
 !.vscode/*.code-snippets
 
 # TypeScript cache
-tsconfig.base.tsbuildinfo%
+*.tsbuildinfo
 
-# ouput dir
-out/
+# output dir
+dist/
 
 # build files
 **/*.vsix
 
-# cache dir
+# cache
 .cache_ggshield
 .vscode-test/
 
 # ggshield internal
 ggshield-internal/
 ggshield-bundled/
+
+# worktrees
+.worktrees
