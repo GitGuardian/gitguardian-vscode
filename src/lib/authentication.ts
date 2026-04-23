@@ -66,7 +66,10 @@ export async function updateAuthenticationStatus(
   context: ExtensionContext,
   configuration: GGShieldConfiguration,
 ): Promise<void> {
-  const proc = runGGShieldCommand(configuration, ["api-status", "--json"]);
+  const proc = await runGGShieldCommand(configuration, [
+    "api-status",
+    "--json",
+  ]);
 
   let authStatus: AuthenticationStatus;
   if (proc.stderr.includes("No token is saved for this instance")) {
@@ -181,6 +184,6 @@ export async function logoutGGShield(
   ) {
     cmd.push("--no-revoke");
   }
-  runGGShieldCommand(configuration, cmd);
+  await runGGShieldCommand(configuration, cmd);
   await updateAuthenticationStatus(context, configuration);
 }
