@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { GitGuardianDiagnostic } from "../lib/ggshield-results-parser";
 
 export class GitGuardianSecretHoverProvider implements vscode.HoverProvider {
   public provideHover(
@@ -13,10 +14,15 @@ export class GitGuardianSecretHoverProvider implements vscode.HoverProvider {
         diagnostic.range.contains(position) &&
         diagnostic.source === "gitguardian"
       ) {
+        const ggDiagnostic = diagnostic as GitGuardianDiagnostic;
         const hoverMessage = new vscode.MarkdownString();
         hoverMessage.isTrusted = true;
 
-        const diagnosticData = diagnosticToJSON(diagnostic);
+        if (ggDiagnostic.details) {
+          hoverMessage.appendCodeblock(ggDiagnostic.details, "text");
+        }
+
+        const diagnosticData = diagnosticToJSON(ggDiagnostic);
         const encodedDiagnosticData = encodeURIComponent(diagnosticData);
 
         hoverMessage.appendMarkdown(
@@ -30,37 +36,14 @@ export class GitGuardianSecretHoverProvider implements vscode.HoverProvider {
   }
 }
 
-function diagnosticToJSON(diagnostic: vscode.Diagnostic) {
-  // Extract the infos useful to generate the secret name
-  const { detector, secretSha } = extractInfosFromMessage(diagnostic.message);
-
+function diagnosticToJSON(diagnostic: GitGuardianDiagnostic) {
   const diagnosticObject = {
     startLine: diagnostic.range.start.line,
-    detector: detector,
-    secretSha: secretSha,
+    detector: diagnostic.detector,
+    secretSha: diagnostic.secretSha,
   };
 
-  // Convert the object to a JSON string
   return JSON.stringify(diagnosticObject);
-}
-
-function extractInfosFromMessage(message: string): {
-  detector: string;
-  secretSha: string;
-} {
-  const regexDetectorPattern = /Secret detected: ([a-zA-Z ]+)/;
-  const regexShaPattern = /Secret SHA: ([a-zA-Z0-9]+)/;
-
-  const matchDetector = message.match(regexDetectorPattern);
-  const matchSha = message.match(regexShaPattern);
-
-  if (matchDetector && matchSha) {
-    const detector = matchDetector[1].trim();
-    const secretSha = matchSha[1].trim();
-    return { detector, secretSha };
-  } else {
-    throw new Error("No match found");
-  }
 }
 
 export function generateSecretName(

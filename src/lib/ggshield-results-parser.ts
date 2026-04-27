@@ -25,6 +25,12 @@ const validityDisplayName: Record<Validity, string> = {
   valid: "Valid",
 };
 
+export interface GitGuardianDiagnostic extends Diagnostic {
+  detector: string;
+  secretSha: string;
+  details: string;
+}
+
 /**
  * Given a list of occurrences, this function searches for the matches of type "connection_uri"
  * and returns it if found. If no "connection_uri" match is found, the original list is returned.
@@ -40,6 +46,37 @@ function filterUriOccurrences(occurrences: Occurrence[]): Occurrence[] {
   return uriOccurrence ? [uriOccurrence] : occurrences;
 }
 
+function buildVaultInfo(incident: Incident): string {
+  if (!incident.secret_vaulted) {
+    return "Secret found in vault: NO";
+  }
+  if (incident.vault_path_count !== null) {
+    return `Secret found in vault: YES (${
+      incident.vault_path_count
+    } ${pluralize(incident.vault_path_count, "location")})
+├─ Vault Type: ${incident.vault_type}
+├─ Vault Name: ${incident.vault_name}
+└─ Secret Path: ${incident.vault_path}`;
+  }
+  return "Secret found in vault: YES";
+}
+
+function buildDetails(
+  incident: Incident,
+  occurrence: Occurrence,
+  vaultInfo: string,
+): string {
+  return `ggshield: ${occurrence.type}
+
+Secret detected: ${incident.type}
+Validity: ${validityDisplayName[incident.validity]}
+Known by GitGuardian dashboard: ${incident.known_secret ? "YES" : "NO"}
+Total occurrences: ${incident.total_occurrences}
+Incident URL: ${incident.incident_url || "N/A"}
+Secret SHA: ${incident.ignore_sha}
+${vaultInfo}`;
+}
+
 /**
  * Parse ggshield results and return diagnostics of found incidents
  *
@@ -49,8 +86,8 @@ function filterUriOccurrences(occurrences: Occurrence[]): Occurrence[] {
 
 export function parseGGShieldResults(
   results: GGShieldScanResults,
-): Diagnostic[] {
-  let diagnostics: Diagnostic[] = [];
+): GitGuardianDiagnostic[] {
+  let diagnostics: GitGuardianDiagnostic[] = [];
 
   try {
     if (!results.entities_with_incidents) {
@@ -66,38 +103,26 @@ export function parseGGShieldResults(
                 new Position(occurrence.line_end - 1, occurrence.index_end),
               );
 
-              let vaultInfo = "";
+              const vaultInfo = buildVaultInfo(incident);
+              const message = `ggshield: ${occurrence.type} - ${
+                incident.type
+              } (${validityDisplayName[incident.validity]})`;
 
-              if (incident.secret_vaulted) {
-                if (incident.vault_path_count !== null) {
-                  vaultInfo += `Secret found in vault: YES (${
-                    incident.vault_path_count
-                  } ${pluralize(incident.vault_path_count, "location")})
-├─ Vault Type: ${incident.vault_type}
-├─ Vault Name: ${incident.vault_name}
-└─ Secret Path: ${incident.vault_path}`;
-                } else {
-                  vaultInfo += "Secret found in vault: YES";
-                }
-              } else {
-                vaultInfo += "Secret found in vault: NO";
-              }
-
-              let diagnostic = new Diagnostic(
+              const diagnostic = new Diagnostic(
                 range,
-                `ggshield: ${occurrence.type}
-
-Secret detected: ${incident.type}
-Validity: ${validityDisplayName[incident.validity]}
-Known by GitGuardian dashboard: ${incident.known_secret ? "YES" : "NO"}
-Total occurrences: ${incident.total_occurrences}
-Incident URL: ${incident.incident_url || "N/A"}
-Secret SHA: ${incident.ignore_sha}
-${vaultInfo}`,
+                message,
                 DiagnosticSeverity.Warning,
+              ) as GitGuardianDiagnostic;
+
+              diagnostic.source = "gitguardian";
+              diagnostic.detector = incident.type;
+              diagnostic.secretSha = incident.ignore_sha;
+              diagnostic.details = buildDetails(
+                incident,
+                occurrence,
+                vaultInfo,
               );
 
-              diagnostic.source = "\ngitguardian";
               diagnostics.push(diagnostic);
             },
           );
