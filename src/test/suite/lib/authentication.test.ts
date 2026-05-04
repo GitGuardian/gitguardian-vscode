@@ -51,12 +51,14 @@ suite("updateAuthenticationStatus", () => {
   });
 
   test("returns noKeyFound status when no key is configured", async () => {
-    runGGShieldMock.returnWith({
-      status: 3,
-      stdout: "",
-      stderr:
-        "Error: No token is saved for this instance: 'https://dashboard.gitguardian.com'",
-    });
+    runGGShieldMock.returnWith(
+      Promise.resolve({
+        status: 3,
+        stdout: "",
+        stderr:
+          "Error: No token is saved for this instance: 'https://dashboard.gitguardian.com'",
+      }),
+    );
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
@@ -84,16 +86,18 @@ suite("updateAuthenticationStatus", () => {
   });
 
   test("returns true when valid credentials are configured", async () => {
-    runGGShieldMock.returnWith({
-      status: 0,
-      stdout: `{
-          "status_code": 200, 
+    runGGShieldMock.returnWith(
+      Promise.resolve({
+        status: 0,
+        stdout: `{
+          "status_code": 200,
           "instance": "https://dashboard.gitguardian.com",
           "api_key_source": "${GGShieldConfigSource.userConfig}",
           "instance_source": "${GGShieldConfigSource.userConfig}"
         }`,
-      stderr: "",
-    });
+        stderr: "",
+      }),
+    );
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,
@@ -122,16 +126,18 @@ suite("updateAuthenticationStatus", () => {
   });
 
   test("returns false with correct sources and instance when API key is invalid", async () => {
-    runGGShieldMock.returnWith({
-      status: 0,
-      stdout: `{
-        "status_code": 401, 
+    runGGShieldMock.returnWith(
+      Promise.resolve({
+        status: 0,
+        stdout: `{
+        "status_code": 401,
         "instance": "https://dashboard.gitguardian.com",
         "api_key_source": "${GGShieldConfigSource.dotEnv}",
         "instance_source": "${GGShieldConfigSource.cmdOption}"
       }`,
-      stderr: "",
-    });
+        stderr: "",
+      }),
+    );
 
     await updateAuthenticationStatus(
       mockContext as ExtensionContext,

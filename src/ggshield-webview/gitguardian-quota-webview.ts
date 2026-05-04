@@ -26,12 +26,16 @@ export class GitGuardianQuotaWebviewProvider
     _token: vscode.CancellationToken,
   ) {
     this._view = webviewView;
-    this.refresh();
+    void this.refresh().catch((err) => {
+      console.error("GitGuardian quota refresh failed:", err);
+    });
 
     webviewView.onDidChangeVisibility(() => {
       if (webviewView.visible) {
         // Refresh the quota when the view becomes visible (e.g., after being collapsed and reopened)
-        this.refresh();
+        void this.refresh().catch((err) => {
+          console.error("GitGuardian quota refresh failed:", err);
+        });
       }
     });
   }
@@ -40,13 +44,13 @@ export class GitGuardianQuotaWebviewProvider
     this.ggshieldConfiguration = configuration;
   }
 
-  private updateQuota() {
+  private async updateQuota(): Promise<void> {
     const authStatus: AuthenticationStatus | undefined =
       this.context.workspaceState.get("authenticationStatus");
     this.isAuthenticated = authStatus?.success ?? false;
     this.instance = authStatus?.instance ?? "";
     if (authStatus?.success) {
-      this.quota = getAPIquota(this.ggshieldConfiguration);
+      this.quota = await getAPIquota(this.ggshieldConfiguration);
     } else {
       this.quota = 0;
     }
@@ -84,11 +88,11 @@ export class GitGuardianQuotaWebviewProvider
       </html>`;
   }
 
-  public refresh() {
+  public async refresh(): Promise<void> {
     this.isLoading = true;
     this.updateWebViewContent();
 
-    this.updateQuota();
+    await this.updateQuota();
 
     this.isLoading = false;
     this.updateWebViewContent();

@@ -27,9 +27,9 @@ export class GGShieldResolver {
    *
    * @returns {void} A promise that resolves once the `ggshield` path is determined.
    */
-  checkGGShieldConfiguration(): void {
+  async checkGGShieldConfiguration(): Promise<void> {
     try {
-      this.testConfiguration(this.configuration);
+      await this.testConfiguration(this.configuration);
       return;
     } catch (error) {
       const errorMessage =
@@ -43,11 +43,11 @@ export class GGShieldResolver {
   /**
    * Tries the configuration from settings.
    *
-   * @returns {void} A promise that resolves if the configuration is valid.
+   * @returns {Promise<void>} A promise that resolves if the configuration is valid.
    */
-  testConfiguration(configuration: GGShieldConfiguration): void {
+  async testConfiguration(configuration: GGShieldConfiguration): Promise<void> {
     // Check if the ggshield path is valid
-    let proc = runGGShieldCommand(configuration, ["--version"]);
+    let proc = await runGGShieldCommand(configuration, ["--version"]);
     if (proc.status !== 0) {
       window.showErrorMessage(
         `GitGuardian: Invalid ggshield path. ${proc.stderr}`,

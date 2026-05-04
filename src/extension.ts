@@ -1,4 +1,5 @@
 import {
+  cancelInFlightScans,
   cleanUpFileDiagnostics,
   createDiagnosticCollection,
   ignoreLastFound,
@@ -150,7 +151,13 @@ export async function activate(context: ExtensionContext) {
     return;
   }
 
-  ggshieldResolver.checkGGShieldConfiguration();
+  ggshieldResolver.checkGGShieldConfiguration().catch((err) => {
+    outputChannel.appendLine(
+      `ggshield configuration check failed: ${
+        err instanceof Error ? err.stack ?? err.message : String(err)
+      }`,
+    );
+  });
 
   // update authentication status
   updateAuthenticationStatus(context, configuration).then(() => {
@@ -163,6 +170,7 @@ export async function activate(context: ExtensionContext) {
   // (i.e. when a new document is opened or when the document is saved)
   createDiagnosticCollection(context);
   context.subscriptions.push(
+    { dispose: cancelInFlightScans },
     workspace.onDidSaveTextDocument((textDocument) => {
       // Check if the document is inside the workspace
       const workspaceFolder = workspace.getWorkspaceFolder(textDocument.uri);
@@ -173,37 +181,54 @@ export async function activate(context: ExtensionContext) {
           textDocument.fileName,
           textDocument.uri,
           ggshieldResolver.configuration,
-        );
+        ).catch((err) => {
+          outputChannel.appendLine(
+            `scanFile failed: ${
+              err instanceof Error ? err.stack ?? err.message : String(err)
+            }`,
+          );
+        });
       }
     }),
     workspace.onDidCloseTextDocument((textDocument) =>
       cleanUpFileDiagnostics(textDocument.uri),
     ),
-    commands.registerCommand("gitguardian.quota", () => {
-      showAPIQuota(ggshieldResolver.configuration);
+    commands.registerCommand("gitguardian.quota", async () => {
+      try {
+        await showAPIQuota(ggshieldResolver.configuration);
+      } catch (err) {
+        outputChannel.appendLine(
+          `showAPIQuota failed: ${
+            err instanceof Error ? err.stack ?? err.message : String(err)
+          }`,
+        );
+      }
     }),
-    commands.registerCommand("gitguardian.ignore", () => {
-      ignoreLastFound(ggshieldResolver.configuration);
+    commands.registerCommand("gitguardian.ignore", async () => {
+      await ignoreLastFound(ggshieldResolver.configuration);
       if (window.activeTextEditor) {
         cleanUpFileDiagnostics(window.activeTextEditor?.document.uri);
       }
     }),
-    commands.registerCommand("gitguardian.ignoreSecret", (diagnosticData) => {
-      window.showInformationMessage("Secret ignored.");
-      let currentFile = getCurrentFile();
-      let secretName = generateSecretName(currentFile, diagnosticData);
+    commands.registerCommand(
+      "gitguardian.ignoreSecret",
+      async (diagnosticData) => {
+        window.showInformationMessage("Secret ignored.");
+        let currentFile = getCurrentFile();
+        let secretName = generateSecretName(currentFile, diagnosticData);
 
-      ignoreSecret(
-        ggshieldResolver.configuration,
-        diagnosticData.secretSha,
-        secretName,
-      );
-      scanFile(
-        currentFile,
-        Uri.file(currentFile),
-        ggshieldResolver.configuration,
-      );
-    }),
+        await ignoreSecret(
+          ggshieldResolver.configuration,
+          diagnosticData.secretSha,
+          secretName,
+        );
+        await scanFile(
+          currentFile,
+          Uri.file(currentFile),
+          ggshieldResolver.configuration,
+        );
+      },
+    ),
     commands.registerCommand("gitguardian.authenticate", async () => {
       commands.executeCommand("gitguardian.openSidebar");
       await loginGGShield(

@@ -21,18 +21,31 @@ import { parseGGShieldResults } from "./ggshield-results-parser";
  */
 export let diagnosticCollection: DiagnosticCollection;
 
+// Tracks the in-flight scan per URI so a later save can abort an earlier one
+// and we can drop stale results that return after being superseded.
+const inFlightScans = new Map<string, AbortController>();
+
+export function cancelInFlightScans(): void {
+  for (const controller of inFlightScans.values()) {
+    controller.abort();
+  }
+  inFlightScans.clear();
+}
+
 /**
  * Display API quota
  *
  * Show error message on failure
  */
-export function showAPIQuota(configuration: GGShieldConfiguration): undefined {
+export async function showAPIQuota(
+  configuration: GGShieldConfiguration,
+): Promise<void> {
   if (!configuration) {
     window.showErrorMessage("ggshield: Missing settings");
     return;
   }
 
-  const proc = runGGShieldCommand(configuration, ["quota"]);
+  const proc = await runGGShieldCommand(configuration, ["quota"]);
 
   if (proc.stderr.length > 0) {
     window.showErrorMessage(`ggshield: ${proc.stderr}`);
@@ -42,9 +55,11 @@ export function showAPIQuota(configuration: GGShieldConfiguration): undefined {
   }
 }
 
-export function getAPIquota(configuration: GGShieldConfiguration): number {
+export async function getAPIquota(
+  configuration: GGShieldConfiguration,
+): Promise<number> {
   try {
-    const proc = runGGShieldCommand(configuration, ["quota", "--json"]);
+    const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
     return JSON.parse(proc.stdout).remaining;
   } catch (e) {
     return 0;
@@ -56,15 +71,15 @@ export function getAPIquota(configuration: GGShieldConfiguration): number {
  *
  * Show error message on failure
  */
-export function ignoreLastFound(
+export async function ignoreLastFound(
   configuration: GGShieldConfiguration,
-): undefined {
+): Promise<void> {
   if (!configuration) {
     window.showErrorMessage("ggshield: Missing settings");
     return;
   }
 
-  const proc = runGGShieldCommand(configuration, [
+  const proc = await runGGShieldCommand(configuration, [
     "secret",
     "ignore",
     "--last-found",
@@ -83,12 +98,12 @@ export function ignoreLastFound(
  *
  * Show error message on failure
  */
-export function ignoreSecret(
+export async function ignoreSecret(
   configuration: GGShieldConfiguration,
   secretSha: string,
   secretName: string,
-): boolean {
-  const proc = runGGShieldCommand(configuration, [
+): Promise<boolean> {
+  const proc = await runGGShieldCommand(configuration, [
     "secret",
     "ignore",
     secretSha,
@@ -129,22 +144,37 @@ export function cleanUpFileDiagnostics(fileUri: Uri): void {
  * @param filePath path to file
  * @param fileUri file uri
  */
-export function scanFile(
+export async function scanFile(
   filePath: string,
   fileUri: Uri,
   configuration: GGShieldConfiguration,
-): void {
+): Promise<void> {
   if (isFileGitignored(filePath)) {
     updateStatusBarItem(StatusBarStatus.ignoredFile);
     return;
   }
-  const proc = runGGShieldCommand(configuration, [
-    "secret",
-    "scan",
-    "--json",
-    "path",
-    filePath,
-  ]);
+
+  const key = fileUri.toString();
+  inFlightScans.get(key)?.abort();
+  const controller = new AbortController();
+  inFlightScans.set(key, controller);
+
+  const proc = await runGGShieldCommand(
+    configuration,
+    ["secret", "scan", "--json", "path", filePath],
+    controller.signal,
+  );
+
+  // Superseded by a newer scan for this URI — drop the result.
+  if (inFlightScans.get(key) !== controller) {
+    return;
+  }
+  inFlightScans.delete(key);
+
+  // Aborted or failed to spawn — no meaningful exit status to interpret.
+  if (controller.signal.aborted || proc.status === null) {
+    return;
+  }
 
   if (proc.status === 128 || proc.status === 3) {
     const errorMessage = proc.stderr
