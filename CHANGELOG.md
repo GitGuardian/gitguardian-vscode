@@ -5,6 +5,11 @@
 ### Added
 
 - Quota view now shows the connected GitGuardian instance and exposes a title-bar action to open the instance URL setting. The view refreshes automatically when `gitguardian.apiUrl` changes.
+- New "Findings" tree view in the GitGuardian sidebar listing detected secrets grouped by file. Click a finding to jump to its location, or use the title-bar refresh action to rebuild the list.
+
+### Fixed
+
+- Diagnostics for a file are now cleared when a re-scan finds no secrets, so previously reported findings no longer linger after they have been resolved.
 
 ### Changed
 

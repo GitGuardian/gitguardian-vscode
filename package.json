@@ -108,6 +108,15 @@
         }
       },
       {
+        "command": "gitguardian.refreshFindings",
+        "title": "Refresh Findings",
+        "category": "GitGuardian",
+        "icon": {
+          "light": "images/refresh-light.svg",
+          "dark": "images/refresh-dark.svg"
+        }
+      },
+      {
         "command": "gitguardian.openInstanceSettings",
         "title": "Configure instance URL",
         "category": "GitGuardian",
@@ -125,6 +134,12 @@
     },
     "views": {
       "gitguardian": [
+        {
+          "type": "tree",
+          "id": "gitguardianFindingsView",
+          "name": "Findings",
+          "when": "isAuthenticated == true"
+        },
         {
           "type": "webview",
           "id": "gitguardianView",
@@ -150,6 +165,10 @@
       {
         "view": "gitguardianView",
         "contents": "To get started with GitGuardian, please authenticate.\n[Authenticate](command:gitguardian.authenticate)"
+      },
+      {
+        "view": "gitguardianFindingsView",
+        "contents": "No secrets detected yet.\nSave a file to scan it for secrets."
       }
     ],
     "menus": {
@@ -163,6 +182,11 @@
           "command": "gitguardian.openInstanceSettings",
           "group": "navigation@2",
           "when": "view == gitguardianQuotaView"
+        },
+        {
+          "command": "gitguardian.refreshFindings",
+          "group": "navigation@1",
+          "when": "view == gitguardianFindingsView"
         }
       ]
     }

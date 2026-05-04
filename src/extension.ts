@@ -30,6 +30,7 @@ import {
 } from "./gitguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
+import { GitGuardianFindingsProvider } from "./gitguardian-interface/gitguardian-findings-tree";
 import {
   AuthenticationStatus,
   loginGGShield,
@@ -110,6 +111,13 @@ export async function activate(context: ExtensionContext) {
     ggshieldQuotaViewProvider,
   );
 
+  const findingsProvider = new GitGuardianFindingsProvider();
+  const findingsTreeView = window.createTreeView("gitguardianFindingsView", {
+    treeDataProvider: findingsProvider,
+    showCollapseAll: true,
+  });
+  context.subscriptions.push(findingsProvider, findingsTreeView);
+
   createStatusBarItem(context);
 
   //generic commands to open correct view on status bar click
@@ -123,6 +131,9 @@ export async function activate(context: ExtensionContext) {
         "workbench.action.openSettings",
         "gitguardian.apiUrl",
       ),
+    ),
+    commands.registerCommand("gitguardian.refreshFindings", () =>
+      findingsProvider.refresh(),
     ),
   );
 
