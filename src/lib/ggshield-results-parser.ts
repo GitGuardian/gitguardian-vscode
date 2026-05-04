@@ -28,6 +28,7 @@ const validityDisplayName: Record<Validity, string> = {
 export interface GitGuardianDiagnostic extends Diagnostic {
   detector: string;
   secretSha: string;
+  matchType: string;
   details: string;
 }
 
@@ -117,6 +118,7 @@ export function parseGGShieldResults(
               diagnostic.source = "gitguardian";
               diagnostic.detector = incident.type;
               diagnostic.secretSha = incident.ignore_sha;
+              diagnostic.matchType = occurrence.type;
               diagnostic.details = buildDetails(
                 incident,
                 occurrence,
