@@ -173,6 +173,7 @@ export function scanFile(
     return undefined;
   } else if (proc.status === 0) {
     updateStatusBarItem(StatusBarStatus.noSecretFound);
+    diagnosticCollection.delete(fileUri);
     return;
   } else {
     updateStatusBarItem(StatusBarStatus.secretFound);

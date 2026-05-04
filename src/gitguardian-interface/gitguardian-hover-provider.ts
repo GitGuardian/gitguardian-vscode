@@ -44,7 +44,7 @@ function diagnosticToJSON(diagnostic: vscode.Diagnostic) {
   return JSON.stringify(diagnosticObject);
 }
 
-function extractInfosFromMessage(message: string): {
+export function extractInfosFromMessage(message: string): {
   detector: string;
   secretSha: string;
 } {
