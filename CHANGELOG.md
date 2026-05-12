@@ -10,6 +10,7 @@
 
 - `ggshield` binaries are again bundled in the extension.
 - Distribute platform-specific extensions to limit the extension size with bundled `ggshield`.
+- Findings now appear as single-line entries in the Problems panel. Full incident details (validity, dashboard status, occurrences, incident URL, SHA, vault info) are shown on hover instead of inline.
 
 ## [0.21.0]
 

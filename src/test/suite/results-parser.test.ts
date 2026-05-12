@@ -10,15 +10,29 @@ import {
 } from "../constants";
 
 suite("parseGGShieldResults", () => {
-  test("Should parse ggshield scan output", () => {
+  test("Should parse ggshield scan output into a single-line message", () => {
     const diagnostics = parseGGShieldResults(
       JSON.parse(scanResultsWithIncident),
     );
     assert.strictEqual(diagnostics.length, 1);
     const diagnostic = diagnostics[0];
-    assert.ok(diagnostic.message.includes("apikey"));
-    assert.ok(diagnostic.message.includes("Generic High Entropy Secret"));
-    assert.ok(diagnostic.message.includes("Secret found in vault: NO"));
+    assert.strictEqual(
+      diagnostic.message,
+      "ggshield: apikey - Generic High Entropy Secret (No Checker)",
+    );
+    assert.ok(!diagnostic.message.includes("\n"));
+    assert.strictEqual(diagnostic.source, "gitguardian");
+    assert.strictEqual(diagnostic.detector, "Generic High Entropy Secret");
+    assert.strictEqual(
+      diagnostic.secretSha,
+      "38353eb1a2aac5b24f39ed67912234d4b4a2e23976d504a88b28137ed2b9185e",
+    );
+    assert.ok(
+      diagnostic.details.includes(
+        "Secret detected: Generic High Entropy Secret",
+      ),
+    );
+    assert.ok(diagnostic.details.includes("Secret found in vault: NO"));
     assert.strictEqual(diagnostic.range.start.line, 3);
     assert.strictEqual(diagnostic.range.start.character, 11);
     assert.strictEqual(diagnostic.range.end.line, 3);
@@ -26,18 +40,19 @@ suite("parseGGShieldResults", () => {
     assert.strictEqual(diagnostic.severity, DiagnosticSeverity.Warning);
   });
 
-  test("Should parse vault information", () => {
+  test("Should expose vault information in details", () => {
     const diagnostics = parseGGShieldResults(JSON.parse(scanResultsVaulted));
     const diagnostic = diagnostics[0];
-    assert.ok(diagnostic.message.includes("Secret found in vault: YES"));
+    assert.ok(!diagnostic.message.includes("\n"));
+    assert.ok(diagnostic.details.includes("Secret found in vault: YES"));
     assert.ok(
-      diagnostic.message.includes("├─ Vault Type: AWS Secrets Manager"),
+      diagnostic.details.includes("├─ Vault Type: AWS Secrets Manager"),
     );
     assert.ok(
-      diagnostic.message.includes("├─ Vault Name: 463175827647/us-west-2"),
+      diagnostic.details.includes("├─ Vault Name: 463175827647/us-west-2"),
     );
     assert.ok(
-      diagnostic.message.includes(
+      diagnostic.details.includes(
         "└─ Secret Path: arn:aws:secretsmanager:us-west-2:463175827647:secret:xav-test-svef2q:pwd",
       ),
     );
