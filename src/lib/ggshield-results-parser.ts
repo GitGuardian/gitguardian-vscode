@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {
   Diagnostic,
   Range,
@@ -87,7 +86,7 @@ ${vaultInfo}`;
 export function parseGGShieldResults(
   results: GGShieldScanResults,
 ): GitGuardianDiagnostic[] {
-  let diagnostics: GitGuardianDiagnostic[] = [];
+  const diagnostics: GitGuardianDiagnostic[] = [];
 
   try {
     if (!results.entities_with_incidents) {
@@ -98,15 +97,30 @@ export function parseGGShieldResults(
         entityWithIncidents.incidents.forEach((incident: Incident) => {
           filterUriOccurrences(incident.occurrences).forEach(
             (occurrence: Occurrence) => {
-              let range = new Range(
+              const range = new Range(
                 new Position(occurrence.line_start - 1, occurrence.index_start),
                 new Position(occurrence.line_end - 1, occurrence.index_end),
               );
 
-              const vaultInfo = buildVaultInfo(incident);
+              let vaultInfo = buildVaultInfo(incident);
               const message = `ggshield: ${occurrence.type} - ${
                 incident.type
               } (${validityDisplayName[incident.validity]})`;
+
+              if (incident.secret_vaulted) {
+                if (incident.vault_path_count !== null) {
+                  vaultInfo += `Secret found in vault: YES (${
+                    incident.vault_path_count
+                  } ${pluralize(incident.vault_path_count, "location")})
+├─ Vault Type: ${incident.vault_type}
+├─ Vault Name: ${incident.vault_name}
+└─ Secret Path: ${incident.vault_path}`;
+                } else {
+                  vaultInfo += "Secret found in vault: YES";
+                }
+              } else {
+                vaultInfo += "Secret found in vault: NO";
+              }
 
               const diagnostic = new Diagnostic(
                 range,

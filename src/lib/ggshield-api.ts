@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
 import {
   window,
   DiagnosticCollection,
@@ -19,7 +18,8 @@ import { parseGGShieldResults } from "./ggshield-results-parser";
 /**
  * Extension diagnostic collection
  */
-export let diagnosticCollection: DiagnosticCollection;
+export const diagnosticCollection: DiagnosticCollection =
+  languages.createDiagnosticCollection("ggshield");
 
 // Tracks the in-flight scan per URI so a later save can abort an earlier one
 // and we can drop stale results that return after being superseded.
@@ -61,7 +61,7 @@ export async function getAPIquota(
   try {
     const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
     return JSON.parse(proc.stdout).remaining;
-  } catch (e) {
+  } catch {
     return 0;
   }
 }
@@ -120,7 +120,6 @@ export async function ignoreSecret(
 }
 
 export function createDiagnosticCollection(context: ExtensionContext): void {
-  diagnosticCollection = languages.createDiagnosticCollection("ggshield");
   context.subscriptions.push(diagnosticCollection);
 }
 
@@ -208,6 +207,6 @@ export async function scanFile(
     updateStatusBarItem(StatusBarStatus.secretFound);
   }
   const results = JSON.parse(proc.stdout);
-  let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
+  const incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
   diagnosticCollection.set(fileUri, incidentsDiagnostics);
 }

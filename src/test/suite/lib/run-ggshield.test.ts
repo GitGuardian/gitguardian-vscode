@@ -1,8 +1,8 @@
-import * as simple from "simple-mock";
-import * as childProcess from "child_process";
+import * as sinon from "sinon";
+import { childProcess } from "../../../lib/child-process";
 import * as vscode from "vscode";
 import * as runGGShield from "../../../lib/run-ggshield";
-import assert = require("assert");
+import assert from "assert";
 import { EventEmitter } from "events";
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 
@@ -23,16 +23,18 @@ function makeFakeProc(): FakeProc {
 }
 
 suite("runGGShieldCommand", () => {
-  let spawnMock: simple.Stub<any>;
+  let spawnMock: sinon.SinonStub;
   let fakeProc: FakeProc;
 
   setup(() => {
     fakeProc = makeFakeProc();
-    spawnMock = simple.mock(childProcess, "spawn").returnWith(fakeProc);
+    spawnMock = sinon
+      .stub(childProcess, "spawn")
+      .returns(fakeProc as ReturnType<typeof childProcess.spawn>);
   });
 
   teardown(() => {
-    simple.restore();
+    sinon.restore();
   });
 
   // Helper: drive the fake process to completion after the runGGShieldCommand
