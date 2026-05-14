@@ -1,0 +1,94 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Download all VSIXes
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: gitguardian-*.vsix
+          merge-multiple: true
+
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PUBLISH_KEY }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          vsixes=(dist/gitguardian-*.vsix)
+          if [ ${#vsixes[@]} -eq 0 ]; then
+            echo "No VSIXes found in dist/" >&2
+            exit 1
+          fi
+          for vsix in "${vsixes[@]}"; do
+            npx --yes @vscode/vsce@3.9.1 publish --skip-duplicate --packagePath "$vsix"
+          done
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PUBLISH_KEY }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          vsixes=(dist/gitguardian-*.vsix)
+          if [ ${#vsixes[@]} -eq 0 ]; then
+            echo "No VSIXes found in dist/" >&2
+            exit 1
+          fi
+          for vsix in "${vsixes[@]}"; do
+            target=$(basename "$vsix" .vsix)
+            target=${target#gitguardian-}
+            npx --yes ovsx@0.10.12 publish --skip-duplicate -i "$vsix" -t "$target"
+          done
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download all VSIXes
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          pattern: gitguardian-*.vsix
+          merge-multiple: true
+
+      - name: Create draft GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          vsixes=(dist/*.vsix)
+          if [ ${#vsixes[@]} -eq 0 ]; then
+            echo "No VSIXes found in dist/" >&2
+            exit 1
+          fi
+          gh release create "${GITHUB_REF_NAME}" "${vsixes[@]}" \
+            --draft \
+            --generate-notes \
+            --title "${GITHUB_REF_NAME}"

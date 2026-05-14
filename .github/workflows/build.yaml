@@ -5,8 +5,7 @@ on:
   push:
     branches:
       - "main"
-    tags:
-      - "v*"
+  workflow_call:
 
 permissions:
   contents: read
@@ -33,7 +32,7 @@ jobs:
           node-version: 22
 
       - name: Setup VSCE
-        run: sudo yarn global add vsce@latest
+        run: sudo yarn global add @vscode/vsce@3.9.1
 
       - name: Install dependencies
         run: yarn install
@@ -42,7 +41,8 @@ jobs:
         run: |
           vsce package --target ${{ matrix.target }} \
             --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ \
-            --allow-missing-repository
+            --allow-missing-repository \
+            -o gitguardian-${{ matrix.target }}.vsix
         env:
           GGSHIELD_TARGET: ${{ matrix.target }}
 
@@ -50,4 +50,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: gitguardian-${{ matrix.target }}.vsix
-          path: gitguardian-*.vsix
+          path: gitguardian-${{ matrix.target }}.vsix
