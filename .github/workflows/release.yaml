@@ -1,0 +1,76 @@
+name: release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    uses: ./.github/workflows/build.yaml
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions: {}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: darwin-x64
+          - target: darwin-arm64
+          - target: linux-x64
+          - target: win32-x64
+          - target: win32-arm64
+    steps:
+      - name: Setup Node.js and tools
+        uses: jdx/mise-action@v4
+
+      - name: Download VSIX
+        uses: actions/download-artifact@v8
+        with:
+          name: gitguardian-${{ matrix.target }}.vsix
+
+      - name: Publish to Visual Studio Marketplace
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PUBLISH_KEY }}
+        run: npx --yes @vscode/vsce@3.9.1 publish --skip-duplicate --packagePath gitguardian-${{ matrix.target }}.vsix
+
+      - name: Publish to Open VSX
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PUBLISH_KEY }}
+        run: npx --yes ovsx@0.10.12 publish --skip-duplicate -i gitguardian-${{ matrix.target }}.vsix -t ${{ matrix.target }}
+
+  github-release:
+    needs: publish
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Download all VSIXes
+        uses: actions/download-artifact@v8
+        with:
+          pattern: gitguardian-*.vsix
+          merge-multiple: true
+
+      - name: Create draft GitHub release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          vsixes=(*.vsix)
+          if [ ${#vsixes[@]} -eq 0 ]; then
+            echo "No VSIXes found" >&2
+            exit 1
+          fi
+          gh release create "${GITHUB_REF_NAME}" "${vsixes[@]}" \
+            --draft \
+            --generate-notes \
+            --title "${GITHUB_REF_NAME}"
