@@ -31,6 +31,7 @@ import {
 } from "./gitguardian-interface/gitguardian-hover-provider";
 import { GitGuardianQuotaWebviewProvider } from "./ggshield-webview/gitguardian-quota-webview";
 import { GitGuardianRemediationMessageWebviewProvider } from "./ggshield-webview/gitguardian-remediation-message-view";
+import { GitGuardianFindingsProvider } from "./gitguardian-interface/gitguardian-findings-tree";
 import {
   AuthenticationStatus,
   loginGGShield,
@@ -111,6 +112,13 @@ export async function activate(context: ExtensionContext) {
     ggshieldQuotaViewProvider,
   );
 
+  const findingsProvider = new GitGuardianFindingsProvider();
+  const findingsTreeView = window.createTreeView("gitguardianFindingsView", {
+    treeDataProvider: findingsProvider,
+    showCollapseAll: true,
+  });
+  context.subscriptions.push(findingsProvider, findingsTreeView);
+
   createStatusBarItem(context);
 
   //generic commands to open correct view on status bar click
@@ -124,6 +132,9 @@ export async function activate(context: ExtensionContext) {
         "workbench.action.openSettings",
         "gitguardian.apiUrl",
       ),
+    ),
+    commands.registerCommand("gitguardian.refreshFindings", () =>
+      findingsProvider.refresh(),
     ),
   );
 
@@ -169,6 +180,17 @@ export async function activate(context: ExtensionContext) {
   // Start scanning documents on activation events
   // (i.e. when a new document is opened or when the document is saved)
   createDiagnosticCollection(context);
+
+  // Clean up diagnostics when a tracked file is renamed. Deletes are handled by
+  // per-URI watchers registered in ggshield-api when diagnostics are produced.
+  context.subscriptions.push(
+    workspace.onDidRenameFiles((event) => {
+      for (const { oldUri } of event.files) {
+        cleanUpFileDiagnostics(oldUri);
+      }
+    }),
+  );
+
   context.subscriptions.push(
     { dispose: cancelInFlightScans },
     workspace.onDidSaveTextDocument((textDocument) => {
@@ -190,9 +212,6 @@ export async function activate(context: ExtensionContext) {
         });
       }
     }),
-    workspace.onDidCloseTextDocument((textDocument) =>
-      cleanUpFileDiagnostics(textDocument.uri),
-    ),
     commands.registerCommand("gitguardian.quota", async () => {
       try {
         await showAPIQuota(ggshieldResolver.configuration);

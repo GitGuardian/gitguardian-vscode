@@ -1,11 +1,15 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import * as path from "path";
 import {
   window,
+  Disposable,
   DiagnosticCollection,
   ExtensionContext,
   languages,
+  RelativePattern,
   Uri,
   Diagnostic,
+  workspace,
 } from "vscode";
 import { GGShieldConfiguration } from "./ggshield-configuration";
 import { isFileGitignored } from "../utils";
@@ -20,6 +24,60 @@ import { parseGGShieldResults } from "./ggshield-results-parser";
  * Extension diagnostic collection
  */
 export let diagnosticCollection: DiagnosticCollection;
+
+// Per-URI delete watchers, registered only for files we currently track
+// diagnostics for.
+const fileWatchers = new Map<string, Disposable>();
+
+function watchUriForRemoval(fileUri: Uri): void {
+  const key = fileUri.toString();
+  if (fileWatchers.has(key)) {
+    return;
+  }
+  const folder = workspace.getWorkspaceFolder(fileUri);
+  if (!folder) {
+    return;
+  }
+  const relativePath = path.relative(folder.uri.fsPath, fileUri.fsPath);
+  if (!relativePath || relativePath.startsWith("..")) {
+    return;
+  }
+  // RelativePattern expects a glob, so use forward slashes on Windows too.
+  const globPath = relativePath.split(path.sep).join("/");
+  const watcher = workspace.createFileSystemWatcher(
+    new RelativePattern(folder, globPath),
+    true, // ignoreCreateEvents
+    true, // ignoreChangeEvents
+    false, // listen for delete
+  );
+  const subscription = watcher.onDidDelete(() => {
+    cleanUpFileDiagnostics(fileUri);
+  });
+  fileWatchers.set(key, {
+    dispose: () => {
+      subscription.dispose();
+      watcher.dispose();
+    },
+  });
+}
+
+function unwatchUri(fileUri: Uri): void {
+  const key = fileUri.toString();
+  const watcher = fileWatchers.get(key);
+  if (watcher) {
+    watcher.dispose();
+    fileWatchers.delete(key);
+  }
+}
+
+function setDiagnostics(fileUri: Uri, diagnostics: Diagnostic[]): void {
+  diagnosticCollection.set(fileUri, diagnostics);
+  if (diagnostics.length > 0) {
+    watchUriForRemoval(fileUri);
+  } else {
+    unwatchUri(fileUri);
+  }
+}
 
 // Tracks the in-flight scan per URI so a later save can abort an earlier one
 // and we can drop stale results that return after being superseded.
@@ -131,6 +189,7 @@ export function createDiagnosticCollection(context: ExtensionContext): void {
  */
 export function cleanUpFileDiagnostics(fileUri: Uri): void {
   diagnosticCollection.delete(fileUri);
+  unwatchUri(fileUri);
 }
 
 /**
@@ -151,6 +210,7 @@ export async function scanFile(
 ): Promise<void> {
   if (isFileGitignored(filePath)) {
     updateStatusBarItem(StatusBarStatus.ignoredFile);
+    cleanUpFileDiagnostics(fileUri);
     return;
   }
 
@@ -198,16 +258,18 @@ export async function scanFile(
       )
     ) {
       updateStatusBarItem(StatusBarStatus.ignoredFile);
+      cleanUpFileDiagnostics(fileUri);
       return;
     }
     return undefined;
   } else if (proc.status === 0) {
     updateStatusBarItem(StatusBarStatus.noSecretFound);
+    cleanUpFileDiagnostics(fileUri);
     return;
   } else {
     updateStatusBarItem(StatusBarStatus.secretFound);
   }
   const results = JSON.parse(proc.stdout);
   let incidentsDiagnostics: Diagnostic[] = parseGGShieldResults(results);
-  diagnosticCollection.set(fileUri, incidentsDiagnostics);
+  setDiagnostics(fileUri, incidentsDiagnostics);
 }
