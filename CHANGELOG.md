@@ -1,10 +1,9 @@
 # GitGuardian Secret Security Changelog
 
-## [0.22.0]
+## [0.23.0]
 
 ### Added
 
-- Quota view now shows the connected GitGuardian instance and exposes a title-bar action to open the instance URL setting. The view refreshes automatically when `gitguardian.apiUrl` changes.
 - New "Findings" tree view in the GitGuardian sidebar listing detected secrets grouped by file.
 
 ### Fixed
@@ -13,9 +12,19 @@
 
 ### Changed
 
+- Updated to [ggshield 1.51.0](https://github.com/GitGuardian/ggshield/releases/v1.51.0).
+- Findings now appear as single-line entries in the Problems panel. Full incident details (validity, dashboard status, occurrences, incident URL, SHA, vault info) are shown on hover instead of inline.
+
+## [0.22.0]
+
+### Added
+
+- Quota view now shows the connected GitGuardian instance and exposes a title-bar action to open the instance URL setting. The view refreshes automatically when `gitguardian.apiUrl` changes.
+
+### Changed
+
 - `ggshield` binaries are again bundled in the extension.
 - Distribute platform-specific extensions to limit the extension size with bundled `ggshield`.
-- Findings now appear as single-line entries in the Problems panel. Full incident details (validity, dashboard status, occurrences, incident URL, SHA, vault info) are shown on hover instead of inline.
 
 ## [0.21.0]
 
