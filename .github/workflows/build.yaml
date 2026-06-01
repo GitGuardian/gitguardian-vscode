@@ -5,8 +5,7 @@ on:
   push:
     branches:
       - "main"
-    tags:
-      - "v*"
+  workflow_call:
 
 permissions:
   contents: read
@@ -39,10 +38,11 @@ jobs:
         run: |
           npx vsce package --target ${{ matrix.target }} \
             --baseContentUrl https://github.com/GitGuardian/gitguardian-vscode/ \
-            --allow-missing-repository
+            --allow-missing-repository \
+            -o gitguardian-${{ matrix.target }}.vsix
 
       - name: Upload extension package
         uses: actions/upload-artifact@v7
         with:
           name: gitguardian-${{ matrix.target }}.vsix
-          path: gitguardian-*.vsix
+          path: gitguardian-${{ matrix.target }}.vsix
