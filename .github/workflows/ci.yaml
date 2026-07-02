@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: ⚙️ Install dependencies
         run: npm ci
@@ -40,7 +40,7 @@ jobs:
 
     steps:
       - name: 👩‍💻 Checkout code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: ⚙️ Set up Node.js and tools
         uses: jdx/mise-action@v4
@@ -72,7 +72,7 @@ jobs:
        github.event.pull_request.head.repo.full_name == github.repository)
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0 # fetch all history so multiple commits can be scanned
       - name: GitGuardian scan
