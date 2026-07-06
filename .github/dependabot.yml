@@ -13,7 +13,8 @@ updates:
       vscode:
         patterns:
           - "@vscode/*"
-          - "@types/vscode"
+    ignore:
+      - dependency-name: "@types/vscode"
 
   - package-ecosystem: github-actions
     directory: /
