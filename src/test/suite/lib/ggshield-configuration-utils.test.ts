@@ -42,7 +42,7 @@ suite("getConfiguration", () => {
       new FakeConfiguration({
         apiUrl: "https://custom-url.com",
         insecure: true,
-      } as Record<string, unknown>),
+      }),
     );
     const configuration = getConfiguration(context, outputChannel);
 
@@ -64,7 +64,7 @@ suite("getConfiguration", () => {
     getConfigurationMock.returns(
       new FakeConfiguration({
         allowSelfSigned: true,
-      } as Record<string, unknown>),
+      }),
     );
     const configuration = getConfiguration(context, outputChannel);
 
