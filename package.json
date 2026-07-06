@@ -206,7 +206,6 @@
     "@types/mocha": "^10.0.1",
     "@types/node": "^22",
     "@types/sinon": "^21.0.0",
-    "@types/tar": "^6.1.13",
     "@types/vscode": "^1.81.0",
     "@vscode/test-cli": "^0.0.12",
     "@vscode/test-electron": "^2.3.2",
