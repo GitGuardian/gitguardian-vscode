@@ -206,7 +206,7 @@ suite("loginGGShield", () => {
           ggshieldPath: "path/to/ggshield",
           apiUrl: "",
           insecure: insecure,
-        } as GGShieldConfiguration,
+        },
         { appendLine: () => {} } as unknown as OutputChannel,
         { webview: { postMessage: () => {} } } as unknown as WebviewView,
         {} as ExtensionContext,

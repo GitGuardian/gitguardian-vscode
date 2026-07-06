@@ -87,7 +87,7 @@ suite("runGGShieldCommand", () => {
           ggshieldPath: "path/to/ggshield",
           apiUrl: "",
           insecure: insecure,
-        } as GGShieldConfiguration,
+        },
         ["test"],
       );
       finishProc();

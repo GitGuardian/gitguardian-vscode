@@ -1,13 +1,7 @@
 import assert from "assert";
 import { GitGuardianQuotaWebviewProvider } from "../../../ggshield-webview/gitguardian-quota-webview";
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
-import {
-  ExtensionContext,
-  Memento,
-  Uri,
-  WebviewOptions,
-  WebviewView,
-} from "vscode";
+import { ExtensionContext, Memento, Uri, WebviewView } from "vscode";
 
 suite("GitGuardianQuotaWebviewProvider", () => {
   let provider: GitGuardianQuotaWebviewProvider;
@@ -40,7 +34,7 @@ suite("GitGuardianQuotaWebviewProvider", () => {
         html: "",
         onDidReceiveMessage: () => ({ dispose: () => {} }),
         cspSource: "",
-        options: {} as WebviewOptions,
+        options: {},
         postMessage: (_message: unknown) => Promise.resolve(true),
         asWebviewUri: (uri: Uri) => uri,
       },
