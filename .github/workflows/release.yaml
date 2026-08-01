@@ -27,7 +27,7 @@ jobs:
           - target: win32-arm64
     steps:
       - name: Setup Node.js and tools
-        uses: jdx/mise-action@v4
+        uses: jdx/mise-action@v4.2.3
 
       - name: Download VSIX
         uses: actions/download-artifact@v8
