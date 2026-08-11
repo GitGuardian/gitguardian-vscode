@@ -43,35 +43,35 @@ export function runGGShieldCommand(
     });
   }
 
-  let finalArgs = args.slice();
-  if (configuration.insecure) {
-    finalArgs = ["--insecure"].concat(finalArgs);
-  }
-  if (configuration.apiUrl && !finalArgs.includes("--version")) {
-    finalArgs.push("--instance", configuration.apiUrl);
-  }
-
-  const env: NodeJS.ProcessEnv = {
-    ...process.env,
-    GG_USER_AGENT: "gitguardian-vscode",
-  };
-
-  // If the command is executed in a workspace, execute ggshield from the root
-  // folder so .gitguardian.yaml is used.
-  const cwd = workspace.workspaceFolders?.length
-    ? workspace.workspaceFolders[0].uri.fsPath
-    : os.tmpdir();
-
-  const options: SpawnOptionsWithoutStdio = {
-    cwd,
-    env,
-    windowsHide: true,
-    signal,
-  };
-
   return new Promise<GGShieldCommandResult>((resolve) => {
     let proc;
     try {
+      let finalArgs = args.slice();
+      if (configuration.insecure) {
+        finalArgs = ["--insecure"].concat(finalArgs);
+      }
+      if (configuration.apiUrl && !finalArgs.includes("--version")) {
+        finalArgs.push("--instance", configuration.apiUrl);
+      }
+
+      const env: NodeJS.ProcessEnv = {
+        ...process.env,
+        GG_USER_AGENT: "gitguardian-vscode",
+      };
+
+      // If the command is executed in a workspace, execute ggshield from the root
+      // folder so .gitguardian.yaml is used.
+      const cwd = workspace.workspaceFolders?.length
+        ? workspace.workspaceFolders[0].uri.fsPath
+        : os.tmpdir();
+
+      const options: SpawnOptionsWithoutStdio = {
+        cwd,
+        env,
+        windowsHide: true,
+        signal,
+      };
+
       proc = childProcess.spawn(configuration.ggshieldPath, finalArgs, options);
     } catch (err) {
       const error = err instanceof Error ? err : new Error(String(err));

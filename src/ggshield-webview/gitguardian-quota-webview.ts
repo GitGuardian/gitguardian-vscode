@@ -9,10 +9,12 @@ export class GitGuardianQuotaWebviewProvider
 {
   public static readonly viewType = "gitguardian.gitguardianQuotaView";
   private _view?: vscode.WebviewView;
-  private quota: number = 0;
+  private quota: number | undefined;
   private isLoading: boolean = false;
   private isAuthenticated: boolean = false;
+  private isQuotaForbidden: boolean = false;
   private instance: string = "";
+  private refreshGeneration: number = 0;
 
   constructor(
     private ggshieldConfiguration: GGShieldConfiguration,
@@ -30,6 +32,10 @@ export class GitGuardianQuotaWebviewProvider
       console.error("GitGuardian quota refresh failed:", err);
     });
 
+    webviewView.onDidDispose(() => {
+      this._view = undefined;
+    });
+
     webviewView.onDidChangeVisibility(() => {
       if (webviewView.visible) {
         // Refresh the quota when the view becomes visible (e.g., after being collapsed and reopened)
@@ -44,16 +50,33 @@ export class GitGuardianQuotaWebviewProvider
     this.ggshieldConfiguration = configuration;
   }
 
-  private async updateQuota(): Promise<void> {
+  private async updateQuota(generation: number): Promise<void> {
     const authStatus: AuthenticationStatus | undefined =
       this.context.workspaceState.get("authenticationStatus");
     this.isAuthenticated = authStatus?.success ?? false;
     this.instance = authStatus?.instance ?? "";
-    if (authStatus?.success) {
-      this.quota = await getAPIquota(this.ggshieldConfiguration);
-    } else {
-      this.quota = 0;
+    if (!authStatus?.success) {
+      this.quota = undefined;
+      this.setQuotaForbidden(false);
+      return;
     }
+
+    const result = await getAPIquota(this.ggshieldConfiguration);
+    if (generation !== this.refreshGeneration) {
+      return;
+    }
+
+    this.quota = result.status === "available" ? result.remaining : undefined;
+    this.setQuotaForbidden(result.status === "forbidden");
+  }
+
+  private setQuotaForbidden(isForbidden: boolean): void {
+    this.isQuotaForbidden = isForbidden;
+    void vscode.commands.executeCommand(
+      "setContext",
+      "isQuotaForbidden",
+      isForbidden,
+    );
   }
 
   private renderConnectedLine(): string {
@@ -68,12 +91,17 @@ export class GitGuardianQuotaWebviewProvider
       return;
     }
 
+    if (this.isQuotaForbidden) {
+      this._view.webview.html = "";
+      return;
+    }
+
     const connectedLine = this.renderConnectedLine();
 
     let body: string;
     if (this.isLoading) {
       body = `${connectedLine}<p>Loading...</p>`;
-    } else if (this.quota !== 0 && this.isAuthenticated) {
+    } else if (this.quota !== undefined && this.isAuthenticated) {
       body = `${connectedLine}<p>Your current quota: ${this.quota}</p>`;
     } else {
       body = `${connectedLine}<p>Please authenticate to see your quota.</p>`;
@@ -89,20 +117,21 @@ export class GitGuardianQuotaWebviewProvider
   }
 
   public async refresh(): Promise<void> {
+    const generation = ++this.refreshGeneration;
     this.isLoading = true;
     this.updateWebViewContent();
 
-    await this.updateQuota();
-
-    this.isLoading = false;
-    this.updateWebViewContent();
+    try {
+      await this.updateQuota(generation);
+    } finally {
+      if (generation === this.refreshGeneration) {
+        this.isLoading = false;
+        this.updateWebViewContent();
+      }
+    }
   }
 
   dispose(): void {
-    if (this._view) {
-      this._view.webview.onDidReceiveMessage(() => {});
-      this._view.webview.html = "";
-      this._view = undefined;
-    }
+    this._view = undefined;
   }
 }

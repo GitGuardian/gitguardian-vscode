@@ -1,7 +1,11 @@
 import { GGShieldConfiguration } from "../../../lib/ggshield-configuration";
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
 import * as sinon from "sinon";
-import { diagnosticCollection, scanFile } from "../../../lib/ggshield-api";
+import {
+  diagnosticCollection,
+  getAPIquota,
+  scanFile,
+} from "../../../lib/ggshield-api";
 import * as runGGShield from "../../../lib/run-ggshield";
 import { Uri, window } from "vscode";
 import {
@@ -159,5 +163,81 @@ suite("scanFile", () => {
       updateStatusBarMock.lastCall.args[0],
       statusBar.StatusBarStatus.ignoredFile,
     );
+  });
+});
+
+suite("getAPIquota", () => {
+  let runGGShieldCommandMock: sinon.SinonStub;
+
+  setup(() => {
+    runGGShieldCommandMock = sinon.stub(runGGShield, "runGGShieldCommand");
+  });
+
+  teardown(() => {
+    sinon.restore();
+  });
+
+  test("reports the remaining quota", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 0,
+      stdout: '{"count": 560, "limit": 10000, "remaining": 9440}',
+      stderr: "",
+    });
+
+    const result = await getAPIquota({} as GGShieldConfiguration);
+
+    assert.deepStrictEqual(result, { status: "available", remaining: 9440 });
+  });
+
+  test("reports an exhausted quota as available", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 0,
+      stdout: '{"count": 10000, "limit": 10000, "remaining": 0}',
+      stderr: "",
+    });
+
+    const result = await getAPIquota({} as GGShieldConfiguration);
+
+    assert.deepStrictEqual(result, { status: "available", remaining: 0 });
+  });
+
+  test("reports the quota as forbidden when the access level is too low", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 128,
+      stdout: "",
+      stderr:
+        "Error: You must have Manager access level to perform this action.",
+    });
+
+    const result = await getAPIquota({} as GGShieldConfiguration);
+
+    assert.deepStrictEqual(result, { status: "forbidden" });
+  });
+
+  test("reports the quota as unavailable on other failures", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 128,
+      stdout: "",
+      stderr: "Error: Invalid API key.",
+    });
+
+    const result = await getAPIquota({} as GGShieldConfiguration);
+
+    assert.deepStrictEqual(result, {
+      status: "unavailable",
+      detail: "Error: Invalid API key.",
+    });
+  });
+
+  test("reports the quota as unavailable on unparsable output", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 0,
+      stdout: "not json",
+      stderr: "",
+    });
+
+    const result = await getAPIquota({} as GGShieldConfiguration);
+
+    assert.deepStrictEqual(result, { status: "unavailable", detail: "" });
   });
 });
