@@ -9,9 +9,12 @@
 ### Fixed
 
 - Diagnostics for a file are now cleared when a re-scan finds no secrets, so previously reported findings no longer linger after they have been resolved.
+- The Quota view is now hidden for members whose access level does not allow reading the workspace quota.
+- The Quota view no longer asks authenticated users to authenticate when the quota cannot be retrieved, and an exhausted quota of 0 is now displayed.
 
 ### Changed
 
+- The "Show quota" command now reports the remaining, used and total quota explicitly, and shows ggshield warnings as warnings instead of errors.
 - Updated to [ggshield 1.51.0](https://github.com/GitGuardian/ggshield/releases/v1.51.0).
 - Findings now appear as single-line entries in the Problems panel. Full incident details (validity, dashboard status, occurrences, incident URL, SHA, vault info) are shown on hover instead of inline.
 

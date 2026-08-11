@@ -158,7 +158,7 @@
           "id": "gitguardianQuotaView",
           "name": "Quota",
           "collapsed": true,
-          "when": "isAuthenticated == true"
+          "when": "isAuthenticated == true && !isQuotaForbidden"
         }
       ]
     },

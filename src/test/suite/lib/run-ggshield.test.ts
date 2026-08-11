@@ -138,6 +138,19 @@ suite("runGGShieldCommand", () => {
     assert.deepStrictEqual(spawnMock.lastCall.args[1], ["--version"]);
   });
 
+  test("returns a failed result instead of throwing when the configuration is unusable", async () => {
+    const result = await runGGShield.runGGShieldCommand(
+      undefined as unknown as GGShieldConfiguration,
+      ["quota", "--json"],
+    );
+
+    assert(!spawnMock.called, "spawn should not be called");
+    assert.strictEqual(result.status, null);
+    assert.strictEqual(result.pid, -1);
+    assert.ok(result.error instanceof Error, "error should be an Error");
+    assert.strictEqual(result.stderr, result.error?.message);
+  });
+
   test("returns a failed result without spawning ggshield in an untrusted workspace", async () => {
     const originalDescriptor = Object.getOwnPropertyDescriptor(
       vscode.workspace,
