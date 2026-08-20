@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.24.0]
+
+### Fixed
+
+- The Quota view is now hidden for members whose access level does not allow reading the workspace quota.
+
 ## [0.23.0]
 
 ### Added

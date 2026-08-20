@@ -103,25 +103,63 @@ export async function showAPIQuota(
     return;
   }
 
-  const proc = await runGGShieldCommand(configuration, ["quota"]);
+  const result = await getAPIquota(configuration);
 
-  if (proc.stderr.length > 0) {
-    window.showErrorMessage(`ggshield: ${proc.stderr}`);
-  }
-  if (proc.stdout.length > 0) {
-    window.showInformationMessage(`ggshield: ${proc.stdout}`);
+  switch (result.status) {
+    case "available":
+      window.showInformationMessage(
+        `ggshield: Your current quota: ${result.remaining}`,
+      );
+      break;
+    case "forbidden":
+      window.showWarningMessage(
+        "ggshield: Reading the API quota requires the Manager access level.",
+      );
+      break;
+    case "unavailable":
+      window.showErrorMessage(
+        result.detail
+          ? `ggshield: could not retrieve the API quota: ${result.detail}`
+          : "ggshield: could not retrieve the API quota.",
+      );
+      break;
   }
 }
 
+export type QuotaResult =
+  | { status: "available"; remaining: number }
+  | { status: "forbidden" }
+  | { status: "unavailable"; detail: string };
+
+// GET /v1/quotas is Manager-only and ggshield discards the HTTP status, so the
+// 403 a plain member gets is only recognizable by its message.
+const MANAGER_ONLY_QUOTA_ERROR = "must have Manager access level";
+
 export async function getAPIquota(
   configuration: GGShieldConfiguration,
-): Promise<number> {
-  try {
-    const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
-    return JSON.parse(proc.stdout).remaining;
-  } catch {
-    return 0;
+): Promise<QuotaResult> {
+  const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
+  const unavailable: QuotaResult = {
+    status: "unavailable",
+    detail: proc.stderr.trim(),
+  };
+
+  if (proc.status !== 0) {
+    return proc.stderr.includes(MANAGER_ONLY_QUOTA_ERROR)
+      ? { status: "forbidden" }
+      : unavailable;
   }
+
+  let remaining: unknown;
+  try {
+    remaining = JSON.parse(proc.stdout).remaining;
+  } catch {
+    return unavailable;
+  }
+
+  return typeof remaining === "number"
+    ? { status: "available", remaining }
+    : unavailable;
 }
 
 /**
