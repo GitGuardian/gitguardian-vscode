@@ -215,7 +215,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-prettier": "^5.5.5",
     "mocha": "^11",
-    "sinon": "^22.0.0",
+    "sinon": "^22.1.0",
     "typescript": "^6.0.3",
     "typescript-eslint": "^8.65.0"
   }
