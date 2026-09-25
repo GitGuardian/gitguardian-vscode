@@ -103,25 +103,88 @@ export async function showAPIQuota(
     return;
   }
 
-  const proc = await runGGShieldCommand(configuration, ["quota"]);
+  const result = await getAPIquota(configuration);
 
-  if (proc.stderr.length > 0) {
-    window.showErrorMessage(`ggshield: ${proc.stderr}`);
-  }
-  if (proc.stdout.length > 0) {
-    window.showInformationMessage(`ggshield: ${proc.stdout}`);
+  switch (result.status) {
+    case "available":
+      if (result.warning) {
+        window.showWarningMessage(`ggshield: ${result.warning}`);
+      }
+      window.showInformationMessage(
+        `ggshield: Quota available: ${result.remaining}. ` +
+          `Quota used in the last 30 days: ${result.count}. ` +
+          `Total quota of the workspace: ${result.limit}.`,
+      );
+      break;
+    case "forbidden":
+      window.showWarningMessage(
+        "ggshield: Reading the API quota requires the Manager access level.",
+      );
+      break;
+    case "unavailable":
+      window.showErrorMessage(
+        result.detail
+          ? `ggshield: could not retrieve the API quota: ${result.detail}`
+          : "ggshield: could not retrieve the API quota.",
+      );
+      break;
   }
 }
 
+export type QuotaResult =
+  | {
+      status: "available";
+      remaining: number;
+      count: number;
+      limit: number;
+      // ggshield may write warnings on stderr even when it succeeds
+      warning: string;
+    }
+  | { status: "forbidden" }
+  | { status: "unavailable"; detail: string };
+
+// GET /v1/quotas is Manager-only and ggshield discards the HTTP status, so the
+// 403 a plain member gets is only recognizable by its message.
+const MANAGER_ONLY_QUOTA_ERROR = "must have Manager access level";
+
 export async function getAPIquota(
   configuration: GGShieldConfiguration,
-): Promise<number> {
-  try {
-    const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
-    return JSON.parse(proc.stdout).remaining;
-  } catch {
-    return 0;
+): Promise<QuotaResult> {
+  const proc = await runGGShieldCommand(configuration, ["quota", "--json"]);
+  const unavailable: QuotaResult = {
+    status: "unavailable",
+    detail: proc.stderr.trim(),
+  };
+
+  if (proc.status !== 0) {
+    return proc.stderr.includes(MANAGER_ONLY_QUOTA_ERROR)
+      ? { status: "forbidden" }
+      : unavailable;
   }
+
+  let quota: { remaining?: unknown; count?: unknown; limit?: unknown };
+  try {
+    quota = JSON.parse(proc.stdout);
+  } catch {
+    return unavailable;
+  }
+
+  const { remaining, count, limit } = quota ?? {};
+  if (
+    typeof remaining !== "number" ||
+    typeof count !== "number" ||
+    typeof limit !== "number"
+  ) {
+    return unavailable;
+  }
+
+  return {
+    status: "available",
+    remaining,
+    count,
+    limit,
+    warning: proc.stderr.trim(),
+  };
 }
 
 /**
