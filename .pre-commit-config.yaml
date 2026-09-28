@@ -29,7 +29,7 @@ repos:
       - id: eslint
         name: eslint
         verbose: false
-        language: node
+        language: system
         types: [file]
         entry: npm run lint
 
