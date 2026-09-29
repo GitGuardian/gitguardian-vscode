@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.25.0]
+
+### Fixed
+
+- "Link IDE to account" button with an empty workspace is now working. [#194](https://github.com/GitGuardian/gitguardian-vscode/issues/194)
+
 ## [0.24.0]
 
 ### Fixed
