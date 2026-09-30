@@ -125,7 +125,7 @@ export async function loginGGShield(
   const { ggshieldPath } = configuration;
 
   const options: SpawnOptionsWithoutStdio = {
-    cwd: workspace.workspaceFolders
+    cwd: workspace.workspaceFolders?.length
       ? workspace.workspaceFolders[0].uri.fsPath
       : os.tmpdir(),
     env: {

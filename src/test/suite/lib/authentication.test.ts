@@ -8,12 +8,14 @@ import {
 import * as statusBar from "../../../gitguardian-interface/gitguardian-status-bar";
 import assert from "assert";
 import { EventEmitter } from "events";
+import * as os from "os";
 import {
   commands,
   ExtensionContext,
   Memento,
   OutputChannel,
   WebviewView,
+  workspace,
 } from "vscode";
 import {
   AuthenticationStatus,
@@ -216,6 +218,55 @@ suite("loginGGShield", () => {
 
       const args = spawnMock.lastCall.args[1];
       assert.strictEqual(args[0] === "--insecure", insecure);
+    });
+  });
+
+  const testCasesWorkspaceFolder = [
+    {
+      folders: undefined,
+      expectTmp: true,
+      description:
+        "loginGGShield falls back to os.tmpdir() when workspaceFolders is undefined",
+    },
+    {
+      folders: [],
+      expectTmp: true,
+      description:
+        "loginGGShield falls back to os.tmpdir() when workspaceFolders is empty",
+    },
+    {
+      folders: [{ uri: { fsPath: "/path/to/workspace" } }],
+      expectTmp: false,
+      description:
+        "loginGGShield uses the first workspace folder path when one is open",
+    },
+  ];
+
+  testCasesWorkspaceFolder.forEach(({ folders, expectTmp, description }) => {
+    test(description, () => {
+      sinon
+        .stub(workspace, "workspaceFolders")
+        .get(() => folders as typeof workspace.workspaceFolders);
+
+      void loginGGShield(
+        {
+          ggshieldPath: "path/to/ggshield",
+          apiUrl: "",
+          insecure: false,
+        },
+        { appendLine: () => {} } as unknown as OutputChannel,
+        { webview: { postMessage: () => {} } } as unknown as WebviewView,
+        {} as ExtensionContext,
+      );
+
+      assert(spawnMock.called, "spawn should be called once");
+
+      const options = spawnMock.lastCall.args[2];
+      if (expectTmp) {
+        assert.strictEqual(options.cwd, os.tmpdir());
+      } else {
+        assert.strictEqual(options.cwd, "/path/to/workspace");
+      }
     });
   });
 });
