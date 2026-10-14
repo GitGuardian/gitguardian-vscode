@@ -4,6 +4,7 @@ import * as sinon from "sinon";
 import {
   diagnosticCollection,
   getAPIquota,
+  ignoreSecret,
   showAPIQuota,
   scanFile,
 } from "../../../lib/ggshield-api";
@@ -302,6 +303,61 @@ suite("showAPIQuota", () => {
     ]);
     assert.deepStrictEqual(infoMessageMock.firstCall.args, [
       "ggshield: Quota available: 9440. Quota used in the last 30 days: 560. Total quota of the workspace: 10000.",
+    ]);
+  });
+});
+
+suite("ignoreSecret", () => {
+  let runGGShieldCommandMock: sinon.SinonStub;
+  let errorMessageMock: sinon.SinonStub;
+  let infoMessageMock: sinon.SinonStub;
+
+  setup(() => {
+    runGGShieldCommandMock = sinon.stub(runGGShield, "runGGShieldCommand");
+    errorMessageMock = sinon.stub(window, "showErrorMessage");
+    infoMessageMock = sinon.stub(window, "showInformationMessage");
+  });
+
+  teardown(() => {
+    sinon.restore();
+  });
+
+  test("succeeds even when ggshield writes a warning on stderr", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 0,
+      stdout:
+        "Added 1 secret to the secret.ignored_matches section of .gitguardian.yaml.",
+      stderr: "A new version of ggshield is available.",
+    });
+
+    const result = await ignoreSecret(
+      {} as GGShieldConfiguration,
+      "sha",
+      "name",
+    );
+
+    assert.strictEqual(result, true);
+    assert.strictEqual(errorMessageMock.callCount, 0);
+    assert.deepStrictEqual(infoMessageMock.firstCall.args, ["Secret ignored."]);
+  });
+
+  test("reports the ggshield error when the command fails", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 2,
+      stdout: "",
+      stderr: "Error: No such option '--instance'.\n",
+    });
+
+    const result = await ignoreSecret(
+      {} as GGShieldConfiguration,
+      "sha",
+      "name",
+    );
+
+    assert.strictEqual(result, false);
+    assert.strictEqual(infoMessageMock.callCount, 0);
+    assert.deepStrictEqual(errorMessageMock.firstCall.args, [
+      "ggshield: failed to ignore secret: Error: No such option '--instance'.",
     ]);
   });
 });

@@ -108,7 +108,7 @@ suite("runGGShieldCommand", () => {
         ggshieldPath: "path/to/ggshield",
         apiUrl: "https://example.com",
       } as GGShieldConfiguration,
-      ["test"],
+      ["quota", "--json"],
     );
     finishProc();
     await resultPromise;
@@ -116,7 +116,8 @@ suite("runGGShieldCommand", () => {
     assert(spawnMock.called, "spawn should be called once");
 
     assert.deepStrictEqual(spawnMock.lastCall.args[1], [
-      "test",
+      "quota",
+      "--json",
       "--instance",
       "https://example.com",
     ]);
@@ -136,6 +137,49 @@ suite("runGGShieldCommand", () => {
     assert(spawnMock.called, "spawn should be called once");
 
     assert.deepStrictEqual(spawnMock.lastCall.args[1], ["--version"]);
+  });
+
+  test("adds the --instance option when calling ggshield auth logout", async () => {
+    const resultPromise = runGGShield.runGGShieldCommand(
+      {
+        ggshieldPath: "path/to/ggshield",
+        apiUrl: "https://example.com",
+      } as GGShieldConfiguration,
+      ["auth", "logout"],
+    );
+    finishProc();
+    await resultPromise;
+
+    assert(spawnMock.called, "spawn should be called once");
+
+    assert.deepStrictEqual(spawnMock.lastCall.args[1], [
+      "auth",
+      "logout",
+      "--instance",
+      "https://example.com",
+    ]);
+  });
+
+  test("does not add the --instance option when calling ggshield secret ignore", async () => {
+    const resultPromise = runGGShield.runGGShieldCommand(
+      {
+        ggshieldPath: "path/to/ggshield",
+        apiUrl: "https://example.com",
+      } as GGShieldConfiguration,
+      ["secret", "ignore", "sha", "--name", "name"],
+    );
+    finishProc();
+    await resultPromise;
+
+    assert(spawnMock.called, "spawn should be called once");
+
+    assert.deepStrictEqual(spawnMock.lastCall.args[1], [
+      "secret",
+      "ignore",
+      "sha",
+      "--name",
+      "name",
+    ]);
   });
 
   test("returns a failed result instead of throwing when the configuration is unusable", async () => {

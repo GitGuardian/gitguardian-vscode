@@ -233,15 +233,17 @@ export function activate(context: ExtensionContext) {
     commands.registerCommand(
       "gitguardian.ignoreSecret",
       async (diagnosticData) => {
-        window.showInformationMessage("Secret ignored.");
         const currentFile = getCurrentFile();
         const secretName = generateSecretName(currentFile, diagnosticData);
 
-        await ignoreSecret(
+        const ignored = await ignoreSecret(
           ggshieldResolver.configuration,
           diagnosticData.secretSha,
           secretName,
         );
+        if (!ignored) {
+          return;
+        }
         await scanFile(
           currentFile,
           Uri.file(currentFile),

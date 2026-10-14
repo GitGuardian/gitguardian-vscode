@@ -217,7 +217,7 @@ export async function ignoreLastFound(
 /**
  * Ignore one secret.
  *
- * Show error message on failure
+ * Show a confirmation message on success and an error message on failure
  */
 export async function ignoreSecret(
   configuration: GGShieldConfiguration,
@@ -231,13 +231,15 @@ export async function ignoreSecret(
     "--name",
     secretName,
   ]);
-  if (proc.stderr || proc.error) {
-    console.log(proc.stderr);
+  // Rely on the exit status: ggshield can write warnings on stderr on success
+  if (proc.status !== 0) {
+    window.showErrorMessage(
+      `ggshield: failed to ignore secret: ${proc.stderr.trim()}`,
+    );
     return false;
-  } else {
-    console.log(proc.stdout);
-    return true;
   }
+  window.showInformationMessage("Secret ignored.");
+  return true;
 }
 
 export function createDiagnosticCollection(context: ExtensionContext): void {
