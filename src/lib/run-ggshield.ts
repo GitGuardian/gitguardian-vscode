@@ -13,6 +13,14 @@ export interface GGShieldCommandResult {
   error?: Error;
 }
 
+// ggshield commands run by the extension that accept the `--instance` option
+const INSTANCE_OPTION_COMMANDS = [
+  "api-status",
+  "auth logout",
+  "quota",
+  "secret scan",
+];
+
 /**
  * Run ggshield CLI application with specified arguments.
  *
@@ -50,7 +58,11 @@ export function runGGShieldCommand(
       if (configuration.insecure) {
         finalArgs = ["--insecure"].concat(finalArgs);
       }
-      if (configuration.apiUrl && !finalArgs.includes("--version")) {
+      const command = args.join(" ");
+      if (
+        configuration.apiUrl &&
+        INSTANCE_OPTION_COMMANDS.some((c) => command.startsWith(c))
+      ) {
         finalArgs.push("--instance", configuration.apiUrl);
       }
 

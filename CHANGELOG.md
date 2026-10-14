@@ -5,6 +5,7 @@
 ### Fixed
 
 - "Link IDE to account" button with an empty workspace is now working. [#194](https://github.com/GitGuardian/gitguardian-vscode/issues/194)
+- "Ignore Secret" now works when `gitguardian.apiUrl` is set. Failures to ignore a secret are now reported as errors.
 
 ## [0.24.0]
 
