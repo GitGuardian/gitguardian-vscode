@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+### Added
+
+- Each [GitHub release](https://github.com/GitGuardian/gitguardian-vscode/releases) now includes a CycloneDX SBOM per platform, `gitguardian-<target>.cdx.json`. It lists the npm packages bundled into the extension and the bundled ggshield, with its own components.
+
 ### Fixed
 
 - A scan that GitGuardian did not complete (rate limit, proxy or firewall block, server error) now shows ggshield's error instead of "Secret found". ggshield exits with code 4 in these cases, more often since ggshield 1.57.0.
