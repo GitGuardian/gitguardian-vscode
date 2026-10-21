@@ -41,8 +41,19 @@ jobs:
             --allow-missing-repository \
             -o gitguardian-${{ matrix.target }}.vsix
 
+      - name: Generate SBOM
+        run: |
+          node scripts/generate-sbom.mjs --target ${{ matrix.target }} \
+            -o gitguardian-${{ matrix.target }}.cdx.json
+
       - name: Upload extension package
         uses: actions/upload-artifact@v7
         with:
           name: gitguardian-${{ matrix.target }}.vsix
           path: gitguardian-${{ matrix.target }}.vsix
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v7
+        with:
+          name: gitguardian-${{ matrix.target }}.cdx.json
+          path: gitguardian-${{ matrix.target }}.cdx.json

@@ -5,6 +5,7 @@
   "description": "A safety net to help developers safeguard their sensitive information (passwords, API key, tokens, ..) from accidental leaks in their code",
   "icon": "images/icon.png",
   "version": "0.25.0",
+  "license": "MIT",
   "publisher": "gitguardian-secret-security",
   "engines": {
     "vscode": "^1.81.0",
@@ -199,7 +200,8 @@
     "check": "tsc --noEmit -p ./tsconfig.src.json && tsc --noEmit -p ./tsconfig.test.json",
     "lint": "eslint src",
     "pretest": "npm run check && npm run compile && tsc -p tsconfig.test.json",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "test:scripts": "node --test scripts/*.test.mjs"
   },
   "devDependencies": {
     "@types/mocha": "^10.0.1",
