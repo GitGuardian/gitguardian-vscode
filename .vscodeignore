@@ -3,6 +3,7 @@
 node_modules/
 src/
 dist/test/
+dist/esbuild-meta.json
 scripts/**
 .gitignore
 .npmrc
