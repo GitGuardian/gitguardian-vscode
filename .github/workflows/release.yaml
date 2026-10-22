@@ -11,6 +11,8 @@ permissions:
 jobs:
   build:
     uses: ./.github/workflows/build.yaml
+    with:
+      require-sbom: true
 
   publish:
     needs: build
