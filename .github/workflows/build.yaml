@@ -6,6 +6,11 @@ on:
     branches:
       - "main"
   workflow_call:
+    inputs:
+      require-sbom:
+        description: Fail when the ggshield release has no SBOM
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -41,10 +46,14 @@ jobs:
             --allow-missing-repository \
             -o gitguardian-${{ matrix.target }}.vsix
 
+      # Until ggshield_version points to a ggshield release that publishes
+      # SBOMs, only releases require one
       - name: Generate SBOM
+        env:
+          ALLOW_MISSING: ${{ !inputs.require-sbom && '--allow-missing-ggshield-sbom' || '' }}
         run: |
           node scripts/generate-sbom.mjs --target ${{ matrix.target }} \
-            -o gitguardian-${{ matrix.target }}.cdx.json
+            -o gitguardian-${{ matrix.target }}.cdx.json $ALLOW_MISSING
 
       - name: Upload extension package
         uses: actions/upload-artifact@v7
@@ -57,3 +66,4 @@ jobs:
         with:
           name: gitguardian-${{ matrix.target }}.cdx.json
           path: gitguardian-${{ matrix.target }}.cdx.json
+          if-no-files-found: ${{ inputs.require-sbom && 'error' || 'warn' }}

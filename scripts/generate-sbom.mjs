@@ -168,13 +168,11 @@ export function buildSbom({
   };
 }
 
+// Returns null when the ggshield release has no SBOM
 async function downloadGgshieldSbom(url) {
   const response = await fetch(url);
   if (response.status === 404) {
-    throw new Error(
-      `${url} does not exist: pin a ggshield release that publishes SBOMs ` +
-        "in ggshield_version",
-    );
+    return null;
   }
   if (!response.ok) {
     throw new Error(`failed to download ${url}: HTTP ${response.status}`);
@@ -194,6 +192,7 @@ async function main() {
       target: { type: "string", default: process.env.GGSHIELD_TARGET },
       output: { type: "string", short: "o" },
       "ggshield-sbom": { type: "string" },
+      "allow-missing-ggshield-sbom": { type: "boolean", default: false },
     },
   });
   const vscodeTarget = values.target;
@@ -201,7 +200,7 @@ async function main() {
   if (!assetTarget || !values.output) {
     console.error(
       "Usage: generate-sbom.mjs --target <vscode-target> --output <file> " +
-        "[--ggshield-sbom <file>]\n" +
+        "[--ggshield-sbom <file> | --allow-missing-ggshield-sbom]\n" +
         `Supported targets: ${Object.keys(GGSHIELD_TARGETS).join(", ")}`,
     );
     process.exit(1);
@@ -230,6 +229,17 @@ async function main() {
   } else {
     url = ggshieldSbomUrl(ggshieldVersion, assetTarget);
     ggshieldSbom = await downloadGgshieldSbom(url);
+    if (!ggshieldSbom) {
+      const message =
+        `${url} does not exist: pin a ggshield release that publishes ` +
+        "SBOMs in ggshield_version";
+      if (!values["allow-missing-ggshield-sbom"]) {
+        throw new Error(message);
+      }
+      // GitHub Actions shows this as an annotation
+      console.log(`::warning::${message}. No SBOM generated.`);
+      return;
+    }
   }
   checkGgshieldSbom(ggshieldSbom, ggshieldVersion, assetTarget);
 
