@@ -11,6 +11,8 @@ permissions:
 jobs:
   build:
     uses: ./.github/workflows/build.yaml
+    with:
+      require-sbom: true
 
   publish:
     needs: build
@@ -54,10 +56,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      - name: Download all VSIXes
+      - name: Download all VSIXes and SBOMs
         uses: actions/download-artifact@v8
         with:
-          pattern: gitguardian-*.vsix
+          pattern: gitguardian-*
           merge-multiple: true
 
       - name: Create draft GitHub release
@@ -67,11 +69,16 @@ jobs:
           set -euo pipefail
           shopt -s nullglob
           vsixes=(*.vsix)
+          sboms=(*.cdx.json)
           if [ ${#vsixes[@]} -eq 0 ]; then
             echo "No VSIXes found" >&2
             exit 1
           fi
-          gh release create "${GITHUB_REF_NAME}" "${vsixes[@]}" \
+          if [ ${#sboms[@]} -ne ${#vsixes[@]} ]; then
+            echo "Expected one SBOM per VSIX, found ${#sboms[@]} for ${#vsixes[@]}" >&2
+            exit 1
+          fi
+          gh release create "${GITHUB_REF_NAME}" "${vsixes[@]}" "${sboms[@]}" \
             --draft \
             --generate-notes \
             --title "${GITHUB_REF_NAME}"

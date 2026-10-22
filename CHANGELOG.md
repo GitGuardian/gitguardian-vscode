@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [Unreleased]
+
+### Added
+
+- Each [GitHub release](https://github.com/GitGuardian/gitguardian-vscode/releases) now includes a CycloneDX SBOM per platform, `gitguardian-<target>.cdx.json`. It lists the npm packages bundled into the extension and the bundled ggshield, with its own components.
+
 ## [0.25.0]
 
 ### Fixed

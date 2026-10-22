@@ -25,6 +25,9 @@ jobs:
         env:
           SKIP: ggshield # covered by the scanning job
 
+      - name: Test scripts
+        run: npm run test:scripts
+
   build-and-test:
     runs-on: ${{ matrix.os }}
     strategy:
