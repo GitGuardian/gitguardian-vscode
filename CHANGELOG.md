@@ -1,5 +1,11 @@
 # GitGuardian Secret Security Changelog
 
+## [0.25.1]
+
+### Changed
+
+- Updated to [ggshield 1.56.1](https://github.com/GitGuardian/ggshield/releases/v1.56.1), which stops trusting the compromised eMudhra emSign G3 intermediate CAs.
+
 ## [0.25.0]
 
 ### Fixed
