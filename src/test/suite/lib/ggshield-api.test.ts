@@ -86,7 +86,7 @@ suite("scanFile", () => {
     );
   });
 
-  const errorCodes = [128, 3];
+  const errorCodes = [128, 3, 4];
   errorCodes.forEach((code) => {
     test(`displays an error message if the scan command fails with error code ${code}`, async () => {
       runGGShieldCommandMock.resolves({
@@ -101,7 +101,52 @@ suite("scanFile", () => {
       // The error message is displayed
       assert.strictEqual(errorMessageMock.callCount, 1);
       assert.strictEqual(errorMessageMock.lastCall.args[0], "ggshield: Error");
+      assert.strictEqual(
+        updateStatusBarMock.lastCall.args[0],
+        statusBar.StatusBarStatus.error,
+      );
     });
+
+    test(`displays the exit code if the scan command fails with error code ${code} and no message`, async () => {
+      runGGShieldCommandMock.resolves({
+        status: code,
+        stdout: "",
+        stderr: "Scanning Path...\n",
+      });
+
+      const testFile: string = path.join("test", "test.py");
+      await scanFile(testFile, Uri.file(testFile), {} as GGShieldConfiguration);
+
+      assert.strictEqual(errorMessageMock.callCount, 1);
+      assert.strictEqual(
+        errorMessageMock.lastCall.args[0],
+        `ggshield: scan failed with exit code ${code}`,
+      );
+    });
+  });
+
+  test("reports an error and no secret when the API did not scan the file (exit code 4)", async () => {
+    runGGShieldCommandMock.resolves({
+      status: 4,
+      stdout: "",
+      stderr:
+        "Error: GitGuardian did not scan the content (HTTP 429: Too many requests).\n",
+    });
+
+    const testFile: string = path.join("test", "exit-code-4.py");
+    await scanFile(testFile, Uri.file(testFile), {} as GGShieldConfiguration);
+
+    assert.strictEqual(
+      errorMessageMock.lastCall.args[0],
+      "ggshield: Error: GitGuardian did not scan the content (HTTP 429: Too many requests).",
+    );
+    assert.ok(
+      !updateStatusBarMock.calledWith(statusBar.StatusBarStatus.secretFound),
+    );
+    assert.strictEqual(
+      diagnosticCollection.get(Uri.file(testFile))?.length ?? 0,
+      0,
+    );
   });
 
   test("drops results from a scan that was superseded for the same URI", async () => {
