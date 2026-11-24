@@ -300,7 +300,8 @@ export async function scanFile(
     return;
   }
 
-  if (proc.status === 128 || proc.status === 3) {
+  // 4: the API did not scan the file (unreachable, refused, rate limited...)
+  if (proc.status === 128 || proc.status === 3 || proc.status === 4) {
     const errorMessage = proc.stderr
       .split("\n")
       .filter(
@@ -308,10 +309,11 @@ export async function scanFile(
           stderrLine.length > 0 && !stderrLine.includes("Scanning Path..."), // ggshield outputs this info message on stderr, ignore it
       )
       .join("\n");
-    if (errorMessage.length > 0) {
-      window.showErrorMessage(`ggshield: ${errorMessage}`);
-      return undefined;
-    }
+    updateStatusBarItem(StatusBarStatus.error);
+    window.showErrorMessage(
+      `ggshield: ${errorMessage || `scan failed with exit code ${proc.status}`}`,
+    );
+    return;
   } else if (proc.status === 2) {
     // Ignore errors concerning usage
     // This occurs when the path of the file is invalid (i.e.VSCode sending an event for files not on the file system)
