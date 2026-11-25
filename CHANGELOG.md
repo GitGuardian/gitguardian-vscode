@@ -1,6 +1,6 @@
 # GitGuardian Secret Security Changelog
 
-## [Unreleased]
+## [0.26.0]
 
 ### Added
 
@@ -9,6 +9,10 @@
 ### Fixed
 
 - A scan that GitGuardian did not complete (rate limit, proxy or firewall block, server error) now shows ggshield's error instead of "Secret found". ggshield exits with code 4 in these cases, more often since ggshield 1.57.0.
+
+### Changed
+
+- Updated to [ggshield 1.57.0](https://github.com/GitGuardian/ggshield/releases/v1.57.0).
 
 ## [0.25.1]
 
