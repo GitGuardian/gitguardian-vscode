@@ -4,7 +4,7 @@
   "displayName": "GitGuardian - Secrets Security",
   "description": "A safety net to help developers safeguard their sensitive information (passwords, API key, tokens, ..) from accidental leaks in their code",
   "icon": "images/icon.png",
-  "version": "0.25.1",
+  "version": "0.26.0",
   "license": "MIT",
   "publisher": "gitguardian-secret-security",
   "engines": {
